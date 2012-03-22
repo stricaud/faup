@@ -48,6 +48,7 @@ furl_t *furl_decode(furl_handler_t *fh, char *url)
 		return NULL;
 	} else {
 		furl_features_t url_features = furl_features_find(fh, url, url_len);
+		/* furl_features_debug(url, url_features); */
 		if (!furl_features_errors_lookup(url_features)) {
 			 if (furl_features_exist(url_features.scheme)) { 
 			 	size_t total_size = url_features.hierarchical - url_features.scheme; 
@@ -90,7 +91,12 @@ furl_t *furl_decode(furl_handler_t *fh, char *url)
 
 					char *tld = strrchr(fh->allocated_buf, '.');
 					if (tld) {
-						if (strlen(tld)>1) {
+						size_t tld_len = strlen(tld);
+						if (tld_len>1) {
+							/* We sometime have no resource_path after but a trailing slash ('www.honeynet.org/') */
+							if (tld[tld_len-1] == '/') {
+								tld[tld_len-1] = '\0';
+							}
 							*tld++;
 							if (!strtod(tld, NULL)) {
 								fprintf(stdout, "%s%c", tld, fh->sep_char);					

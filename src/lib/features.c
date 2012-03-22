@@ -94,15 +94,20 @@ furl_features_t furl_features_find(furl_handler_t *fh, char *url, size_t url_len
 					}
 					url_features.domain = -1; /* So finally we don't start with a domain */
 				} else {
-					if (!furl_features_exist(url_features.scheme)) {
-						/* This domain has a '/' with no hierarchy */
-						/* The seen '/' is not a hierarchy so it is something like foo/bar.html */
-						last_slash_meaning = FURL_LAST_SLASH_AFTER_DOMAIN;
-						url_features.resource_path = current_pos;
-					} else {
-						if (furl_features_exist(url_features.domain)) {
-							last_slash_meaning = FURL_LAST_SLASH_AFTER_DOMAIN;
-							url_features.resource_path = current_pos;		
+					/* We now check for the resource path */
+					if (!furl_features_exist(url_features.resource_path)) {
+						if (!furl_features_exist(url_features.scheme)) {
+							if (!furl_features_exist(url_features.hierarchical)) {
+								/* This domain has a '/' with no hierarchy */
+								/* The seen '/' is not a hierarchy so it is something like foo/bar.html */
+								last_slash_meaning = FURL_LAST_SLASH_AFTER_DOMAIN;
+								url_features.resource_path = current_pos;
+							}
+						} else {
+							if (furl_features_exist(url_features.domain)) {
+								last_slash_meaning = FURL_LAST_SLASH_AFTER_DOMAIN;
+								url_features.resource_path = current_pos;		
+							}
 						}
 					}
 				}

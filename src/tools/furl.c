@@ -24,6 +24,7 @@ int main(int argc, char **argv)
 	/* f_url = furl_decode(fh, "http://foo@bar:www.slashdot.org:9191/query?foo=bar#tada"); */
 	/* f_url = furl_decode(fh, "foo@bar:www.slashdot.org/tagada@blah"); */
 	/* f_url = furl_decode(fh, "http://www.slashdot.org/funny@one"); */
+	/* f_url = furl_decode(fh, "http://www.slashdot.org/?blah&ref=http://www.faizbook.org"); */
 
 	/* if (!f_url) { */
 	/* 	fprintf(stderr, "Cannot decode given url!\n"); */
