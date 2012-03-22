@@ -2,6 +2,14 @@ cmake_minimum_required(VERSION 2.8)
 
 project(furl-project)
 
+include(CMakeOptions.txt)
+
+if (DEBUG_MODE)
+        if(NOT WIN32)
+                add_definitions(-ggdb3)
+        endif()
+endif()
+
 include(CTest)
 
 include(CheckIncludeFiles)

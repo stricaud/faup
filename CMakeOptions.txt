@@ -1,0 +1,8 @@
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/cmake-options/debug)
+        set(DEBUG_MODE 1)
+        message(STATUS "Compile mode: Debug")
+        set(CMAKE_BUILD_TYPE "Debug")
+else()
+        message(STATUS "Compile mode: Release")
+        set(CMAKE_BUILD_TYPE "Release")
+endif()
