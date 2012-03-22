@@ -10,7 +10,7 @@ include(CheckLibraryExists)
 
 include(FindPkgConfig)
 
-set(FURL_INCLUDE_DIRS "${furl_SOURCE_DIR}/src/lib/include/")
-set(FURL_LIBRARY "${furl_SOURCE_DIR}/src/lib/libfurll.a")
+set(FURL_INCLUDE_DIRS "${furl-project_SOURCE_DIR}/src/lib/include/")
+set(FURL_LIBRARY "${furl-project_SOURCE_DIR}/src/lib/libfurll.a")
 
 add_subdirectory(src)
