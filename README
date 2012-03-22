@@ -1,0 +1,4 @@
+furl: Fast URL Library
+======================
+
+This library + command line tool provide you ways to handle an url without bothering with the hassle of what it takes to work with a url.
