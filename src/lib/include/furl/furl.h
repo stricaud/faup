@@ -17,7 +17,7 @@
 #ifndef _FURL_FURL_H_
 #define _FURL_FURL_H_
 
-#include <furl/furl.h>
+#include <furl/errors.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,6 +43,7 @@ struct _furl_t {
 struct _furl_handler_t {
 	char *allocated_buf;
 	char sep_char;
+	furl_t *furl;
 };
 
 enum _furl_last_slash_t {

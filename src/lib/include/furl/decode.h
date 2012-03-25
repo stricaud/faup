@@ -23,6 +23,6 @@
 extern "C" {
 #endif
 
-furl_t *furl_decode(furl_handler_t *fh, char *url);
+int furl_decode(furl_handler_t *fh, char *url);
 
 #endif	/* _FURL_DECODE_H_ */

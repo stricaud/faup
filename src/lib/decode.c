@@ -23,29 +23,25 @@
 #include <string.h>
 #include <stdlib.h>
 
-furl_t *furl_decode(furl_handler_t *fh, char *url)
+int furl_decode(furl_handler_t *fh, char *url)
 {
-	furl_t *furl;
 	size_t url_len = 0;
 
 	int next_valid_token_pos = 0;
 
 	if (!url) {
-		/* NULL is null */
-		return NULL;
+		return FURL_URL_EMPTY;
 	}
 
 	url_len = strlen(url);
 
 	if (url_len > FURL_MAXLEN) {
-		fprintf(stderr, "URL(%s) too long (%d)!\n", url, url_len);
-		return NULL;
+		return FURL_URL_TOOLONG;
 	}
 
-	furl = malloc(sizeof(furl_t *));
-	if (!furl) {
-		fprintf(stderr, "Cannot allocate furl_t!\n");
-		return NULL;
+	fh->furl = malloc(sizeof(furl_t *));
+	if (!fh->furl) {
+		return FURL_URL_MEM_ERROR;
 	} else {
 		furl_features_t url_features = furl_features_find(fh, url, url_len);
 		/* furl_features_debug(url, url_features); */
@@ -181,17 +177,12 @@ furl_t *furl_decode(furl_handler_t *fh, char *url)
 			} else {
 				/* FIXME: Such a message should not belong to the library */
 				fprintf(stderr, "Cannot parse the url: '%s'\n", url);
-				return NULL;
+				return FURL_URL_PARSER_ERROR;
 			}
-		/* furl_features_debug(url, url_features); */
-
-		/* if (url_features.hierarchical >= 0) { */
-		/* 	fprintf(stderr, "Has Hierarchy\n"); */
-		/* } */
 	}
 
 			
 
-	return NULL;
+	return FURL_URL_UNKNOWN_ERROR;
 }
 

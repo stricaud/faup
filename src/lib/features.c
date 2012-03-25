@@ -86,13 +86,16 @@ furl_features_t furl_features_find(furl_handler_t *fh, char *url, size_t url_len
 			case '/':
 				/* If it is the first time we have a '/' and previous char is ':' */
 				if ((char_counter['/'] == 1) && (get_last_c(url_o, current_pos) == ':')) {
-					last_slash_meaning = FURL_LAST_SLASH_HIERARCHICAL;
-					url_features.hierarchical = current_pos -1;
-					c = get_last_c(url_o, current_pos - 1);
-					if (isalpha(c)) {
-						url_features.scheme = 0;
-					}
-					url_features.domain = -1; /* So finally we don't start with a domain */
+					if (last_slash_meaning < FURL_LAST_SLASH_AFTER_DOMAIN) {
+						last_slash_meaning = FURL_LAST_SLASH_HIERARCHICAL;
+						url_features.hierarchical = current_pos -1;
+						c = get_last_c(url_o, current_pos - 1);
+						if (isalpha(c)) {
+							url_features.scheme = 0;
+						}
+						url_features.domain = -1; /* So finally we don't start with a domain */
+						url_features.port = -1; /* So the last ':' we've found was not for a port but for  */
+					} /* if (last_slash_meaning < FURL_LAST_SLASH_AFTER_DOMAIN) */
 				} else {
 					/* We now check for the resource path */
 					if (!furl_features_exist(url_features.resource_path)) {
@@ -124,10 +127,11 @@ furl_features_t furl_features_find(furl_handler_t *fh, char *url, size_t url_len
 				if (!furl_features_exist(url_features.credential)) {
 					fh->allocated_buf[buffer_pos] = '\0';
 					whatever_len = strlen(fh->allocated_buf);
-					if ((last_slash_meaning == FURL_LAST_SLASH_HIERARCHICAL) || /* This '@' belongs to the authentication if http://foo@bar:domain/blah */
-				     	    (last_slash_meaning == FURL_LAST_SLASH_NOTFOUND)) {     /* This '@' belongs to the authentication if foo@bar:domain/blah */
+					if ((last_slash_meaning == FURL_LAST_SLASH_HIERARCHICAL) || /* This '@' belongs to the authentication if http://foo:bar@domain/blah */
+				     	    (last_slash_meaning == FURL_LAST_SLASH_NOTFOUND)) {     /* This '@' belongs to the authentication if foo:bar@domain/blah */
 						url_features.credential = current_pos - whatever_len;
-						url_features.domain = -1;
+						url_features.domain = current_pos + 1;
+						url_features.port = -1; /* So the last ':' we've found was not for a port but for credential */
 					}
 				}
 				buffer_pos=-1;
@@ -137,21 +141,12 @@ furl_features_t furl_features_find(furl_handler_t *fh, char *url, size_t url_len
 				   - a ':' for the credential
 				   - a ':' for the port number
 				   - a ':' in the query request */
-
-				/* If we have a domain, but have not seen the '/' after the domain, then we have a port */
-					/* last_slash_meaning = FURL_LAST_SLASH_AFTER_DOMAIN; */
-				if ((furl_features_exist(url_features.domain)) && (last_slash_meaning < FURL_LAST_SLASH_AFTER_DOMAIN)) {
-					if ((current_pos + (url_len - current_pos)) > (current_pos + 2)) { /* We have enough to check +1, +2 */
-						if (url_o[current_pos+1] != '/') {
-							/* We are not a scheme, so we are after a real domain and not before a credential (where the domain could look like the scheme until we know it is a scheme) */
-							url_features.port = current_pos + 1;
-						}
+				/* url_features.port = -1; */
+				if (!furl_features_exist(url_features.port)) {
+					if (last_slash_meaning < FURL_LAST_SLASH_AFTER_DOMAIN) {
+						fh->allocated_buf[buffer_pos] = c;
+						url_features.port = current_pos + 1;
 					}
-				}
-
-				/* If we have credential but no domain, then we start having a domain now */
-				if ((furl_features_exist(url_features.credential)) && (!furl_features_exist(url_features.domain))) {
-					url_features.domain = current_pos + 1;
 				}
 
 				buffer_pos=-1;
