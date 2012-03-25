@@ -16,15 +16,17 @@
 int main(int argc, char **argv)
 {
 	furl_handler_t *fh;
-	furl_t *f_url;
-
+	int retval;
 	fh = furl_init();
 
 	if (argc < 2) {
 		fprintf(stderr, "%s url\n", argv[0]);
 	}
 
-	f_url = furl_decode(fh, argv[1]);
+	retval = furl_decode(fh, argv[1]);
+	if (retval > 0) {
+		fprintf(stderr, "There was an error:%d\n", retval);
+	}
 	/* f_url = furl_decode(fh, "www.honeynet.org"); */
 	/* f_url = furl_decode(fh, "://www.honeynet.org/"); */
 	/* f_url = furl_decode(fh, "localhost"); */
