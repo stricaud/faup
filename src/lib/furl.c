@@ -22,7 +22,7 @@ furl_handler_t *furl_init(void)
 {
 	furl_handler_t *fh;
 
-	fh = malloc(sizeof(furl_handler_t *));
+	fh = malloc(sizeof(furl_handler_t));
 	fh->allocated_buf = malloc(FURL_MAXLEN);
 	fh->sep_char = ',';
 
@@ -32,5 +32,6 @@ furl_handler_t *furl_init(void)
 void furl_terminate(furl_handler_t *fh)
 {
 	free(fh->allocated_buf);
+	free(fh->furl);
 	free(fh);
 }
