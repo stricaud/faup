@@ -174,6 +174,7 @@ int furl_decode(furl_handler_t *fh, char *url)
 			}
 
 			 fprintf(stdout, "\n"); 
+			 return 0;
 			} else {
 				/* FIXME: Such a message should not belong to the library */
 				fprintf(stderr, "Cannot parse the url: '%s'\n", url);
