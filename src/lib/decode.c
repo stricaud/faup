@@ -26,6 +26,7 @@
 int furl_decode(furl_handler_t *fh, char *url)
 {
 	size_t url_len = 0;
+	size_t total_size = 0;
 
 	int next_valid_token_pos = 0;
 
@@ -79,7 +80,7 @@ int furl_decode(furl_handler_t *fh, char *url)
 			 		next_valid_token_pos = url_len; 
 				}
 
-			 	size_t total_size = next_valid_token_pos - url_features.domain; 
+			 	total_size = next_valid_token_pos - url_features.domain; 
 			 	memcpy(fh->allocated_buf, url + url_features.domain, total_size); 
 			 	fh->allocated_buf[total_size] = '\0'; 
 			 	fprintf(stdout, "%s%c", fh->allocated_buf, fh->sep_char);
@@ -122,7 +123,7 @@ int furl_decode(furl_handler_t *fh, char *url)
 			 		/* /\\* FIXME: We shall return after, no need to go further *\\/  */
 			 		next_valid_token_pos = url_len; 
 				}
-			 	size_t total_size = next_valid_token_pos - url_features.port; 
+			 	total_size = next_valid_token_pos - url_features.port; 
 			 	memcpy(fh->allocated_buf, url + url_features.port, total_size); 
 			 	fh->allocated_buf[total_size] = '\0'; 
 			 	fprintf(stdout, "%s%c", fh->allocated_buf, fh->sep_char);
@@ -140,7 +141,7 @@ int furl_decode(furl_handler_t *fh, char *url)
 			 		/* /\\* FIXME: We shall return after, no need to go further *\\/  */
 			 		next_valid_token_pos = url_len; 
 				}
-			 	size_t total_size = next_valid_token_pos - url_features.resource_path; 
+			 	total_size = next_valid_token_pos - url_features.resource_path; 
 			 	memcpy(fh->allocated_buf, url + url_features.resource_path, total_size); 
 			 	fh->allocated_buf[total_size] = '\0'; 
 			 	fprintf(stdout, "%s%c", fh->allocated_buf, fh->sep_char);
@@ -156,7 +157,7 @@ int furl_decode(furl_handler_t *fh, char *url)
 			 		/* /\\* FIXME: We shall return after, no need to go further *\\/  */
 			 		next_valid_token_pos = url_len; 
 				}
-			 	size_t total_size = next_valid_token_pos - url_features.query_string; 
+			 	total_size = next_valid_token_pos - url_features.query_string; 
 			 	memcpy(fh->allocated_buf, url + url_features.query_string, total_size); 
 			 	fh->allocated_buf[total_size] = '\0'; 
 			 	fprintf(stdout, "%s%c", fh->allocated_buf, fh->sep_char);
@@ -165,7 +166,7 @@ int furl_decode(furl_handler_t *fh, char *url)
 			}
 
 			 if (furl_features_exist(url_features.fragment)) { 
-			 	size_t total_size = url_len - url_features.fragment; 
+			 	total_size = url_len - url_features.fragment; 
 			 	memcpy(fh->allocated_buf, url + url_features.fragment, total_size); 
 			 	fh->allocated_buf[total_size] = '\0'; 
 			 	fprintf(stdout, "%s", fh->allocated_buf, fh->sep_char);

@@ -69,7 +69,7 @@ furl_features_t furl_features_find(furl_handler_t *fh, char *url, size_t url_len
 {
 	furl_features_t url_features = furl_features_init();
 	char c;
-	int char_counter[128] = {};
+	int char_counter[128];
 	int last_slash_pos = 0;
 	const char *url_o = url;	/* We keep the original pointer as we move it */
 	size_t whatever_len = 0;
@@ -78,6 +78,13 @@ furl_features_t furl_features_find(furl_handler_t *fh, char *url, size_t url_len
 
 	size_t current_pos = 0;
 	size_t buffer_pos = 0;
+
+	int i = 0;
+	while (i <= 128) {
+		char_counter[i] = 0;
+		i++;
+	}
+
 	while (c=*url++) {
 		/* fh->allocated_buf[buffer_position] = c; */
 		char_counter[c]++;
