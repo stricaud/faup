@@ -1,6 +1,11 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
 #include <furl/furl.h>
 #include <furl/decode.h>
+
 
 /* IPv6 tests:
 
@@ -17,13 +22,31 @@ int main(int argc, char **argv)
 {
 	furl_handler_t *fh;
 	int retval;
+
+	char *str_url;
+	ssize_t rsize;
+
 	fh = furl_init();
 
-	if (argc < 2) {
-		fprintf(stderr, "%s url\n", argv[0]);
+
+	if (isatty(fileno(stdin))) {
+		if (argc < 2) {
+			fprintf(stderr, "%s url\n", argv[0]);
+			exit(1);
+		}
+		str_url = strdup(argv[1]);
+	} else {
+		str_url = malloc(FURL_MAXLEN);
+		fflush(stdin);
+		rsize = read(fileno(stdin), (void *)str_url, FURL_MAXLEN);
+		if (rsize>0) {
+			str_url[rsize-1] = '\0';
+		} else {
+			str_url[0] = '\0';
+		}
 	}
 
-	retval = furl_decode(fh, argv[1]);
+	retval = furl_decode(fh, str_url);
 	if (retval > 0) {
 		fprintf(stderr, "There was an error:%d\n", retval);
 	}
@@ -48,6 +71,8 @@ int main(int argc, char **argv)
 
 
 	furl_terminate(fh);
+
+	free(str_url);
 
 	return 0;
 }
