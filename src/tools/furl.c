@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdint.h>
 
 #include <furl/furl.h>
 #include <furl/decode.h>
-
 
 /* IPv6 tests:
 
@@ -18,61 +18,71 @@
       http://[2010:836B:4179::836B:4179]
  */
 
+/* readline() - read a line from the file handle.
+ * Return an allocated string */
+static char *readline(FILE *fp)
+{
+        char *str = (char *)NULL;
+        int ch = 0, len = 256, step = 256, i = 0;
+
+        str = (char *)malloc(len);
+        if (str == NULL)
+                return str;
+
+        while (1) {
+                ch = fgetc(fp);
+                if (feof(fp)) {
+			str[i] = '\0';
+                        break;
+		}
+                if (ch == '\n' || ch == '\r') {
+                        str[i++] = 0;
+                        break;
+                }
+                str[i++] = ch;
+                if (i == len - 2) {
+                        len += step;
+                        str = (char *)realloc(str, len);
+                        if (str == NULL) {
+                                fclose(fp);
+                                return str;
+                        }
+                }
+        }
+        return str;
+}
+
 int main(int argc, char **argv)
 {
 	furl_handler_t *fh;
-	int retval;
 
-	char *str_url;
-	ssize_t rsize;
+	char *strbuf=NULL;
 
 	fh = furl_init();
-
 
 	if (isatty(fileno(stdin))) {
 		if (argc < 2) {
 			fprintf(stderr, "%s url\n", argv[0]);
 			exit(1);
 		}
-		str_url = strdup(argv[1]);
-	} else {
-		str_url = malloc(FURL_MAXLEN);
-		fflush(stdin);
-		rsize = read(fileno(stdin), (void *)str_url, FURL_MAXLEN);
-		if (rsize>0) {
-			str_url[rsize-1] = '\0';
-		} else {
-			str_url[0] = '\0';
+		furl_decode(fh, argv[1]);
+	} else {		/* We read from stdin */
+		while (!feof(stdin)) {
+			strbuf = readline(stdin);
+			if (!strbuf) {
+				break;
+			}
+			if (strbuf[0] == '\0') {
+				break;
+			}
+
+			furl_decode(fh, strbuf);			
+
+			free(strbuf);
 		}
 	}
 
-	retval = furl_decode(fh, str_url);
-	if (retval > 0) {
-		fprintf(stderr, "There was an error:%d\n", retval);
-	}
-	/* f_url = furl_decode(fh, "www.honeynet.org"); */
-	/* f_url = furl_decode(fh, "://www.honeynet.org/"); */
-	/* f_url = furl_decode(fh, "localhost"); */
-	/* f_url = furl_decode(fh, "127.0.0.1"); */
-	/* f_url = furl_decode(fh, "127.0.0.1:8080/toto.html"); */
-	/* f_url = furl_decode(fh, "foo@bar:www.slashdot.org:22/fun"); */
-	/* f_url = furl_decode(fh, "http://foo@bar:www.slashdot.org"); */
-	/* f_url = furl_decode(fh, "http://foo@bar:www.slashdot.org:9191/query?foo=bar#tada"); */
-	/* f_url = furl_decode(fh, "foo@bar:www.slashdot.org/tagada@blah"); */
-	/* f_url = furl_decode(fh, "http://www.slashdot.org/funny@one"); */
-	/* f_url = furl_decode(fh, "http://www.slashdot.org/?blah&ref=http://www.faizbook.org"); */
-	/* f_url = furl_decode(fh, "http://foo:bar@google.com:324/foo?ref=http://www.slashdot.org"); */
-
-	/* if (!f_url) { */
-	/* 	fprintf(stderr, "Cannot decode given url!\n"); */
-	/* 	furl_terminate(fh); */
-	/* 	return 1; */
-	/* } */
-
-
 	furl_terminate(fh);
-
-	free(str_url);
 
 	return 0;
 }

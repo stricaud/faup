@@ -23,7 +23,7 @@
 extern "C" {
 #endif
 
-#define FURL_MAXLEN 31768
+#define FURL_MAXLEN 8192
 
 typedef struct _furl_t furl_t;
 typedef struct _furl_handler_t furl_handler_t;

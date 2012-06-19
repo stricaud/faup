@@ -56,11 +56,11 @@ int furl_features_exist(int feature)
 
 int furl_features_errors_lookup(furl_features_t url_features) 
 {
-	if ((furl_features_exist(url_features.scheme)) && 
-	    (!furl_features_exist(url_features.hierarchical))) {
-		fprintf(stderr, "url error: can't have a schem without a hierarchical!\n");
-		return 1;
-	}
+	/* if ((furl_features_exist(url_features.scheme)) && */
+	/*     (!furl_features_exist(url_features.hierarchical))) { */
+	/* 	fprintf(stderr, "url error: can't have a scheme without a hierarchical!\n"); */
+	/* 	return 1; */
+	/* } */
 
 	return 0;
 }

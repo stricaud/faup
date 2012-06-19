@@ -47,7 +47,7 @@ int furl_decode(furl_handler_t *fh, char *url)
 		furl_features_t url_features = furl_features_find(fh, url, url_len);
 		/* furl_features_debug(url, url_features); */
 		if (!furl_features_errors_lookup(url_features)) {
-			 if (furl_features_exist(url_features.scheme)) { 
+			if ((furl_features_exist(url_features.scheme)) && (furl_features_exist(url_features.hierarchical))) { 
 			 	size_t total_size = url_features.hierarchical - url_features.scheme; 
 			 	memcpy(fh->allocated_buf, url + url_features.scheme, total_size); 
 			 	fh->allocated_buf[total_size] = '\0'; 
