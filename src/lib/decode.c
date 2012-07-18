@@ -14,6 +14,7 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
+#define _GNU_SOURCE
 #include <furl/furl.h>
 #include <furl/decode.h>
 #include <furl/features.h>
@@ -23,10 +24,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-int furl_decode(furl_handler_t *fh, char *url)
+int furl_decode(furl_handler_t *fh, const char *url, const size_t url_len)
 {
-	size_t url_len = 0;
-	size_t total_size = 0;
+	uint32_t total_size = 0;
 
 	int next_valid_token_pos = 0;
 
@@ -34,157 +34,109 @@ int furl_decode(furl_handler_t *fh, char *url)
 		return FURL_URL_EMPTY;
 	}
 
-	url_len = strlen(url);
+	fh->furl.org_str = url;
+	furl_features_find(fh, url, url_len);
+	furl_features_t* url_features = &fh->furl.features;
+	if (!furl_features_errors_lookup(url_features)) {
+		if ((furl_features_exist(url_features->scheme)) && (furl_features_exist(url_features->hierarchical))) { 
+			total_size = url_features->hierarchical.pos - url_features->scheme.pos; 
+			url_features->scheme.size = total_size;
+		}
 
-	if (url_len > FURL_MAXLEN) {
-		return FURL_URL_TOOLONG;
-	}
+		if (furl_features_exist(url_features->credential)) { 
+			total_size = url_features->domain.pos - url_features->credential.pos - 1; 
+			url_features->credential.size = total_size;
+		}
 
-	fh->furl = malloc(sizeof(furl_t *));
-	if (!fh->furl) {
-		return FURL_URL_MEM_ERROR;
-	} else {
-		furl_features_t url_features = furl_features_find(fh, url, url_len);
-		/* furl_features_debug(url, url_features); */
-		if (!furl_features_errors_lookup(url_features)) {
-			if ((furl_features_exist(url_features.scheme)) && (furl_features_exist(url_features.hierarchical))) { 
-			 	size_t total_size = url_features.hierarchical - url_features.scheme; 
-			 	memcpy(fh->allocated_buf, url + url_features.scheme, total_size); 
-			 	fh->allocated_buf[total_size] = '\0'; 
-			 	fprintf(stdout, "%s%c", fh->allocated_buf, fh->sep_char); 
-			 } else { 
-			 	fprintf(stdout, "%c", fh->sep_char); 
-			 } 
+		if (furl_features_exist(url_features->domain)) { 
+			if (furl_features_exist(url_features->port)) { 
+				next_valid_token_pos = url_features->port.pos - 1; 
+			} else if (furl_features_exist(url_features->resource_path)) { 
+				next_valid_token_pos = url_features->resource_path.pos; 
+			} else if (furl_features_exist(url_features->query_string)) { 
+				next_valid_token_pos = url_features->query_string.pos; 
+			} else if (furl_features_exist(url_features->fragment)) { 
+				next_valid_token_pos = url_features->fragment.pos; 
+			} else { 
+				/* /\\* We have no next token *\\/  */
+				/* /\\* FIXME: We shall return after, no need to go further *\\/  */
+				next_valid_token_pos = url_len; 
+			}
 
-			 if (furl_features_exist(url_features.credential)) { 
-			 	size_t total_size = url_features.domain - url_features.credential - 1; 
-			 	memcpy(fh->allocated_buf, url + url_features.credential, total_size); 
-			 	fh->allocated_buf[total_size] = '\0'; 
-			 	fprintf(stdout, "%s%c", fh->allocated_buf, fh->sep_char); 
-			 } else { 
-			 	fprintf(stdout, "%c", fh->sep_char); 
-			 } 
-
-			 if (furl_features_exist(url_features.domain)) { 
-			 	if (furl_features_exist(url_features.port)) { 
-			 		next_valid_token_pos = url_features.port - 1; 
-			 	} else if (furl_features_exist(url_features.resource_path)) { 
-			 		next_valid_token_pos = url_features.resource_path; 
-			 	} else if (furl_features_exist(url_features.query_string)) { 
-			 		next_valid_token_pos = url_features.query_string; 
-			 	} else if (furl_features_exist(url_features.fragment)) { 
-			 		next_valid_token_pos = url_features.fragment; 
-			 	} else { 
-			 		/* /\\* We have no next token *\\/  */
-			 		/* /\\* FIXME: We shall return after, no need to go further *\\/  */
-			 		next_valid_token_pos = url_len; 
-				}
-
-			 	total_size = next_valid_token_pos - url_features.domain; 
-			 	memcpy(fh->allocated_buf, url + url_features.domain, total_size); 
-			 	fh->allocated_buf[total_size] = '\0'; 
-			 	fprintf(stdout, "%s%c", fh->allocated_buf, fh->sep_char);
-				{	 /* Extract the TLD now */
-
-					char *tld = strrchr(fh->allocated_buf, '.');
-					if (tld) {
-						size_t tld_len = strlen(tld);
-						if (tld_len>1) {
-							/* We sometime have no resource_path after but a trailing slash ('www.honeynet.org/') */
-							if (tld[tld_len-1] == '/') {
-								tld[tld_len-1] = '\0';
-							}
-							*tld++;
-							if (!strtod(tld, NULL)) {
-								fprintf(stdout, "%s%c", tld, fh->sep_char);					
-							} else {
-								fprintf(stdout, "%c", fh->sep_char);
-							}
+			total_size = next_valid_token_pos - url_features->domain.pos;
+			url_features->domain.size = total_size;
+			{	 /* Extract the TLD now */
+				const char* domain = url + url_features->domain.pos;
+				const char *tld = (char*) memrchr(domain, '.', url_features->domain.size);
+				if (tld) {
+					tld++;
+					uint32_t tld_pos = (uint32_t) (((uintptr_t)tld)-((uintptr_t)domain));
+					uintptr_t tld_len = url_features->domain.size - tld_pos;
+					if (tld_len>1) {
+						/* We sometime have no resource_path after but a trailing slash ('www.honeynet.org/') */
+						if (tld[tld_len-1] == '/') {
+							tld_len--;
 						}
-					} else {
-						fprintf(stdout, "%c", fh->sep_char);
+						// TODO: check for numbers ?
+						url_features->tld.pos = tld_pos + url_features->domain.pos;
+						url_features->tld.size = tld_len;
 					}
 				}
-
-			 } else {	/* if (furl_features_exist(url_features.domain)) { */
-			 	fprintf(stdout, "%c%c", fh->sep_char, fh->sep_char); 
-		 	} 
-
-
-			 if (furl_features_exist(url_features.port)) { 
-				if (furl_features_exist(url_features.resource_path)) { 
-			 		next_valid_token_pos = url_features.resource_path; 
-			 	} else if (furl_features_exist(url_features.query_string)) { 
-			 		next_valid_token_pos = url_features.query_string; 
-			 	} else if (furl_features_exist(url_features.fragment)) { 
-			 		next_valid_token_pos = url_features.fragment; 
-			 	} else { 
-			 		/* /\\* We have no next token *\\/  */
-			 		/* /\\* FIXME: We shall return after, no need to go further *\\/  */
-			 		next_valid_token_pos = url_len; 
-				}
-			 	total_size = next_valid_token_pos - url_features.port; 
-			 	memcpy(fh->allocated_buf, url + url_features.port, total_size); 
-			 	fh->allocated_buf[total_size] = '\0'; 
-			 	fprintf(stdout, "%s%c", fh->allocated_buf, fh->sep_char);
-			} else {
-		 		fprintf(stdout, "%c", fh->sep_char); 
 			}
+		}
 
-			 if (furl_features_exist(url_features.resource_path)) { 
-				if (furl_features_exist(url_features.query_string)) { 
-			 		next_valid_token_pos = url_features.query_string; 
-			 	} else if (furl_features_exist(url_features.fragment)) { 
-			 		next_valid_token_pos = url_features.fragment; 
-			 	} else { 
-			 		/* /\\* We have no next token *\\/  */
-			 		/* /\\* FIXME: We shall return after, no need to go further *\\/  */
-			 		next_valid_token_pos = url_len; 
-				}
-			 	total_size = next_valid_token_pos - url_features.resource_path; 
-			 	memcpy(fh->allocated_buf, url + url_features.resource_path, total_size); 
-			 	fh->allocated_buf[total_size] = '\0'; 
-			 	fprintf(stdout, "%s%c", fh->allocated_buf, fh->sep_char);
-			} else {
-		 		fprintf(stdout, "%c", fh->sep_char); 
+		if (furl_features_exist(url_features->port)) { 
+			if (furl_features_exist(url_features->resource_path)) { 
+				next_valid_token_pos = url_features->resource_path.pos; 
+			} else if (furl_features_exist(url_features->query_string)) { 
+				next_valid_token_pos = url_features->query_string.pos; 
+			} else if (furl_features_exist(url_features->fragment)) { 
+				next_valid_token_pos = url_features->fragment.pos; 
+			} else { 
+				/* /\\* We have no next token *\\/  */
+				/* /\\* FIXME: We shall return after, no need to go further *\\/  */
+				next_valid_token_pos = url_len; 
 			}
+			total_size = next_valid_token_pos - url_features->port.pos; 
+			url_features->port.size = total_size;
+		}
 
-			 if (furl_features_exist(url_features.query_string)) { 
-				if (furl_features_exist(url_features.fragment)) { 
-			 		next_valid_token_pos = url_features.fragment; 
-			 	} else { 
-			 		/* /\\* We have no next token *\\/  */
-			 		/* /\\* FIXME: We shall return after, no need to go further *\\/  */
-			 		next_valid_token_pos = url_len; 
-				}
-			 	total_size = next_valid_token_pos - url_features.query_string; 
-			 	memcpy(fh->allocated_buf, url + url_features.query_string, total_size); 
-			 	fh->allocated_buf[total_size] = '\0'; 
-			 	fprintf(stdout, "%s%c", fh->allocated_buf, fh->sep_char);
-			} else {
-		 		fprintf(stdout, "%c", fh->sep_char); 
+		if (furl_features_exist(url_features->resource_path)) { 
+			if (furl_features_exist(url_features->query_string)) { 
+				next_valid_token_pos = url_features->query_string.pos; 
+			} else if (furl_features_exist(url_features->fragment)) { 
+				next_valid_token_pos = url_features->fragment.pos; 
+			} else { 
+				/* /\\* We have no next token *\\/  */
+				/* /\\* FIXME: We shall return after, no need to go further *\\/  */
+				next_valid_token_pos = url_len; 
 			}
+			total_size = next_valid_token_pos - url_features->resource_path.pos; 
+			url_features->resource_path.size = total_size;
+		}
 
-			 if (furl_features_exist(url_features.fragment)) { 
-			 	total_size = url_len - url_features.fragment; 
-			 	memcpy(fh->allocated_buf, url + url_features.fragment, total_size); 
-			 	fh->allocated_buf[total_size] = '\0'; 
-			 	fprintf(stdout, "%s", fh->allocated_buf, fh->sep_char);
-			} else {
-		 		fprintf(stdout, "%c", fh->sep_char); 
+		if (furl_features_exist(url_features->query_string)) { 
+			if (furl_features_exist(url_features->fragment)) { 
+				next_valid_token_pos = url_features->fragment.pos; 
+			} else { 
+				/* /\\* We have no next token *\\/  */
+				/* /\\* FIXME: We shall return after, no need to go further *\\/  */
+				next_valid_token_pos = url_len; 
 			}
+			total_size = next_valid_token_pos - url_features->query_string.pos; 
+			url_features->query_string.size = total_size;
+		}
 
-			 fprintf(stdout, "\n"); 
-			 return 0;
-			} else {
-				/* FIXME: Such a message should not belong to the library */
-				fprintf(stderr, "Cannot parse the url: '%s'\n", url);
-				return FURL_URL_PARSER_ERROR;
-			}
+		if (furl_features_exist(url_features->fragment)) { 
+			total_size = url_len - url_features->fragment.pos; 
+			url_features->fragment.size = total_size;
+		}
+
+		//furl_features_debug(url, url_features);
+		return 0;
 	}
 
-			
-
-	return FURL_URL_UNKNOWN_ERROR;
+	/* FIXME: Such a message should not belong to the library */
+	fprintf(stderr, "Cannot parse the url: '%s'\n", url);
+	return FURL_URL_PARSER_ERROR;
 }
-

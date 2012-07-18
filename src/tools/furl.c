@@ -1,3 +1,4 @@
+#define _POSIX_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -65,7 +66,9 @@ int main(int argc, char **argv)
 			fprintf(stderr, "%s url\n", argv[0]);
 			exit(1);
 		}
-		furl_decode(fh, argv[1]);
+		furl_decode(fh, argv[1], strlen(argv[1]));
+		furl_show(fh, ',', stdout);
+		printf("\n");
 	} else {		/* We read from stdin */
 		while (!feof(stdin)) {
 			strbuf = readline(stdin);
@@ -76,7 +79,9 @@ int main(int argc, char **argv)
 				break;
 			}
 
-			furl_decode(fh, strbuf);			
+			furl_decode(fh, strbuf, strlen(strbuf));			
+			furl_show(fh, ',', stdout);
+			printf("\n");
 
 			free(strbuf);
 		}

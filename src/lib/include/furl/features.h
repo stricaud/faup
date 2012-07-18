@@ -17,35 +17,47 @@
 #ifndef _FURL_FEATURES_H_
 #define _FURL_FEATURES_H_
 
-#include <furl/furl.h>
-
+#include <stdio.h>
+#include <stdint.h>
 #include <string.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+typedef struct _furl_handler_t furl_handler_t;
+
+typedef struct _furl_feature_t furl_feature_t;
+// This will be aligned on 8 bytes on 64-bit platforms, that's
+// why 'size' is not of type size_t.
+struct _furl_feature_t {
+	int32_t pos;
+	uint32_t size;
+};
+
 /* int is better since we can know if we have those features
    and store the position */
 typedef struct _furl_features_t furl_features_t;
 struct _furl_features_t {
-	int scheme;
-	int hierarchical;
-	int credential;
-	int domain;
-	int port;
-	int resource_path;
-	int query_string;
-	int fragment;
+	furl_feature_t scheme;
+	furl_feature_t hierarchical;
+	furl_feature_t credential;
+	furl_feature_t domain;
+	furl_feature_t tld;
+	furl_feature_t port;
+	furl_feature_t resource_path;
+	furl_feature_t query_string;
+	furl_feature_t fragment;
 };
 
-furl_features_t furl_features_init(void);
+void furl_features_init(furl_features_t* features);
 /**
  * This function will find positions for big level features of an url: domain, credentials, etc.
  */
-furl_features_t furl_features_find(furl_handler_t *fh, char *url, size_t url_len);
-void furl_features_debug(char *url, furl_features_t features);
-int furl_features_exist(int feature);
-int furl_features_errors_lookup(furl_features_t url_features);
+void furl_features_find(furl_handler_t *fh, const char *url, const size_t url_len);
+void furl_features_debug(const char *url, furl_features_t const* features);
+int furl_features_exist(furl_feature_t feature);
+void furl_features_show(furl_handler_t const* fh, const furl_feature_t feature, FILE* out);
+int furl_features_errors_lookup(furl_features_t const* url_features);
 
 #endif	/* _FURL_FEATURES_H_ */
