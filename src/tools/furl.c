@@ -53,6 +53,11 @@ static char *readline(FILE *fp)
         return str;
 }
 
+void print_header()
+{
+	printf("scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment\n");
+}
+
 int main(int argc, char **argv)
 {
 	furl_handler_t *fh;
@@ -61,6 +66,7 @@ int main(int argc, char **argv)
 
 	fh = furl_init();
 
+	print_header();
 	if (isatty(fileno(stdin))) {
 		if (argc < 2) {
 			fprintf(stderr, "%s url\n", argv[0]);

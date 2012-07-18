@@ -42,7 +42,9 @@ struct _furl_features_t {
 	furl_feature_t scheme;
 	furl_feature_t hierarchical;
 	furl_feature_t credential;
+	furl_feature_t host;
 	furl_feature_t domain;
+	furl_feature_t subdomain;
 	furl_feature_t tld;
 	furl_feature_t port;
 	furl_feature_t resource_path;

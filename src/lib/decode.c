@@ -23,6 +23,74 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <ctype.h>
+
+uint32_t powui(uint32_t base, uint32_t n)
+{
+	uint32_t ret = 1;
+	for (uint32_t i = 0; i < n; i++) {
+		ret *= base;
+	}
+	return ret;
+}
+
+bool is_ipv4(const char* str, const size_t n)
+{
+	if (n > 15) {
+		return false;
+	}
+
+	// TODO: vectorize this
+	uint32_t ndots = 0;
+	uint32_t nip = 0;
+	int32_t cur_d = 2;
+	size_t i = 0;
+	while ((i < n) && isspace(str[i])) {
+		i++;
+	}
+	char prev_c = 0;
+	for (; i < n; i++) {
+		const char c = str[i];
+		if (c == '.') {
+			if (prev_c == '.') {
+				return false;
+			}
+			ndots++;
+			nip /= powui(10, cur_d+1);
+			if (nip > 255) {
+				return false;
+			}
+			nip = 0;
+			cur_d = 2;
+		}
+		else {
+			if ((c < '0') || (c > '9')) {
+				if (prev_c == '.') {
+					return false;
+				}
+				break;
+			}
+			if (cur_d < 0) {
+				return false;
+			}
+			nip += ((uint32_t)((c-'0')))*powui(10, cur_d);
+			cur_d--;
+		}
+		prev_c = c;
+	}
+	nip /= powui(10, cur_d+1);
+	if (nip > 255) {
+		return false;
+	}
+	// Check trailing characters
+	for (; i < n; i++) {
+		if (!isspace(str[i])) {
+			return false;
+		}
+	}
+	return ndots == 3;
+}
 
 int furl_decode(furl_handler_t *fh, const char *url, const size_t url_len)
 {
@@ -44,11 +112,11 @@ int furl_decode(furl_handler_t *fh, const char *url, const size_t url_len)
 		}
 
 		if (furl_features_exist(url_features->credential)) { 
-			total_size = url_features->domain.pos - url_features->credential.pos - 1; 
+			total_size = url_features->host.pos - url_features->credential.pos - 1; 
 			url_features->credential.size = total_size;
 		}
 
-		if (furl_features_exist(url_features->domain)) { 
+		if (furl_features_exist(url_features->host)) { 
 			if (furl_features_exist(url_features->port)) { 
 				next_valid_token_pos = url_features->port.pos - 1; 
 			} else if (furl_features_exist(url_features->resource_path)) { 
@@ -63,25 +131,52 @@ int furl_decode(furl_handler_t *fh, const char *url, const size_t url_len)
 				next_valid_token_pos = url_len; 
 			}
 
-			total_size = next_valid_token_pos - url_features->domain.pos;
-			url_features->domain.size = total_size;
-			{	 /* Extract the TLD now */
-				const char* domain = url + url_features->domain.pos;
-				const char *tld = (char*) memrchr(domain, '.', url_features->domain.size);
+			total_size = next_valid_token_pos - url_features->host.pos;
+			url_features->host.size = total_size;
+			/* Check if we are dealing with an IPv(4|6) */
+			const char* host = url + url_features->host.pos;
+			if (!is_ipv4(host, total_size)) {
+				 /* Extract the TLD now */
+				const char *tld = (const char*) memrchr(host, '.', url_features->host.size);
 				if (tld) {
 					tld++;
-					uint32_t tld_pos = (uint32_t) (((uintptr_t)tld)-((uintptr_t)domain));
-					uintptr_t tld_len = url_features->domain.size - tld_pos;
+					const uint32_t tld_pos = (uint32_t) (((uintptr_t)tld)-((uintptr_t)host));
+					uintptr_t tld_len = url_features->host.size - tld_pos;
 					if (tld_len>1) {
 						/* We sometime have no resource_path after but a trailing slash ('www.honeynet.org/') */
 						if (tld[tld_len-1] == '/') {
 							tld_len--;
 						}
-						// TODO: check for numbers ?
-						url_features->tld.pos = tld_pos + url_features->domain.pos;
+						url_features->tld.pos = tld_pos + url_features->host.pos;
 						url_features->tld.size = tld_len;
+
+						// Extract the domain (google.com)
+						const char* domain = (const char*) memrchr(host, '.', url_features->host.size - tld_len - 1);
+						if (domain) {
+							uint32_t domain_pos = (uint32_t) (((uintptr_t)domain)-((uintptr_t)host));
+							if (tld_pos > domain_pos) {
+								domain_pos += url_features->host.pos + 1;
+								url_features->domain.pos = domain_pos;
+								// Grab the TLD with us
+								url_features->domain.size = next_valid_token_pos - domain_pos;
+
+								// Subhost is what's remaing of the host
+								if (url_features->domain.pos > 1) {
+									url_features->subdomain.pos = url_features->host.pos;
+									url_features->subdomain.size = url_features->domain.pos - url_features->host.pos - 1;
+								}
+							}
+						}
 					}
 				}
+				else {
+					// If no TLD, the domain is same as the host
+					url_features->domain = url_features->host;
+				}
+			}
+			else {
+				// If this is an IPv4, put it also in the host field
+				url_features->domain = url_features->host;
 			}
 		}
 

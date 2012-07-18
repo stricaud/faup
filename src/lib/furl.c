@@ -30,12 +30,16 @@ furl_handler_t *furl_init(void)
 void furl_show(furl_handler_t const* fh, const char sep_char, FILE* out)
 {
 	// Output order is:
-	// scheme,credential,domain,tld,port,resource_path,query_string,fragment
+	// scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment
 	furl_features_show(fh, fh->furl.features.scheme, out);
 	fwrite(&sep_char, 1, 1, out);
 	furl_features_show(fh, fh->furl.features.credential, out);
 	fwrite(&sep_char, 1, 1, out);
+	furl_features_show(fh, fh->furl.features.subdomain, out);
+	fwrite(&sep_char, 1, 1, out);
 	furl_features_show(fh, fh->furl.features.domain, out);
+	fwrite(&sep_char, 1, 1, out);
+	furl_features_show(fh, fh->furl.features.host, out);
 	fwrite(&sep_char, 1, 1, out);
 	furl_features_show(fh, fh->furl.features.tld, out);
 	fwrite(&sep_char, 1, 1, out);
@@ -46,9 +50,6 @@ void furl_show(furl_handler_t const* fh, const char sep_char, FILE* out)
 	furl_features_show(fh, fh->furl.features.query_string, out);
 	fwrite(&sep_char, 1, 1, out);
 	furl_features_show(fh, fh->furl.features.fragment, out);
-	fwrite(&sep_char, 1, 1, out);
-	//furl_features_show(fh, fh->furl.features.hierarchical, out);
-	//fwrite(&sep_char, 1, 1, out);
 }
 
 void furl_terminate(furl_handler_t *fh)
