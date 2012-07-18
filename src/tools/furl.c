@@ -1,3 +1,4 @@
+#define _POSIX_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -52,6 +53,11 @@ static char *readline(FILE *fp)
         return str;
 }
 
+void print_header()
+{
+	printf("scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment\n");
+}
+
 int main(int argc, char **argv)
 {
 	furl_handler_t *fh;
@@ -60,12 +66,15 @@ int main(int argc, char **argv)
 
 	fh = furl_init();
 
+	print_header();
 	if (isatty(fileno(stdin))) {
 		if (argc < 2) {
 			fprintf(stderr, "%s url\n", argv[0]);
 			exit(1);
 		}
-		furl_decode(fh, argv[1]);
+		furl_decode(fh, argv[1], strlen(argv[1]));
+		furl_show(fh, ',', stdout);
+		printf("\n");
 	} else {		/* We read from stdin */
 		while (!feof(stdin)) {
 			strbuf = readline(stdin);
@@ -76,7 +85,9 @@ int main(int argc, char **argv)
 				break;
 			}
 
-			furl_decode(fh, strbuf);			
+			furl_decode(fh, strbuf, strlen(strbuf));			
+			furl_show(fh, ',', stdout);
+			printf("\n");
 
 			free(strbuf);
 		}

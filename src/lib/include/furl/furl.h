@@ -18,6 +18,12 @@
 #define _FURL_FURL_H_
 
 #include <furl/errors.h>
+#include <furl/features.h>
+
+#include <stdio.h>
+#include <stdint.h>
+#include <stddef.h>
+#include <sys/types.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,20 +36,12 @@ typedef struct _furl_handler_t furl_handler_t;
 typedef enum _furl_last_slash_t furl_last_slash_t;
 
 struct _furl_t {
-	char *scheme;		/* http, https, ftp, etc. */
-	char *hierarchical;	/* '//' */
-	char *credential;
-	char *host;
-	char *port;
-	char *resource_path;
-	char *query_string;	/* What comes after a '?' */
-	char *fragment;		/* What comes after a '#' */
+	const char *org_str;
+	furl_features_t features;
 };
 
 struct _furl_handler_t {
-	char *allocated_buf;
-	char sep_char;
-	furl_t *furl;
+	furl_t furl;
 };
 
 enum _furl_last_slash_t {
@@ -53,5 +51,7 @@ enum _furl_last_slash_t {
 };
 
 furl_handler_t *furl_init(void);
+void furl_show(furl_handler_t const* fh, const char sep_char, FILE* out);
+void furl_terminate(furl_handler_t *fh);
 
 #endif	/* _FURL_FURL_H_ */
