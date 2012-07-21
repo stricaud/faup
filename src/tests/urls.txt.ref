@@ -1,0 +1,15 @@
+scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment
+http,,www,picviz.com,www.picviz.com,com,,/test,,
+http,,,127.0.0.1,127.0.0.1,,,/,,
+,,,127.0.0.1,127.0.0.1,,,,,
+tunnel,,,,www.mysei,mysei,440,/,,
+https,,,,lol.com,com,443,/,,
+https,,,,test.com,com,,/,?gna=v,
+http,,,,test.com,com,40,/query,?vars,
+http,,,vars,vars,,,,?=test&dfdsf,
+ftp,pwd,,,myftp.com,com,,/path,,
+ftp,login,,127.0.0.1,127.0.0.1,,,/,,
+tunnel,,,,test.com,com,443,/vars,?=test&dfdsf,#salut
+https,,wwdég,google.com,wwdég.google.com,com,,/unicode%20,,#hi
+,,,dsfdsfs,dsfdsfs,,,,,
+http,,www,google.com,www.google.com,com,,/aclk,?sa=l&ai=CYXXXXXXXXXXXpa7lo0Epsa91UHFisELCAAQAVD2kfW1_P____8BYPvhkoO4CqABisnWzAPIAQGpAkvOYeOnnbQ-XXXXXXXXXXXXXXXXXXXX&sig=AOD64_3XAr8_1wJEFMTu04cHBeza8bTInw&ved=0CFoQ0Qw&adurl=sdqdfdsgregrerth%3Fxtor%3DSEC-553&rct=j&q=,

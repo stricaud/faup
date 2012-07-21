@@ -9,9 +9,10 @@ set(CMAKE_BUILD_TYPE "Release")
 if (DEBUG_MODE)
 set(CMAKE_BUILD_TYPE "Debug")
         if(NOT WIN32)
-                add_definitions(-ggdb3)
+                add_definitions(-g)
         endif()
 endif()
+add_definitions(-std=c99)
 
 include(CTest)
 
