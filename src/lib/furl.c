@@ -27,6 +27,11 @@ furl_handler_t *furl_init(void)
 	return fh;
 }
 
+char *furl_get_version(void)
+{
+  return FURL_VERSION;
+}
+
 void furl_show(furl_handler_t const* fh, const char sep_char, FILE* out)
 {
 	// Output order is:

@@ -19,5 +19,5 @@
 
 #define FURL_VERSION "${FURL_VERSION}"
 
-#endif  /* _FURL_VERSION_H_
+#endif  /* _FURL_VERSION_H_ */
 

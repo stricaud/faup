@@ -19,6 +19,7 @@
 
 #include <furl/errors.h>
 #include <furl/features.h>
+#include <furl/version.h>
 
 #include <stdio.h>
 #include <stdint.h>
@@ -51,6 +52,7 @@ enum _furl_last_slash_t {
 };
 
 furl_handler_t *furl_init(void);
+char *furl_get_version(void);
 void furl_show(furl_handler_t const* fh, const char sep_char, FILE* out);
 void furl_terminate(furl_handler_t *fh);
 
