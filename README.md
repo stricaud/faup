@@ -3,14 +3,15 @@ Fast URL Library
 
 The Fast URL Library provides:
 
-* A library you can embed in your software (furll)
+* A static library you can embed in your software (furl_static)
+* A dynamic library you can get along with (furll)
 * A command line tool you can use to extract various parts of a url (furl)
 
 Mission
 -------
 
 Furl is written to be fast and resilient to badly formated URL. It extract any 
-required url field by checking each character once. 
+required url field by checking each character once.
 
 Why Yet Another URL Extraction Library?
 ---------------------------------------
@@ -23,4 +24,18 @@ Architecture
 ------------
 
 [ URL ] -> [ Features discovery ] -> [ Decoding ] -> [ URL Fields ]
+
+Command line usage
+------------------
+
+Simply pipe or give your url as a parameter:
+
+::
+	$ echo "www.github.com" |furl
+	scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment
+	,,www,github.com,www.github.com,com,,,,
+
+	$ furl www.github.com
+	scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment
+	,,www,github.com,www.github.com,com,,,,
 
