@@ -39,6 +39,7 @@ Simply pipe or give your url as a parameter:
 	,,www,github.com,www.github.com,com,,,,
 
 Python bindings are also around. Here's what you can do:
+
        >>> from pyfurl.furl import Furl
        >>> f = Furl()
        >>> f.decode("https://www.slashdot.org")
