@@ -38,7 +38,10 @@ Simply pipe or give your url as a parameter:
 	scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment
 	,,www,github.com,www.github.com,com,,,,
 
-Python bindings are also around. Here's what you can do:
+Python bindings
+---------------
+
+Here's what you can do:
 
        >>> from pyfurl.furl import Furl
        >>> f = Furl()
@@ -46,3 +49,18 @@ Python bindings are also around. Here's what you can do:
        >>> f.get()
        {'credential': None, 'domain': 'slashdot.org', 'subdomain': 'www', 'fragment': None, 'host': 'www.slashdot.org', 'resource_path': None, 'tld': 'org', 'query_string': None, 'scheme': 'https', 'port': None}
        >>> 
+
+C API
+-----
+
+Again, things are basic:
+
+       furl_handler_t *fh;
+
+       fh = furl_init();
+       furl_decode(fh, "https://wallinfire.net", strlen("https://wallinfire.net"));
+       tld_pos = furl_get_tld_pos(fh); /* will return 19 */       
+       tld_size = furl_get_tld_size(fh); /* will return 3 */       
+       furl_show(fh, ',', stdout);
+
+       furl_terminate(fh);
