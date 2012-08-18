@@ -51,9 +51,34 @@ enum _furl_last_slash_t {
 	FURL_LAST_SLASH_AFTER_DOMAIN,
 };
 
+#define furl_get_pos(fh, name) (fh)->furl.features.name.pos
+#define furl_get_size(fh, name) (fh)->furl.features.name.size
+
 furl_handler_t *furl_init(void);
 char *furl_get_version(void);
 void furl_show(furl_handler_t const* fh, const char sep_char, FILE* out);
 void furl_terminate(furl_handler_t *fh);
+
+int32_t furl_get_scheme_pos(furl_handler_t *fh);
+uint32_t furl_get_scheme_size(furl_handler_t *fh);
+int32_t furl_get_credential_pos(furl_handler_t *fh);
+uint32_t furl_get_credential_size(furl_handler_t *fh);
+int32_t furl_get_subdomain_pos(furl_handler_t *fh);
+uint32_t furl_get_subdomain_size(furl_handler_t *fh);
+int32_t furl_get_domain_pos(furl_handler_t *fh);
+uint32_t furl_get_domain_size(furl_handler_t *fh);
+int32_t furl_get_host_pos(furl_handler_t *fh);
+uint32_t furl_get_host_size(furl_handler_t *fh);
+int32_t furl_get_tld_pos(furl_handler_t *fh);
+uint32_t furl_get_tld_size(furl_handler_t *fh);
+int32_t furl_get_port_pos(furl_handler_t *fh);
+uint32_t furl_get_port_size(furl_handler_t *fh);
+int32_t furl_get_resource_path_pos(furl_handler_t *fh);
+uint32_t furl_get_resource_path_size(furl_handler_t *fh);
+int32_t furl_get_query_string_pos(furl_handler_t *fh);
+uint32_t furl_get_query_string_size(furl_handler_t *fh);
+int32_t furl_get_fragment_pos(furl_handler_t *fh);
+uint32_t furl_get_fragment_size(furl_handler_t *fh);
+
 
 #endif	/* _FURL_FURL_H_ */

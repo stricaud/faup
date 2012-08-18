@@ -61,3 +61,111 @@ void furl_terminate(furl_handler_t *fh)
 {
 	free(fh);
 }
+
+int32_t furl_get_scheme_pos(furl_handler_t *fh)
+{
+        return furl_get_pos(fh, scheme);
+}
+
+uint32_t furl_get_scheme_size(furl_handler_t *fh)
+{
+        return furl_get_size(fh, scheme);
+}
+
+int32_t furl_get_credential_pos(furl_handler_t *fh)
+{
+        return furl_get_pos(fh, credential);
+}
+
+uint32_t furl_get_credential_size(furl_handler_t *fh)
+{
+        return furl_get_size(fh, credential);
+}
+
+int32_t furl_get_subdomain_pos(furl_handler_t *fh)
+{
+        return furl_get_pos(fh, subdomain);
+}
+
+uint32_t furl_get_subdomain_size(furl_handler_t *fh)
+{
+        return furl_get_size(fh, subdomain);
+}
+
+int32_t furl_get_domain_pos(furl_handler_t *fh)
+{
+        return furl_get_pos(fh, domain);
+}
+
+uint32_t furl_get_domain_size(furl_handler_t *fh)
+{
+        return furl_get_size(fh, domain);
+}
+
+int32_t furl_get_host_pos(furl_handler_t *fh)
+{
+        return furl_get_pos(fh, host);
+}
+
+uint32_t furl_get_host_size(furl_handler_t *fh)
+{
+        return furl_get_size(fh, host);
+}
+
+int32_t furl_get_tld_pos(furl_handler_t *fh)
+{
+        return furl_get_pos(fh, tld);
+}
+
+uint32_t furl_get_tld_size(furl_handler_t *fh)
+{
+        return furl_get_size(fh, tld);
+}
+
+int32_t furl_get_port_pos(furl_handler_t *fh)
+{
+        return furl_get_pos(fh, port);
+}
+
+uint32_t furl_get_port_size(furl_handler_t *fh)
+{
+        return furl_get_size(fh, port);
+}
+
+int32_t furl_get_resource_path_pos(furl_handler_t *fh)
+{
+        return furl_get_pos(fh, resource_path);
+}
+
+uint32_t furl_get_resource_path_size(furl_handler_t *fh)
+{
+        return furl_get_size(fh, resource_path);
+}
+
+int32_t furl_get_query_string_pos(furl_handler_t *fh)
+{
+        return furl_get_pos(fh, query_string);
+}
+
+uint32_t furl_get_query_string_size(furl_handler_t *fh)
+{
+        return furl_get_size(fh, query_string);
+}
+
+int32_t furl_get_fragment_pos(furl_handler_t *fh)
+{
+        return furl_get_pos(fh, fragment);
+}
+
+uint32_t furl_get_fragment_size(furl_handler_t *fh)
+{
+        return furl_get_size(fh, fragment);
+}
+
+
+
+
+
+
+
+

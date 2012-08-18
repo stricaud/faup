@@ -199,6 +199,9 @@ void furl_features_debug(const char *url, furl_features_t const* features)
 	fprintf(stdout, "features->hierarchical:%d,%u\n", features->hierarchical.pos, features->hierarchical.size);
 	fprintf(stdout, "features->credential:%d,%u\n", features->credential.pos, features->credential.size);
 	fprintf(stdout, "features->host:%d,%u\n", features->host.pos, features->host.size);
+	fprintf(stdout, "features->domain:%d,%u\n", features->domain.pos, features->domain.size);
+	fprintf(stdout, "features->subdomain:%d,%u\n", features->subdomain.pos, features->subdomain.size);
+	fprintf(stdout, "features->tld:%d,%u\n", features->tld.pos, features->tld.size);
 	fprintf(stdout, "features->port:%d,%u\n", features->port.pos, features->port.size);
 	fprintf(stdout, "features->resource_path:%d,%u\n", features->resource_path.pos, features->resource_path.size);
 	fprintf(stdout, "features->query_string:%d,%u\n", features->query_string.pos, features->query_string.size);
