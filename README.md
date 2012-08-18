@@ -31,6 +31,7 @@ Command line usage
 Simply pipe or give your url as a parameter:
 
 ::
+
 	$ echo "www.github.com" |furl
 	scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment
 	,,www,github.com,www.github.com,com,,,,
