@@ -30,8 +30,6 @@ Command line usage
 
 Simply pipe or give your url as a parameter:
 
-::
-
 	$ echo "www.github.com" |furl
 	scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment
 	,,www,github.com,www.github.com,com,,,,
@@ -40,3 +38,10 @@ Simply pipe or give your url as a parameter:
 	scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment
 	,,www,github.com,www.github.com,com,,,,
 
+Python bindings are also around. Here's what you can do:
+       >>> from pyfurl.furl import Furl
+       >>> f = Furl()
+       >>> f.decode("https://www.slashdot.org")
+       >>> f.get()
+       {'credential': None, 'domain': 'slashdot.org', 'subdomain': 'www', 'fragment': None, 'host': 'www.slashdot.org', 'resource_path': None, 'tld': 'org', 'query_string': None, 'scheme': 'https', 'port': None}
+       >>> 
