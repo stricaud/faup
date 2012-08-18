@@ -22,10 +22,15 @@ include(CheckLibraryExists)
 
 include(FindPkgConfig)
 
+# Manage the version
+file(STRINGS VERSION VERSION)
+set(FURL_VERSION ${VERSION})
+configure_file("src/lib/include/furl/version.h.cmake" "src/lib/include/furl/version.h")
+
 set(FURL_INCLUDE_DIRS "${furl-project_SOURCE_DIR}/src/lib/include/")
 if(WIN32)
 	set(FURL_LIBRARY "${furl-project_SOURCE_DIR}/src/lib/${CMAKE_BUILD_TYPE}/furll.lib")
 else(WIN32)
-	set(FURL_LIBRARY "${furl-project_SOURCE_DIR}/src/lib/libfurll.a")
+	set(FURL_LIBRARY "${furl-project_SOURCE_DIR}/src/lib/libfurll.so")
 endif(WIN32)
 add_subdirectory(src)
