@@ -66,13 +66,13 @@ int main(int argc, char **argv)
 
 	fh = furl_init();
 
-	print_header();
 	if (isatty(fileno(stdin))) {
 		if (argc < 2) {
 			fprintf(stderr, "%s url\n", argv[0]);
 			exit(1);
 		}
 		furl_decode(fh, argv[1], strlen(argv[1]));
+		print_header();
 		furl_show(fh, ',', stdout);
 		printf("\n");
 	} else {		/* We read from stdin */
@@ -86,6 +86,7 @@ int main(int argc, char **argv)
 			}
 
 			furl_decode(fh, strbuf, strlen(strbuf));			
+			print_header();
 			furl_show(fh, ',', stdout);
 			printf("\n");
 
