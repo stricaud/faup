@@ -7,7 +7,7 @@ https,,,,lol.com,com,443,/,,
 https,,,,test.com,com,,/,?gna=v,
 http,,,,test.com,com,40,/query,?vars,
 http,,,vars,vars,,,,?=test&dfdsf,
-ftp,pwd,,,myftp.com,com,,/path,,
+ftp,login:pwd,,,myftp.com,com,,/path,,
 ftp,login,,127.0.0.1,127.0.0.1,,,/,,
 tunnel,,,,test.com,com,443,/vars,?=test&dfdsf,#salut
 https,,wwdég,google.com,wwdég.google.com,com,,/unicode%20,,#hi

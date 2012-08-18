@@ -82,6 +82,8 @@ void furl_features_find(furl_handler_t *fh, const char *url, const size_t url_le
 			nb_slashes++;
 		}
 
+		/* printf("reading %c, bufferpos=%d\n", c, buffer_pos); */
+
 		switch(c) {
 			case '/':
 				/* If it is the first time we have a '/' and previous char is ':' */
@@ -125,11 +127,10 @@ void furl_features_find(furl_handler_t *fh, const char *url, const size_t url_le
 				break;
 			case '@':
 				if (!furl_features_exist(url_features->credential)) {
-					//fh->allocated_buf[buffer_pos] = '\0';
 					whatever_len = buffer_pos;
 					if ((last_slash_meaning == FURL_LAST_SLASH_HIERARCHICAL) || /* This '@' belongs to the authentication if http://foo:bar@host/blah */
 							(last_slash_meaning == FURL_LAST_SLASH_NOTFOUND)) {     /* This '@' belongs to the authentication if foo:bar@host/blah */
-						url_features->credential.pos = current_pos - whatever_len;
+					        url_features->credential.pos = url_features->host.pos; /* The credential starts where we thought it was a pos */
 						url_features->host.pos = current_pos + 1;
 						url_features->port.pos = -1; /* So the last ':' we've found was not for a port but for credential */
 					}
@@ -144,12 +145,13 @@ void furl_features_find(furl_handler_t *fh, const char *url, const size_t url_le
 				/* url_features->port = -1; */
 				if (!furl_features_exist(url_features->port)) {
 					if (last_slash_meaning < FURL_LAST_SLASH_AFTER_DOMAIN) {
-						//fh->allocated_buf[buffer_pos] = c;
 						url_features->port.pos = current_pos + 1;
+						/* furl_features_debug("", url_features); */
 					}
 				}
 
 				buffer_pos=-1;
+
 				break;
 			case '?':
 				url_features->query_string.pos = current_pos;
