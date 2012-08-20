@@ -71,11 +71,12 @@ int main(int argc, char **argv)
 			fprintf(stderr, "%s url\n", argv[0]);
 			exit(1);
 		}
-		furl_decode(fh, argv[1], strlen(argv[1]));
 		print_header();
+		furl_decode(fh, argv[1], strlen(argv[1]));
 		furl_show(fh, ',', stdout);
 		printf("\n");
 	} else {		/* We read from stdin */
+		print_header();
 		while (!feof(stdin)) {
 			strbuf = readline(stdin);
 			if (!strbuf) {
@@ -86,7 +87,6 @@ int main(int argc, char **argv)
 			}
 
 			furl_decode(fh, strbuf, strlen(strbuf));			
-			print_header();
 			furl_show(fh, ',', stdout);
 			printf("\n");
 

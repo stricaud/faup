@@ -131,52 +131,54 @@ int furl_decode(furl_handler_t *fh, const char *url, const size_t url_len)
 				next_valid_token_pos = url_len; 
 			}
 
-			total_size = next_valid_token_pos - url_features->host.pos;
-			url_features->host.size = total_size;
-			/* Check if we are dealing with an IPv(4|6) */
-			const char* host = url + url_features->host.pos;
-			if (!is_ipv4(host, total_size)) {
-				 /* Extract the TLD now */
-				const char *tld = (const char*) memrchr(host, '.', url_features->host.size);
-				if (tld) {
-					tld++;
-					const uint32_t tld_pos = (uint32_t) (((uintptr_t)tld)-((uintptr_t)host));
-					uintptr_t tld_len = url_features->host.size - tld_pos;
-					if (tld_len>1) {
-						/* We sometime have no resource_path after but a trailing slash ('www.honeynet.org/') */
-						if (tld[tld_len-1] == '/') {
-							tld_len--;
-						}
-						url_features->tld.pos = tld_pos + url_features->host.pos;
-						url_features->tld.size = tld_len;
+			if (next_valid_token_pos > url_features->host.pos) {
+				total_size = next_valid_token_pos - url_features->host.pos;
+				url_features->host.size = total_size;
+				/* Check if we are dealing with an IPv(4|6) */
+				const char* host = url + url_features->host.pos;
+				if (!is_ipv4(host, total_size)) {
+					 /* Extract the TLD now */
+					const char *tld = (const char*) memrchr(host, '.', url_features->host.size);
+					if (tld) {
+						tld++;
+						const uint32_t tld_pos = (uint32_t) (((uintptr_t)tld)-((uintptr_t)host));
+						uintptr_t tld_len = url_features->host.size - tld_pos;
+						if (tld_len>1) {
+							/* We sometime have no resource_path after but a trailing slash ('www.honeynet.org/') */
+							if (tld[tld_len-1] == '/') {
+								tld_len--;
+							}
+							url_features->tld.pos = tld_pos + url_features->host.pos;
+							url_features->tld.size = tld_len;
 
-						// Extract the domain (google.com)
-						const char* domain = (const char*) memrchr(host, '.', url_features->host.size - tld_len - 1);
-						if (domain) {
-							uint32_t domain_pos = (uint32_t) (((uintptr_t)domain)-((uintptr_t)host));
-							if (tld_pos > domain_pos) {
-								domain_pos += url_features->host.pos + 1;
-								url_features->domain.pos = domain_pos;
-								// Grab the TLD with us
-								url_features->domain.size = next_valid_token_pos - domain_pos;
+							// Extract the domain (google.com)
+							const char* domain = (const char*) memrchr(host, '.', url_features->host.size - tld_len - 1);
+							if (domain) {
+								uint32_t domain_pos = (uint32_t) (((uintptr_t)domain)-((uintptr_t)host));
+								if (tld_pos > domain_pos) {
+									domain_pos += url_features->host.pos + 1;
+									url_features->domain.pos = domain_pos;
+									// Grab the TLD with us
+									url_features->domain.size = next_valid_token_pos - domain_pos;
 
-								// Subhost is what's remaing of the host
-								if (url_features->domain.pos > 1) {
-									url_features->subdomain.pos = url_features->host.pos;
-									url_features->subdomain.size = url_features->domain.pos - url_features->host.pos - 1;
+									// Subhost is what's remaing of the host
+									if (url_features->domain.pos > 1) {
+										url_features->subdomain.pos = url_features->host.pos;
+										url_features->subdomain.size = url_features->domain.pos - url_features->host.pos - 1;
+									}
 								}
 							}
 						}
 					}
+					else {
+						// If no TLD, the domain is same as the host
+						url_features->domain = url_features->host;
+					}
 				}
 				else {
-					// If no TLD, the domain is same as the host
+					// If this is an IPv4, put it also in the host field
 					url_features->domain = url_features->host;
 				}
-			}
-			else {
-				// If this is an IPv4, put it also in the host field
-				url_features->domain = url_features->host;
 			}
 		}
 
@@ -192,8 +194,10 @@ int furl_decode(furl_handler_t *fh, const char *url, const size_t url_len)
 				/* /\\* FIXME: We shall return after, no need to go further *\\/  */
 				next_valid_token_pos = url_len; 
 			}
-			total_size = next_valid_token_pos - url_features->port.pos; 
-			url_features->port.size = total_size;
+			if (next_valid_token_pos > url_features->port.pos) {
+				total_size = next_valid_token_pos - url_features->port.pos; 
+				url_features->port.size = total_size;
+			}
 		}
 
 		if (furl_features_exist(url_features->resource_path)) { 
@@ -206,8 +210,10 @@ int furl_decode(furl_handler_t *fh, const char *url, const size_t url_len)
 				/* /\\* FIXME: We shall return after, no need to go further *\\/  */
 				next_valid_token_pos = url_len; 
 			}
-			total_size = next_valid_token_pos - url_features->resource_path.pos; 
-			url_features->resource_path.size = total_size;
+			if (next_valid_token_pos > url_features->resource_path.pos) {
+				total_size = next_valid_token_pos - url_features->resource_path.pos; 
+				url_features->resource_path.size = total_size;
+			}
 		}
 
 		if (furl_features_exist(url_features->query_string)) { 
@@ -218,8 +224,10 @@ int furl_decode(furl_handler_t *fh, const char *url, const size_t url_len)
 				/* /\\* FIXME: We shall return after, no need to go further *\\/  */
 				next_valid_token_pos = url_len; 
 			}
-			total_size = next_valid_token_pos - url_features->query_string.pos; 
-			url_features->query_string.size = total_size;
+			if (next_valid_token_pos > url_features->query_string.pos) {
+				total_size = next_valid_token_pos - url_features->query_string.pos; 
+				url_features->query_string.size = total_size;
+			}
 		}
 
 		if (furl_features_exist(url_features->fragment)) { 
