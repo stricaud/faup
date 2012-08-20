@@ -4,9 +4,16 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <getopt.h>
 
 #include <furl/furl.h>
 #include <furl/decode.h>
+
+struct _furl_cli_options_t {
+  int print_header;
+  char sep_char;
+};
+typedef struct _furl_cli_options_t furl_cli_options_t;
 
 /* IPv6 tests:
 
@@ -18,6 +25,12 @@
       http://[::FFFF:129.144.52.38]:80/index.html
       http://[2010:836B:4179::836B:4179]
  */
+
+void init_cli_options(furl_cli_options_t *opts)
+{
+  opts->print_header = 0;
+  opts->sep_char = ',';
+}
 
 /* readline() - read a line from the file handle.
  * Return an allocated string */
@@ -53,7 +66,16 @@ static char *readline(FILE *fp)
         return str;
 }
 
-void print_header()
+void print_help(char **argv) 
+{
+	printf("Usage: %s [-p] [-d delimiter] url\n \
+		Where:\n \
+		url is the url that you want to parse\n \
+		\t-p: print the header\n \
+		\t-d delimiter: will separate the fields with the wanted delimiter\n", argv[0]);
+}
+
+void print_header(void)
 {
 	printf("scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment\n");
 }
@@ -61,22 +83,44 @@ void print_header()
 int main(int argc, char **argv)
 {
 	furl_handler_t *fh;
-
 	char *strbuf=NULL;
+
+	furl_cli_options_t furl_opts;
+	int opt;
+
+	init_cli_options(&furl_opts);
 
 	fh = furl_init();
 
+	while ((opt = getopt(argc, argv, "pd:")) != -1) {
+	  switch(opt) {
+	  case 'p':
+	    furl_opts.print_header = 1;
+	    break;
+	  case 'd':
+	    furl_opts.sep_char = optarg[0];
+	    break;
+	  default:
+	    print_help(argv);
+	    exit(1);
+	  }
+	}
+
 	if (isatty(fileno(stdin))) {
 		if (argc < 2) {
-			fprintf(stderr, "%s url\n", argv[0]);
+			print_help(argv);
 			exit(1);
 		}
-		print_header();
-		furl_decode(fh, argv[1], strlen(argv[1]));
-		furl_show(fh, ',', stdout);
+		if (furl_opts.print_header) {
+			print_header();
+		}
+		furl_decode(fh, argv[optind], strlen(argv[optind]));
+		furl_show(fh, furl_opts.sep_char, stdout);
 		printf("\n");
 	} else {		/* We read from stdin */
-		print_header();
+		if (furl_opts.print_header) {
+			print_header();
+		}
 		while (!feof(stdin)) {
 			strbuf = readline(stdin);
 			if (!strbuf) {
