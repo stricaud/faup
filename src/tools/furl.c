@@ -92,7 +92,7 @@ int main(int argc, char **argv)
 
 	fh = furl_init();
 
-	while ((opt = getopt(argc, argv, "pd:")) != -1) {
+	while ((opt = getopt(argc, argv, "pd:v")) != -1) {
 	  switch(opt) {
 	  case 'p':
 	    furl_opts.print_header = 1;
@@ -100,6 +100,9 @@ int main(int argc, char **argv)
 	  case 'd':
 	    furl_opts.sep_char = optarg[0];
 	    break;
+	  case 'v':
+	    printf("furl v%s\n", furl_get_version());
+	    exit(0);
 	  default:
 	    print_help(argv);
 	    exit(1);
