@@ -18,7 +18,6 @@
 #include <furl/furl.h>
 #include <furl/decode.h>
 #include <furl/features.h>
-#include <furl/handlers.h>
 
 #include <stdio.h>
 #include <string.h>
