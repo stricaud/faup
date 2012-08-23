@@ -21,11 +21,11 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <furl/handler.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef struct _furl_handler_t furl_handler_t;
 
 typedef struct _furl_feature_t furl_feature_t;
 // This will be aligned on 8 bytes on 64-bit platforms, that's

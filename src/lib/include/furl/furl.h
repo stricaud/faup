@@ -19,6 +19,7 @@
 
 #include <furl/errors.h>
 #include <furl/features.h>
+#include <furl/handler.h>
 #include <furl/version.h>
 
 #include <stdio.h>
@@ -33,7 +34,6 @@ extern "C" {
 #define FURL_MAXLEN 8192
 
 typedef struct _furl_t furl_t;
-typedef struct _furl_handler_t furl_handler_t;
 typedef enum _furl_last_slash_t furl_last_slash_t;
 
 struct _furl_t {
