@@ -4,7 +4,7 @@
 import sys
 from ctypes import *
 
-from bind import *
+from pyfurl.bind import *
 
 UNIX_LIBRARY_FILENAME = "libfurll.so.1"
 WIN32_LIBRARY_FILENAME = "furll.dll"

@@ -6,7 +6,7 @@ class UrlNotDecoded(Exception):
 class Furl():    
 
     def __init__(self):
-    	self.fh = furl_init()
+        self.fh = furl_init()
         self.decoded = False
 
     def __del__(self):
