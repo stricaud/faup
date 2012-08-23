@@ -25,4 +25,8 @@ extern "C" {
 
 int furl_decode(furl_handler_t *fh, const char *url, const size_t url_size);
 
+#ifdef __cplusplus
+}
+#endif
+
 #endif	/* _FURL_DECODE_H_ */

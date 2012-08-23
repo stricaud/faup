@@ -23,6 +23,9 @@
 extern "C" {
 #endif
 
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif	/* _FURL_HANDLERS_H_ */

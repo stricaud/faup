@@ -80,5 +80,8 @@ uint32_t furl_get_query_string_size(furl_handler_t *fh);
 int32_t furl_get_fragment_pos(furl_handler_t *fh);
 uint32_t furl_get_fragment_size(furl_handler_t *fh);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* _FURL_FURL_H_ */

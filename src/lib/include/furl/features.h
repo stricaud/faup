@@ -62,4 +62,8 @@ int furl_features_exist(furl_feature_t feature);
 void furl_features_show(furl_handler_t const* fh, const furl_feature_t feature, FILE* out);
 int furl_features_errors_lookup(furl_features_t const* url_features);
 
+#ifdef __cplusplus
+}
+#endif
+
 #endif	/* _FURL_FEATURES_H_ */
