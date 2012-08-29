@@ -4,12 +4,14 @@ set(FURL_LIB_SRC_FILES
 decode.c
 features.c
 furl.c
+portable.c
 )
 
 set(FURL_LIB_HDR_FILES
 include/furl/features.h
 include/furl/furl.h
 include/furl/decode.h
+include/furl/portable.h
 )
 
 set(FURL_LINK_LIBRARIES
