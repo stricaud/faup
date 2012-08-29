@@ -117,6 +117,11 @@ int main(int argc, char **argv)
 		if (furl_opts.print_header) {
 			print_header();
 		}
+
+		if (!argv[optind]) {
+		  exit(1);
+		}
+
 		furl_decode(fh, argv[optind], strlen(argv[optind]));
 		furl_show(fh, furl_opts.sep_char, stdout);
 		printf("\n");
