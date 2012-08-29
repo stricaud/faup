@@ -39,9 +39,13 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 endif()
 
 set(FURL_INCLUDE_DIRS "${furl-project_SOURCE_DIR}/src/lib/include/")
+
+set(FURL_LIBRARY "${furl-project_SOURCE_DIR}/src/lib/libfurll.so")
 if(WIN32)
 	set(FURL_LIBRARY "${furl-project_SOURCE_DIR}/src/lib/${CMAKE_BUILD_TYPE}/furll.lib")
-else(WIN32)
-	set(FURL_LIBRARY "${furl-project_SOURCE_DIR}/src/lib/libfurll.so")
 endif(WIN32)
+if(APPLE)
+	set(FURL_LIBRARY "${furl-project_SOURCE_DIR}/src/lib/${CMAKE_BUILD_TYPE}/libfurll.dylib")
+endif(APPLE)
+
 add_subdirectory(src)
