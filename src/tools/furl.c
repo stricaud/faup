@@ -75,9 +75,10 @@ void print_help(char **argv)
 		\t-d delimiter: will separate the fields with the wanted delimiter\n", argv[0]);
 }
 
-void print_header(void)
+void print_header(char sep_char)
 {
-	printf("scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment\n");
+	printf("scheme%ccredential%csubdomain%cdomain%chost%ctld%cport%cresource_path%cquery_string%cfragment\n",
+	       sep_char,sep_char,sep_char,sep_char,sep_char,sep_char,sep_char,sep_char,sep_char);
 }
 
 int main(int argc, char **argv)
@@ -115,7 +116,7 @@ int main(int argc, char **argv)
 			exit(1);
 		}
 		if (furl_opts.print_header) {
-			print_header();
+			print_header(furl_opts.sep_char);
 		}
 
 		if (!argv[optind]) {
@@ -127,7 +128,7 @@ int main(int argc, char **argv)
 		printf("\n");
 	} else {		/* We read from stdin */
 		if (furl_opts.print_header) {
-			print_header();
+			print_header(furl_opts.sep_char);
 		}
 		while (!feof(stdin)) {
 			strbuf = readline(stdin);
