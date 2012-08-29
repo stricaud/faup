@@ -20,6 +20,7 @@
 #include <furl/errors.h>
 #include <furl/features.h>
 #include <furl/handler.h>
+#include <furl/portable.h>
 #include <furl/version.h>
 
 #include <stdio.h>
