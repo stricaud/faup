@@ -45,7 +45,7 @@ if(WIN32)
 	set(FURL_LIBRARY "${furl-project_SOURCE_DIR}/src/lib/${CMAKE_BUILD_TYPE}/furll.lib")
 endif(WIN32)
 if(APPLE)
-	set(FURL_LIBRARY "${furl-project_SOURCE_DIR}/src/lib/${CMAKE_BUILD_TYPE}/libfurll.dylib")
+	set(FURL_LIBRARY "${furl-project_SOURCE_DIR}/src/lib/libfurll.dylib")
 endif(APPLE)
 
 add_subdirectory(src)
