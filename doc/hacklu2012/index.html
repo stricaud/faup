@@ -1,0 +1,302 @@
+<!doctype html>  
+<html lang="en">
+	
+	<head>
+		<meta charset="utf-8">
+		
+		<title>Furl: fast, parse, fast!</title>
+
+		<meta name="description" content="Fast URL Parser Library">
+		<meta name="author" content="Sebastien Tricaud">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		
+		<link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+		
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/default.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+		<script>
+			document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+	
+	<body>
+		
+		<div class="reveal">
+
+			<!-- Used to fade in a background when a specific slide state is reached -->
+			<div class="state-background"></div>
+			
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h1>Furl</h1>
+					<h3>Fast Url Parser Library</h3>
+					<h4>http://github.com/stricaud/furl</h4>
+				</section>
+
+				<section>
+				  <h2>Problem</h2>
+				  <p>I have an url: <pre>http://www.hack.lu/index.php3?ref=http://www.wallinfire.net</pre></p>
+				  <br/>
+				  <p>
+				  How do I extract the 'lu' TLD?
+				  </p>
+				</section>
+
+				<section>
+				  <h2>Problem</h2>
+				  <p>I have an url: <pre>http://www.hack.lu/index.php3?ref=http://www.wallinfire.net</pre></p>
+				  <br/>
+				  <p>
+				  Regular Expression?
+				  </p>
+				  <p>
+				    <pre>^(?=[^&])(?:(?[^:/?#]+):)?(?://(?[^/?#]*))?(?[^?#]*)(?:\?(?[^#]*))?(?:#(?.*))?</pre>
+				  </p>
+				</section>
+
+				<section>
+				  <section>
+				  <h2>Broken Solutions</h2>
+				  <h3>urllib.parse</h3>
+				  <h3>QUrl</h3>
+				  <h3>...</h3>
+
+				  </section>
+				  <section>
+				  <h2>Broken Solutions</h2>
+				  <h3>urllib.parse #1</h3>
+				  <p>
+				  <pre>
+>>> from urllib.parse import urlparse
+>>> url = urlparse('http://192.168.0.1/index.php3?ref=http://slashdot.org#blah')
+ParseResult(scheme='http', netloc='192.168.0.1', path='/index.php3', params='', 
+  query='ref=http://slashdot.org', fragment='blah')
+</pre>
+				  </p>
+
+				  </section>
+				  <section>
+				  <h2>Broken Solutions</h2>
+				  <h3>urllib.parse #2</h3>
+				  <p>
+				  <pre>
+>>> from urllib.parse import urlparse
+>>> url = urlparse('192.168.0.1/index.php3?ref=http://slashdot.org#blah')
+ParseResult(scheme='', netloc='', path='192.168.0.1/index.php3', params='', 
+  query='ref=http://slashdot.org', fragment='blah')
+</pre>
+				  </p>
+				  </section>
+
+				  <section>
+				  <h2>Broken Solutions</h2>
+				  <h3>QUrl</h3>
+				  <p>
+<pre>
+>>> from PyQt4 import QtCore
+>>> url = QtCore.QUrl("192.168.0.1/index.php3?ref=http://slashdot.org#blah")
+>>> print(url.host())
+
+>>>
+</pre>
+				  </p>
+
+				  </section>
+
+				</section>
+				
+				<section>
+					<h2>Stuff ain't working!</h2>
+					<p>
+					  <ul>
+					    <li>Because URLs can simply be 'localhost'</li>
+					    <li>Many scripts would love running on top of url fields in a fast manner</li>
+					  </ul>
+					</p>
+				</section>
+
+				
+				<section>
+					<h2>What fast means?</h2>
+					<p>
+					  <ul>
+					    <li>No allocation to decode an url</li>
+					    <li>Read characters only once</li>
+					  </ul>
+					</p>
+				</section>
+
+				<section>
+					<h2>Pragmatic</h2>
+					<p>
+					  <ul>
+					    <li>A static C library you can embed</li>
+					    <li>A dynamic C library</li>
+					    <li>A command line tool</li>
+					  </ul>
+					</p>
+				</section>
+
+				<section>
+					<h2>A command line tool: furl</h2>
+					<p>
+					  <pre>
+$ furl -p 192.168.0.1/index.php3?ref=http://slashdot.org#blah
+scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment
+,,,192.168.0.1,192.168.0.1,,,/index.php3,?ref=http://slashdot.org,#blah
+					  </pre>
+					</p>
+				</section>
+
+				<section>
+					<h2>Extract a TLD</h2>
+					<p>
+					  <pre>
+$ furl http://www.hack.lu:42/foo.html |cut -d',' -f6
+lu
+					  </pre>
+					</p>
+				</section>
+
+				<section>
+					<h2>List your TLD, sorted</h2>
+					<p>
+					  <pre>
+$ cat urls |furl |cut -d',' -f6 |sort |uniq
+com
+lu
+net
+org
+					  </pre>
+					</p>
+				</section>
+
+				<section>
+					<h2>Fyodor admited he had troubles with google-anatylics.com yesterday!</h2>
+					<p>
+					  <pre>
+$ cat fyodor |furl |cut -d',' -f5 |sort |uniq
+google-analitycs.com
+google-analytics.com
+google-anatylics.com
+					  </pre>
+					</p>
+				</section>
+
+				<section>
+					<h2>Python bindings</h2>
+					<p>
+					  <pre>
+   >>> from pyfurl.furl import Furl
+   >>> f = Furl()
+   >>> f.decode("https://www.slashdot.org")
+   >>> f.get()
+   {'credential': None, 'domain': 'slashdot.org', 'subdomain': 'www', 
+    'fragment': None, 'host': 'www.slashdot.org', 'resource_path': None, 
+    'tld': 'org', 'query_string': None, 'scheme': 'https', 'port': None}
+   >>> 					  </pre>
+					</p>
+				</section>
+
+				<section>
+				  <h2>How it works?</h2>
+				  A look at the C API:
+				  <pre>
+   furl_handler_t *fh;
+
+   fh = furl_init();
+   furl_decode(fh, "https://wallinfire.net", strlen("https://wallinfire.net"));
+   tld_pos = furl_get_tld_pos(fh); /* will return 19 */       
+   tld_size = furl_get_tld_size(fh); /* will return 3 */       
+   furl_show(fh, ',', stdout);
+
+   furl_terminate(fh);
+				  </pre>
+				</section>
+
+
+				<section>
+					<h2>Availability</h2>
+					<p>
+					  <h4>http://github.com/stricaud/furl</h4>
+					  License
+					  <pre>
+DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE 
+Version 2, December 2004 
+
+Copyright (C) 2012 Sebastien Tricaud (sebastien@honeynet.org)
+
+Everyone is permitted to copy and distribute verbatim or modified 
+copies of this license document, and changing it is allowed as long 
+as the name is changed. 
+
+DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE 
+TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION 
+
+ 0. You just DO WHAT THE FUCK YOU WANT TO.
+
+					  </pre>
+					</p>
+				</section>
+
+				
+				<section>
+					<h1>Questions?</h1>
+				</section>
+			</div>
+
+			<!-- The navigational controls UI -->
+			<aside class="controls">
+				<a class="left" href="#">&#x25C4;</a>
+				<a class="right" href="#">&#x25BA;</a>
+				<a class="up" href="#">&#x25B2;</a>
+				<a class="down" href="#">&#x25BC;</a>
+			</aside>
+
+			<!-- Presentation progress bar -->
+			<div class="progress"><span></span></div>
+			
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+			
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				
+				theme: Reveal.getQueryHash().theme || 'default', // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/linear(2d)
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/highlight.js', async: true, callback: function() { window.hljs.initHighlightingOnLoad(); } },
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'lib/js/showdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'lib/js/data-markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: '/socket.io/socket.io.js', async: true, condition: function() { return window.location.host === 'localhost:1947'; } },
+					{ src: 'plugin/speakernotes/client.js', async: true, condition: function() { return window.location.host === 'localhost:1947'; } },
+				]
+			});
+			
+		</script>
+
+	</body>
+</html>
