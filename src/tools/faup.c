@@ -6,14 +6,14 @@
 #include <stdint.h>
 #include <getopt.h>
 
-#include <furl/furl.h>
-#include <furl/decode.h>
+#include <faup/faup.h>
+#include <faup/decode.h>
 
-struct _furl_cli_options_t {
+struct _faup_cli_options_t {
   int print_header;
   char sep_char;
 };
-typedef struct _furl_cli_options_t furl_cli_options_t;
+typedef struct _faup_cli_options_t faup_cli_options_t;
 
 /* IPv6 tests:
 
@@ -26,7 +26,7 @@ typedef struct _furl_cli_options_t furl_cli_options_t;
       http://[2010:836B:4179::836B:4179]
  */
 
-void init_cli_options(furl_cli_options_t *opts)
+void init_cli_options(faup_cli_options_t *opts)
 {
   opts->print_header = 0;
   opts->sep_char = ',';
@@ -83,26 +83,26 @@ void print_header(char sep_char)
 
 int main(int argc, char **argv)
 {
-	furl_handler_t *fh;
+	faup_handler_t *fh;
 	char *strbuf=NULL;
 
-	furl_cli_options_t furl_opts;
+	faup_cli_options_t faup_opts;
 	int opt;
 
-	init_cli_options(&furl_opts);
+	init_cli_options(&faup_opts);
 
-	fh = furl_init();
+	fh = faup_init();
 
 	while ((opt = getopt(argc, argv, "pd:v")) != -1) {
 	  switch(opt) {
 	  case 'p':
-	    furl_opts.print_header = 1;
+	    faup_opts.print_header = 1;
 	    break;
 	  case 'd':
-	    furl_opts.sep_char = optarg[0];
+	    faup_opts.sep_char = optarg[0];
 	    break;
 	  case 'v':
-	    printf("furl v%s\n", furl_get_version());
+	    printf("faup v%s\n", faup_get_version());
 	    exit(0);
 	  default:
 	    print_help(argv);
@@ -115,20 +115,20 @@ int main(int argc, char **argv)
 			print_help(argv);
 			exit(1);
 		}
-		if (furl_opts.print_header) {
-			print_header(furl_opts.sep_char);
+		if (faup_opts.print_header) {
+			print_header(faup_opts.sep_char);
 		}
 
 		if (!argv[optind]) {
 		  exit(1);
 		}
 
-		furl_decode(fh, argv[optind], strlen(argv[optind]));
-		furl_show(fh, furl_opts.sep_char, stdout);
+		faup_decode(fh, argv[optind], strlen(argv[optind]));
+		faup_show(fh, faup_opts.sep_char, stdout);
 		printf("\n");
 	} else {		/* We read from stdin */
-		if (furl_opts.print_header) {
-			print_header(furl_opts.sep_char);
+		if (faup_opts.print_header) {
+			print_header(faup_opts.sep_char);
 		}
 		while (!feof(stdin)) {
 			strbuf = readline(stdin);
@@ -139,15 +139,15 @@ int main(int argc, char **argv)
 				break;
 			}
 
-			furl_decode(fh, strbuf, strlen(strbuf));			
-			furl_show(fh, ',', stdout);
+			faup_decode(fh, strbuf, strlen(strbuf));			
+			faup_show(fh, ',', stdout);
 			printf("\n");
 
 			free(strbuf);
 		}
 	}
 
-	furl_terminate(fh);
+	faup_terminate(fh);
 
 	return 0;
 }

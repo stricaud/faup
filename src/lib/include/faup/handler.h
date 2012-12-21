@@ -14,14 +14,18 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-#ifndef _FURL_RETURN_CODES_H_
-#define _FURL_RETURN_CODES_H_
+#ifndef _FAUP_HANDLER_H_
+#define _FAUP_HANDLER_H_
 
-#define FURL_OK 0
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#define FURL_INVALID_STRONG 100	/* The string cannot be parsed at all */
-#define FURL_INVALID_MEDIUM 101	/* The string sucks, but we can still get some stuff (eg. 'http://@') */
-#define FURL_INVALID_WEAK 102 	/* The string can be mostly parsed, except a few weird stuff (eg. 'localhost') */
+typedef struct _faup_handler_t faup_handler_t;
 
+#ifdef __cplusplus
+}
+#endif
 
-#endif	/* _FURL_RETURN_CODES_H_ */
+#endif	/* _FAUP_HANDLER_H_ */
+

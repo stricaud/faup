@@ -14,20 +14,14 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-#ifndef _FURL_PORTABLE_H_
-#define _FURL_PORTABLE_H_
+#ifndef _FAUP_ERRORS_H_
+#define _FAUP_ERRORS_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define FAUP_URL_EMPTY 1
+#define FAUP_URL_TOOLONG 2
 
-#ifdef MACOS
-void *memrchr(const void *s, int c, size_t n);
-#endif /* MACOS */
+#define FAUP_URL_MEM_ERROR 3
+#define FAUP_URL_PARSER_ERROR 4
+#define FAUP_URL_UNKNOWN_ERROR 5
 
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif	/* _FURL_PORTABLE_H_ */
+#endif	/* _FAUP_ERRORS_H_ */

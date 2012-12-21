@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(furl-project)
+project(faup-project)
 
 include(CMakeOptions.txt)
 
@@ -30,22 +30,22 @@ include(FindPkgConfig)
 
 # Manage the version
 file(STRINGS VERSION VERSION)
-set(FURL_VERSION ${VERSION})
-configure_file("src/lib/include/furl/version.h.cmake" "src/lib/include/furl/version.h")
+set(FAUP_VERSION ${VERSION})
+configure_file("src/lib/include/faup/version.h.cmake" "src/lib/include/faup/version.h")
 
 # Mac OS Specifics
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   add_definitions(-DMACOS=1)
 endif()
 
-set(FURL_INCLUDE_DIRS "${furl-project_SOURCE_DIR}/src/lib/include/")
+set(FAUP_INCLUDE_DIRS "${faup-project_SOURCE_DIR}/src/lib/include/")
 
-set(FURL_LIBRARY "${furl-project_SOURCE_DIR}/src/lib/libfurll.so")
+set(FAUP_LIBRARY "${faup-project_SOURCE_DIR}/src/lib/libfaupl.so")
 if(WIN32)
-	set(FURL_LIBRARY "${furl-project_SOURCE_DIR}/src/lib/${CMAKE_BUILD_TYPE}/furll.lib")
+	set(FAUP_LIBRARY "${faup-project_SOURCE_DIR}/src/lib/${CMAKE_BUILD_TYPE}/faupl.lib")
 endif(WIN32)
 if(APPLE)
-	set(FURL_LIBRARY "${furl-project_SOURCE_DIR}/src/lib/libfurll.dylib")
+	set(FAUP_LIBRARY "${faup-project_SOURCE_DIR}/src/lib/libfaupl.dylib")
 endif(APPLE)
 
 add_subdirectory(src)

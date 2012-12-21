@@ -30,7 +30,7 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
-FURL_OUT=$("$SCRIPTDIR/../tools/furl" "$1")
+FAUP_OUT=$("$SCRIPTDIR/../tools/faup" "$1")
 if [ $? -ne 0 ]; then
 	echo "Error while adding URL to urls.txt... Exiting."
 	head -n-1 "$URLFILE" >"$URLFILE.tmp"
@@ -38,6 +38,6 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
-echo $FURL_OUT >>"$SCRIPTDIR/urls.txt.ref"
+echo $FAUP_OUT >>"$SCRIPTDIR/urls.txt.ref"
 
-echo "URL added to furl test case."
+echo "URL added to faup test case."

@@ -14,9 +14,14 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-#ifndef _FURL_SCHEME_CODES_H_
-#define _FURL_SCHEME_CODES_H_
+#ifndef _FAUP_RETURN_CODES_H_
+#define _FAUP_RETURN_CODES_H_
+
+#define FAUP_OK 0
+
+#define FAUP_INVALID_STRONG 100	/* The string cannot be parsed at all */
+#define FAUP_INVALID_MEDIUM 101	/* The string sucks, but we can still get some stuff (eg. 'http://@') */
+#define FAUP_INVALID_WEAK 102 	/* The string can be mostly parsed, except a few weird stuff (eg. 'localhost') */
 
 
-
-#endif	/* _FURL_SCHEME_CODES_H_ */
+#endif	/* _FAUP_RETURN_CODES_H_ */

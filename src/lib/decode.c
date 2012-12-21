@@ -15,9 +15,9 @@
  */
 
 #define _GNU_SOURCE
-#include <furl/furl.h>
-#include <furl/decode.h>
-#include <furl/features.h>
+#include <faup/faup.h>
+#include <faup/decode.h>
+#include <faup/features.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -91,38 +91,38 @@ bool is_ipv4(const char* str, const size_t n)
 	return ndots == 3;
 }
 
-int furl_decode(furl_handler_t *fh, const char *url, const size_t url_len)
+int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len)
 {
 	uint32_t total_size = 0;
 
 	int next_valid_token_pos = 0;
 
 	if (!url) {
-		return FURL_URL_EMPTY;
+		return FAUP_URL_EMPTY;
 	}
 
-	fh->furl.org_str = url;
-	furl_features_find(fh, url, url_len);
-	furl_features_t* url_features = &fh->furl.features;
-	if (!furl_features_errors_lookup(url_features)) {
-		if ((furl_features_exist(url_features->scheme)) && (furl_features_exist(url_features->hierarchical))) { 
+	fh->faup.org_str = url;
+	faup_features_find(fh, url, url_len);
+	faup_features_t* url_features = &fh->faup.features;
+	if (!faup_features_errors_lookup(url_features)) {
+		if ((faup_features_exist(url_features->scheme)) && (faup_features_exist(url_features->hierarchical))) { 
 			total_size = url_features->hierarchical.pos - url_features->scheme.pos; 
 			url_features->scheme.size = total_size;
 		}
 
-		if (furl_features_exist(url_features->credential)) { 
+		if (faup_features_exist(url_features->credential)) { 
 			total_size = url_features->host.pos - url_features->credential.pos - 1; 
 			url_features->credential.size = total_size;
 		}
 
-		if (furl_features_exist(url_features->host)) { 
-			if (furl_features_exist(url_features->port)) { 
+		if (faup_features_exist(url_features->host)) { 
+			if (faup_features_exist(url_features->port)) { 
 				next_valid_token_pos = url_features->port.pos - 1; 
-			} else if (furl_features_exist(url_features->resource_path)) { 
+			} else if (faup_features_exist(url_features->resource_path)) { 
 				next_valid_token_pos = url_features->resource_path.pos; 
-			} else if (furl_features_exist(url_features->query_string)) { 
+			} else if (faup_features_exist(url_features->query_string)) { 
 				next_valid_token_pos = url_features->query_string.pos; 
-			} else if (furl_features_exist(url_features->fragment)) { 
+			} else if (faup_features_exist(url_features->fragment)) { 
 				next_valid_token_pos = url_features->fragment.pos; 
 			} else { 
 				/* /\\* We have no next token *\\/  */
@@ -181,12 +181,12 @@ int furl_decode(furl_handler_t *fh, const char *url, const size_t url_len)
 			}
 		}
 
-		if (furl_features_exist(url_features->port)) { 
-			if (furl_features_exist(url_features->resource_path)) { 
+		if (faup_features_exist(url_features->port)) { 
+			if (faup_features_exist(url_features->resource_path)) { 
 				next_valid_token_pos = url_features->resource_path.pos; 
-			} else if (furl_features_exist(url_features->query_string)) { 
+			} else if (faup_features_exist(url_features->query_string)) { 
 				next_valid_token_pos = url_features->query_string.pos; 
-			} else if (furl_features_exist(url_features->fragment)) { 
+			} else if (faup_features_exist(url_features->fragment)) { 
 				next_valid_token_pos = url_features->fragment.pos; 
 			} else { 
 				/* /\\* We have no next token *\\/  */
@@ -199,10 +199,10 @@ int furl_decode(furl_handler_t *fh, const char *url, const size_t url_len)
 			}
 		}
 
-		if (furl_features_exist(url_features->resource_path)) { 
-			if (furl_features_exist(url_features->query_string)) { 
+		if (faup_features_exist(url_features->resource_path)) { 
+			if (faup_features_exist(url_features->query_string)) { 
 				next_valid_token_pos = url_features->query_string.pos; 
-			} else if (furl_features_exist(url_features->fragment)) { 
+			} else if (faup_features_exist(url_features->fragment)) { 
 				next_valid_token_pos = url_features->fragment.pos; 
 			} else { 
 				/* /\\* We have no next token *\\/  */
@@ -215,8 +215,8 @@ int furl_decode(furl_handler_t *fh, const char *url, const size_t url_len)
 			}
 		}
 
-		if (furl_features_exist(url_features->query_string)) { 
-			if (furl_features_exist(url_features->fragment)) { 
+		if (faup_features_exist(url_features->query_string)) { 
+			if (faup_features_exist(url_features->fragment)) { 
 				next_valid_token_pos = url_features->fragment.pos; 
 			} else { 
 				/* /\\* We have no next token *\\/  */
@@ -229,16 +229,16 @@ int furl_decode(furl_handler_t *fh, const char *url, const size_t url_len)
 			}
 		}
 
-		if (furl_features_exist(url_features->fragment)) { 
+		if (faup_features_exist(url_features->fragment)) { 
 			total_size = url_len - url_features->fragment.pos; 
 			url_features->fragment.size = total_size;
 		}
 
-		//furl_features_debug(url, url_features);
+		//faup_features_debug(url, url_features);
 		return 0;
 	}
 
 	/* FIXME: Such a message should not belong to the library */
 	fprintf(stderr, "Cannot parse the url: '%s'\n", url);
-	return FURL_URL_PARSER_ERROR;
+	return FAUP_URL_PARSER_ERROR;
 }

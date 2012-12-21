@@ -14,19 +14,20 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-#ifndef _FURL_DECODE_H_
-#define _FURL_DECODE_H_
-
-#include <furl/furl.h>
+#ifndef _FAUP_PORTABLE_H_
+#define _FAUP_PORTABLE_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int furl_decode(furl_handler_t *fh, const char *url, const size_t url_size);
+#ifdef MACOS
+void *memrchr(const void *s, int c, size_t n);
+#endif /* MACOS */
+
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	/* _FURL_DECODE_H_ */
+#endif	/* _FAUP_PORTABLE_H_ */

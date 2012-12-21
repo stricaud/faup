@@ -1,6 +1,6 @@
-include_directories(AFTER ${FURL_INCLUDE_DIRS})
+include_directories(AFTER ${FAUP_INCLUDE_DIRS})
 
-add_executable(furl furl.c)
-target_link_libraries(furl ${FURL_LIBRARY})
+add_executable(faup faup.c)
+target_link_libraries(faup ${FAUP_LIBRARY})
 
-install(TARGETS furl DESTINATION bin)
+install(TARGETS faup DESTINATION bin)

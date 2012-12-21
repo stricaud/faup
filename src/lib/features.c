@@ -14,13 +14,13 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-#include <furl/furl.h>
-#include <furl/features.h>
+#include <faup/faup.h>
+#include <faup/features.h>
 
 #include <stdio.h>
 #include <ctype.h>
 
-void furl_features_init(furl_features_t* features)
+void faup_features_init(faup_features_t* features)
 {
 	features->scheme.pos        = -1;
 	features->hierarchical.pos  = -1;
@@ -44,15 +44,15 @@ static inline char get_last_c(const char *buffer, size_t pos)
 	return -1;
 }
 
-int furl_features_exist(furl_feature_t feature) 
+int faup_features_exist(faup_feature_t feature) 
 {
 	return (feature.pos >= 0);
 }
 
-int furl_features_errors_lookup(furl_features_t const* url_features) 
+int faup_features_errors_lookup(faup_features_t const* url_features) 
 {
-	/* if ((furl_features_exist(url_features.scheme)) && */
-	/*     (!furl_features_exist(url_features.hierarchical))) { */
+	/* if ((faup_features_exist(url_features.scheme)) && */
+	/*     (!faup_features_exist(url_features.hierarchical))) { */
 	/* 	fprintf(stderr, "url error: can't have a scheme without a hierarchical!\n"); */
 	/* 	return 1; */
 	/* } */
@@ -60,10 +60,10 @@ int furl_features_errors_lookup(furl_features_t const* url_features)
 	return 0;
 }
 
-void furl_features_find(furl_handler_t *fh, const char *url, const size_t url_len)
+void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_len)
 {
-	furl_features_t* url_features = &fh->furl.features;
-	furl_features_init(url_features);
+	faup_features_t* url_features = &fh->faup.features;
+	faup_features_init(url_features);
 	char c;
 	size_t nb_slashes = 0;
 	//int char_counter[128];
@@ -71,7 +71,7 @@ void furl_features_find(furl_handler_t *fh, const char *url, const size_t url_le
 	const char *url_o = url;	/* We keep the original pointer as we move it */
 	ssize_t whatever_len = 0;
 
-	furl_last_slash_t last_slash_meaning = FURL_LAST_SLASH_NOTFOUND;
+	faup_last_slash_t last_slash_meaning = FAUP_LAST_SLASH_NOTFOUND;
 
 	ssize_t current_pos = 0;
 	ssize_t buffer_pos = 0;
@@ -88,8 +88,8 @@ void furl_features_find(furl_handler_t *fh, const char *url, const size_t url_le
 			case '/':
 				/* If it is the first time we have a '/' and previous char is ':' */
 				if ((nb_slashes == 1) && (get_last_c(url_o, current_pos) == ':')) {
-					if (last_slash_meaning < FURL_LAST_SLASH_AFTER_DOMAIN) {
-						last_slash_meaning = FURL_LAST_SLASH_HIERARCHICAL;
+					if (last_slash_meaning < FAUP_LAST_SLASH_AFTER_DOMAIN) {
+						last_slash_meaning = FAUP_LAST_SLASH_HIERARCHICAL;
 						url_features->hierarchical.pos = current_pos -1;
 						c = get_last_c(url_o, current_pos - 1);
 						if (isalpha(c)) {
@@ -97,20 +97,20 @@ void furl_features_find(furl_handler_t *fh, const char *url, const size_t url_le
 						}
 						url_features->host.pos = -1; /* So finally we don't start with a host */
 						url_features->port.pos = -1; /* So the last ':' we've found was not for a port but for  */
-					} /* if (last_slash_meaning < FURL_LAST_SLASH_AFTER_DOMAIN) */
+					} /* if (last_slash_meaning < FAUP_LAST_SLASH_AFTER_DOMAIN) */
 				} else {
 					/* We now check for the resource path */
-					if (!furl_features_exist(url_features->resource_path)) {
-						if (!furl_features_exist(url_features->scheme)) {
-							if (!furl_features_exist(url_features->hierarchical)) {
+					if (!faup_features_exist(url_features->resource_path)) {
+						if (!faup_features_exist(url_features->scheme)) {
+							if (!faup_features_exist(url_features->hierarchical)) {
 								/* This host has a '/' with no hierarchy */
 								/* The seen '/' is not a hierarchy so it is something like foo/bar.html */
-								last_slash_meaning = FURL_LAST_SLASH_AFTER_DOMAIN;
+								last_slash_meaning = FAUP_LAST_SLASH_AFTER_DOMAIN;
 								url_features->resource_path.pos = current_pos;
 							}
 						} else {
-							if (furl_features_exist(url_features->host)) {
-								last_slash_meaning = FURL_LAST_SLASH_AFTER_DOMAIN;
+							if (faup_features_exist(url_features->host)) {
+								last_slash_meaning = FAUP_LAST_SLASH_AFTER_DOMAIN;
 								url_features->resource_path.pos = current_pos;		
 							}
 						}
@@ -119,17 +119,17 @@ void furl_features_find(furl_handler_t *fh, const char *url, const size_t url_le
 
 				last_slash_pos = current_pos;
 
-				if (furl_features_exist(url_features->host)) {
-					last_slash_meaning = FURL_LAST_SLASH_AFTER_DOMAIN;
+				if (faup_features_exist(url_features->host)) {
+					last_slash_meaning = FAUP_LAST_SLASH_AFTER_DOMAIN;
 				}
 
 				buffer_pos=-1;
 				break;
 			case '@':
-				if (!furl_features_exist(url_features->credential)) {
+				if (!faup_features_exist(url_features->credential)) {
 					whatever_len = buffer_pos;
-					if ((last_slash_meaning == FURL_LAST_SLASH_HIERARCHICAL) || /* This '@' belongs to the authentication if http://foo:bar@host/blah */
-							(last_slash_meaning == FURL_LAST_SLASH_NOTFOUND)) {     /* This '@' belongs to the authentication if foo:bar@host/blah */
+					if ((last_slash_meaning == FAUP_LAST_SLASH_HIERARCHICAL) || /* This '@' belongs to the authentication if http://foo:bar@host/blah */
+							(last_slash_meaning == FAUP_LAST_SLASH_NOTFOUND)) {     /* This '@' belongs to the authentication if foo:bar@host/blah */
 					        url_features->credential.pos = url_features->host.pos; /* The credential starts where we thought it was a pos */
 						url_features->host.pos = current_pos + 1;
 						url_features->port.pos = -1; /* So the last ':' we've found was not for a port but for credential */
@@ -143,10 +143,10 @@ void furl_features_find(furl_handler_t *fh, const char *url, const size_t url_le
 				   - a ':' for the port number
 				   - a ':' in the query request */
 				/* url_features->port = -1; */
-				if (!furl_features_exist(url_features->port)) {
-					if (last_slash_meaning < FURL_LAST_SLASH_AFTER_DOMAIN) {
+				if (!faup_features_exist(url_features->port)) {
+					if (last_slash_meaning < FAUP_LAST_SLASH_AFTER_DOMAIN) {
 						url_features->port.pos = current_pos + 1;
-						/* furl_features_debug("", url_features); */
+						/* faup_features_debug("", url_features); */
 					}
 				}
 
@@ -170,8 +170,8 @@ void furl_features_find(furl_handler_t *fh, const char *url, const size_t url_le
 					url_features->host.pos = 0;
 				}
 				/* We have a scheme, but no host nor no credential, then host is current_pos until we have a credential to remove it */
-				if ((!furl_features_exist(url_features->host)) && 
-						(!furl_features_exist(url_features->credential))) {
+				if ((!faup_features_exist(url_features->host)) && 
+						(!faup_features_exist(url_features->credential))) {
 
 					url_features->host.pos = current_pos;
 
@@ -185,14 +185,14 @@ void furl_features_find(furl_handler_t *fh, const char *url, const size_t url_le
 	}
 }
 
-void furl_features_show(furl_handler_t const* fh, const furl_feature_t feature, FILE* out)
+void faup_features_show(faup_handler_t const* fh, const faup_feature_t feature, FILE* out)
 {
-	if (furl_features_exist(feature)) {
-		fwrite(fh->furl.org_str + feature.pos, feature.size, 1, out);
+	if (faup_features_exist(feature)) {
+		fwrite(fh->faup.org_str + feature.pos, feature.size, 1, out);
 	}
 }
 
-void furl_features_debug(const char *url, furl_features_t const* features)
+void faup_features_debug(const char *url, faup_features_t const* features)
 {
 	fprintf(stdout, "url:%s\n", url);
 	fprintf(stdout, "features->scheme:%d,%u\n", features->scheme.pos, features->scheme.size);

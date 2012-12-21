@@ -14,13 +14,13 @@
 #
 #  0. You just DO WHAT THE FUCK YOU WANT TO.
 
-# Test furl output
-# furl output format is :
+# Test faup output
+# faup output format is :
 # scheme,credential,domain,tld,port,resource_path,query_string,fragment
 # 
 # To add an URL to the list of URL to test, simply use the provided add_url.sh script :
 # $ ./add_url.sh http://www.test.com/myweirdurl
-# It will basically add http://www.test.com/myweirdurl to urls.txt, and the output of furl to urls.txt.ref
+# It will basically add http://www.test.com/myweirdurl to urls.txt, and the output of faup to urls.txt.ref
 
 # Get script absolute directory
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -28,8 +28,8 @@ URLS="$SCRIPTDIR/urls.txt"
 URLS_CMP="$SCRIPTDIR/urls.txt.cmp"
 URLS_REF="$SCRIPTDIR/urls.txt.ref"
 
-# Execute furl on urls.txt and compare to the reference output
-"$SCRIPTDIR/../tools/furl" <"$URLS" >"$URLS_CMP" ||exit $1
+# Execute faup on urls.txt and compare to the reference output
+"$SCRIPTDIR/../tools/faup" <"$URLS" >"$URLS_CMP" ||exit $1
 diff -u "$URLS_CMP" "$URLS_REF" >/dev/null
 RET=$?
 if [ $RET -eq 0 ]; then rm "$URLS_CMP"; fi

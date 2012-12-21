@@ -1,2 +1,2 @@
 enable_testing()
-add_test(test test_furl.sh)
+add_test(test test_faup.sh)

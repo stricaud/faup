@@ -14,18 +14,10 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-#ifndef _FURL_HANDLER_H_
-#define _FURL_HANDLER_H_
+#ifndef _FAUP_VERSION_H_
+#define _FAUP_VERSION_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define FAUP_VERSION "${FAUP_VERSION}"
 
-typedef struct _furl_handler_t furl_handler_t;
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif	/* _FURL_HANDLER_H_ */
+#endif  /* _FAUP_VERSION_H_ */
 

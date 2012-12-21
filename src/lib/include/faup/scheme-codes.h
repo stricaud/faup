@@ -14,10 +14,9 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-#ifndef _FURL_VERSION_H_
-#define _FURL_VERSION_H_
+#ifndef _FAUP_SCHEME_CODES_H_
+#define _FAUP_SCHEME_CODES_H_
 
-#define FURL_VERSION "${FURL_VERSION}"
 
-#endif  /* _FURL_VERSION_H_ */
 
+#endif	/* _FAUP_SCHEME_CODES_H_ */

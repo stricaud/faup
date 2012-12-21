@@ -1,16 +1,16 @@
-Fast URL Library and Tools
-==========================
+Faup: Finally an url parser! Library and Tools
+==============================================
 
-The Fast URL Library provides:
+The Faup Library provides:
 
-* A static library you can embed in your software (furl_static)
-* A dynamic library you can get along with (furll)
-* A command line tool you can use to extract various parts of a url (furl)
+* A static library you can embed in your software (faup_static)
+* A dynamic library you can get along with (faupl)
+* A command line tool you can use to extract various parts of a url (faup)
 
 Mission
 -------
 
-Furl is written to be fast and resilient to badly formated URL. It extract any 
+Faup is written to be fast and resilient to badly formated URL. It extract any 
 required url field by checking each character once.
 
 Why Yet Another URL Extraction Library?
@@ -30,11 +30,11 @@ Command line usage
 
 Simply pipe or give your url as a parameter:
 
-	$ echo "www.github.com" |furl
+	$ echo "www.github.com" |faup
 	scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment
 	,,www,github.com,www.github.com,com,,,,
 
-	$ furl www.github.com
+	$ faup www.github.com
 	scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment
 	,,www,github.com,www.github.com,com,,,,
 
@@ -43,8 +43,8 @@ Python bindings
 
 Here's what you can do:
 
-       >>> from pyfurl.furl import Furl
-       >>> f = Furl()
+       >>> from pyfaup.faup import Faup
+       >>> f = Faup()
        >>> f.decode("https://www.slashdot.org")
        >>> f.get()
        {'credential': None, 'domain': 'slashdot.org', 'subdomain': 'www', 'fragment': None, 'host': 'www.slashdot.org', 'resource_path': None, 'tld': 'org', 'query_string': None, 'scheme': 'https', 'port': None}
@@ -55,12 +55,12 @@ C API
 
 Again, things are basic:
 
-       furl_handler_t *fh;
+       faup_handler_t *fh;
 
-       fh = furl_init();
-       furl_decode(fh, "https://wallinfire.net", strlen("https://wallinfire.net"));
-       tld_pos = furl_get_tld_pos(fh); /* will return 19 */       
-       tld_size = furl_get_tld_size(fh); /* will return 3 */       
-       furl_show(fh, ',', stdout);
+       fh = faup_init();
+       faup_decode(fh, "https://wallinfire.net", strlen("https://wallinfire.net"));
+       tld_pos = faup_get_tld_pos(fh); /* will return 19 */       
+       tld_size = faup_get_tld_size(fh); /* will return 3 */       
+       faup_show(fh, ',', stdout);
 
-       furl_terminate(fh);
+       faup_terminate(fh);

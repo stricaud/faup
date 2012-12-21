@@ -1,10 +1,10 @@
 #!/usr/bin/python
 
-from pyfurl.furl import Furl
+from pyfaup.faup import Faup
 
 url = "http://www.wallinfire.net"
 
-f = Furl()
+f = Faup()
 print("We decode the url: %s" % (url))
 f.decode(url)
 data = f.get()

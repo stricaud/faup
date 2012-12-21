@@ -14,14 +14,19 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-#ifndef _FURL_ERRORS_H_
-#define _FURL_ERRORS_H_
+#ifndef _FAUP_DECODE_H_
+#define _FAUP_DECODE_H_
 
-#define FURL_URL_EMPTY 1
-#define FURL_URL_TOOLONG 2
+#include <faup/faup.h>
 
-#define FURL_URL_MEM_ERROR 3
-#define FURL_URL_PARSER_ERROR 4
-#define FURL_URL_UNKNOWN_ERROR 5
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#endif	/* _FURL_ERRORS_H_ */
+int faup_decode(faup_handler_t *fh, const char *url, const size_t url_size);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif	/* _FAUP_DECODE_H_ */

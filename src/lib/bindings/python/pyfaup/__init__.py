@@ -4,10 +4,10 @@
 import sys
 from ctypes import *
 
-from pyfurl.bind import *
+from pyfaup.bind import *
 
-UNIX_LIBRARY_FILENAME = "libfurll.so.1"
-WIN32_LIBRARY_FILENAME = "furll.dll"
+UNIX_LIBRARY_FILENAME = "libfaupl.so.1"
+WIN32_LIBRARY_FILENAME = "faupl.dll"
 
 if sys.platform == "win32":
 	LIBRARY_FILENAME = WIN32_LIBRARY_FILENAME
