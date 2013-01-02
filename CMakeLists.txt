@@ -38,9 +38,9 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   add_definitions(-DMACOS=1)
 endif()
 
-set(FAUP_INCLUDE_DIRS "${faup-project_SOURCE_DIR}/src/lib/include/")
+set(FAUP_INCLUDE_DIRS "${faup-project_SOURCE_DIR}/src/lib/include/" "${faup-project_BINARY_DIR}/src/lib/include")
 
-set(FAUP_LIBRARY "${faup-project_SOURCE_DIR}/src/lib/libfaupl.so")
+set(FAUP_LIBRARY "${faup-project_BINARY_DIR}/src/lib/libfaupl.so")
 if(WIN32)
 	set(FAUP_LIBRARY "${faup-project_SOURCE_DIR}/src/lib/${CMAKE_BUILD_TYPE}/faupl.lib")
 endif(WIN32)

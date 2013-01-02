@@ -1,4 +1,4 @@
-include_directories(AFTER "include/")
+include_directories(AFTER "include/" ${FAUP_INCLUDE_DIRS})
 
 set(FAUP_LIB_SRC_FILES
 decode.c
