@@ -2,6 +2,17 @@ cmake_minimum_required(VERSION 2.8)
 
 project(faup-project)
 
+if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
+message(FATAL_ERROR "CMake generation is not allowed within the source directory!
+Remove the CMakeCache.txt file and try again from another folder, e.g.:
+
+   rm CMakeCache.txt
+   mkdir build
+   cd build
+   cmake ..
+")
+endif()
+
 include(CMakeOptions.txt)
 
 set(CMAKE_BUILD_TYPE "Release")
