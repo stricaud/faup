@@ -7,10 +7,13 @@ from ctypes import *
 from pyfaup.bind import *
 
 UNIX_LIBRARY_FILENAME = "libfaupl.so.1"
+DARWIN_LIBRARY_FILENAME = "libfaupl.dylib"
 WIN32_LIBRARY_FILENAME = "faupl.dll"
 
 if sys.platform == "win32":
 	LIBRARY_FILENAME = WIN32_LIBRARY_FILENAME
+elif sys.platform == "darwin":
+	LIBRARY_FILENAME = DARWIN_LIBRARY_FILENAME
 else:
 	LIBRARY_FILENAME = UNIX_LIBRARY_FILENAME
 	bind.library = cdll.LoadLibrary(LIBRARY_FILENAME)
