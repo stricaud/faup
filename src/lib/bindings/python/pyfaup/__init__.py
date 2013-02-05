@@ -16,4 +16,5 @@ elif sys.platform == "darwin":
 	LIBRARY_FILENAME = DARWIN_LIBRARY_FILENAME
 else:
 	LIBRARY_FILENAME = UNIX_LIBRARY_FILENAME
-	bind.library = cdll.LoadLibrary(LIBRARY_FILENAME)
+
+bind.library = cdll.LoadLibrary(LIBRARY_FILENAME)

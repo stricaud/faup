@@ -2,11 +2,12 @@
 
 from pyfaup.faup import Faup
 
-url = "http://www.wallinfire.net"
+url = b"http://www.wallinfire.co.uk"
 
 f = Faup()
 print("We decode the url: %s" % (url))
-f.decode(url)
+f.decode(url, False)
 data = f.get()
+print(f.get_tld())
 print("URL TLD: %s" % (data['tld']))
 
