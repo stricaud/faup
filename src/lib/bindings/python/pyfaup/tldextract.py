@@ -30,9 +30,8 @@ import os
 import re
 import socket
 import sys
-import urllib.request, urllib.error, urllib.parse
-import urllib.parse
 import binascii
+
 try:
     import pickle as pickle
 except ImportError:
@@ -133,7 +132,7 @@ class TLDExtract(object):
                 snapshot = sorted(pickle.load(snapshot_file))
             new = sorted(tlds)
             for line in difflib.unified_diff(snapshot, new, fromfile=".tld_set_snapshot", tofile=cached_file):
-                print(line.encode('utf-8'), file=sys.stderr)
+                print(line)
 
         try:
             with open(cached_file, 'wb') as f:
@@ -145,10 +144,20 @@ class TLDExtract(object):
         return self._extractor
 
 def _fetch_page(url):
-    try:
-        return str(urllib.request.urlopen(url).read(), 'utf-8')
-    except urllib.error.URLError as e:
-        LOG.error(e)
+        if sys.version.split('.')[0].split('.')[0]=='3':
+            try:
+                import urllib.request, urllib.error, urllib.parse
+                import urllib.parse
+                return str(urllib.request.urlopen(url).read(), 'utf-8')
+            except urllib.error.URLError as e:
+                LOG.error(e)
+        if sys.version.split('.')[0].split('.')[0]=='2':
+            import urllib2
+            try:
+                return str(urllib2.urlopen(url).read())
+            except urllib2.URLError as e:
+                LOG.error(e)
+        
         return ''
 
 def _PublicSuffixListSource():
