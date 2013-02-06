@@ -1,0 +1,14 @@
+http://www.picviz.com/test
+http://127.0.0.1/
+127.0.0.1
+tunnel://www.mysei:440/
+https://lol.com:443/
+https://test.com/?gna=v
+http://test.com:40/query?vars
+http:///vars?=test&dfdsf
+ftp://login:pwd@myftp.com/path
+ftp://login@127.0.0.1/
+tunnel://test.com:443/vars?=test&dfdsf#salut
+https://wwdég.google.com/unicode%20#hi
+dsfdsfs
+http://www.google.com/aclk?sa=l&ai=CYXXXXXXXXXXXpa7lo0Epsa91UHFisELCAAQAVD2kfW1_P____8BYPvhkoO4CqABisnWzAPIAQGpAkvOYeOnnbQ-XXXXXXXXXXXXXXXXXXXX&sig=AOD64_3XAr8_1wJEFMTu04cHBeza8bTInw&ved=0CFoQ0Qw&adurl=sdqdfdsgregrerth%3Fxtor%3DSEC-553&rct=j&q=
