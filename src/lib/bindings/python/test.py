@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from pyfaup.faup import Faup
+import sys
 
 url = b"http://www.wallinfire.co.uk"
 
@@ -10,4 +11,3 @@ f.decode(url, False)
 data = f.get()
 print(f.get_tld())
 print("URL TLD: %s" % (data['tld']))
-
