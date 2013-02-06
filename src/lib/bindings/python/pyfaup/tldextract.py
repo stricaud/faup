@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-"""`tldextract` accurately separates the gTLD or ccTLD (generic or country code
+"""
+this code is inspired: https://github.com/john-kurkowski/tldextract
+`tldextract` accurately separates the gTLD or ccTLD (generic or country code
 top-level domain) from the registered domain and subdomains of a URL.
 
     >>> import tldextract
@@ -30,7 +32,7 @@ import socket
 import sys
 import urllib.request, urllib.error, urllib.parse
 import urllib.parse
-
+import binascii
 try:
     import pickle as pickle
 except ImportError:
@@ -51,48 +53,9 @@ except ImportError:
 
 LOG = logging.getLogger("tldextract")
 
-SCHEME_RE = re.compile(r'^([' + urllib.parse.scheme_chars + ']+:)?//')
-IP_RE = re.compile(r'^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$')
 
-class ExtractResult(tuple):
-    'ExtractResult(subdomain, domain, tld)'
-    __slots__ = ()
-    _fields = ('subdomain', 'domain', 'tld')
 
-    def __new__(cls, subdomain, domain, tld):
-        'Create new instance of ExtractResult(subdomain, domain, tld)'
-        return tuple.__new__(cls, (subdomain, domain, tld))
 
-    @classmethod
-    def _make(cls, iterable, new=tuple.__new__, len=len):
-        'Make a new ExtractResult object from a sequence or iterable'
-        result = new(cls, iterable)
-        if len(result) != 3:
-            raise TypeError('Expected 3 arguments, got %d' % len(result))
-        return result
-
-    def __repr__(self):
-        'Return a nicely formatted representation string'
-        return 'ExtractResult(subdomain=%r, domain=%r, tld=%r)' % self
-
-    def _asdict(self):
-        'Return a new dict which maps field names to their values'
-        return dict(list(zip(self._fields, self)))
-
-    def _replace(self, **kwds):
-        'Return a new ExtractResult object replacing specified fields with new values'
-        result = self._make(list(map(kwds.pop, ('subdomain', 'domain', 'tld'), self)))
-        if kwds:
-            raise ValueError('Got unexpected field names: %r' % list(kwds.keys()))
-        return result
-
-    def __getnewargs__(self):
-        'Return self as a plain tuple.  Used by copy and pickle.'
-        return tuple(self)
-
-    subdomain = property(itemgetter(0), doc='Alias for field number 0')
-    domain = property(itemgetter(1), doc='Alias for field number 1')
-    tld = property(itemgetter(2), doc='Alias for field number 2')
 
 class TLDExtract(object):
     def __init__(self, fetch=True, cache_file=''):
@@ -130,7 +93,7 @@ class TLDExtract(object):
 
     def _extract(self, host):                
         registered_domain, tld = self._get_tld_extractor().extract(host)    
-        subdomain, _, domain = registered_domain.rpartition('.')
+        subdomain, _, domain = registered_domain.rpartition(b'.')
         self.tld=tld
         self.subdomain=subdomain
         self.domain=domain
@@ -155,15 +118,15 @@ class TLDExtract(object):
 
         tlds = frozenset()
         if self.fetch:
-            tld_sources = (_PublicSuffixListSource,)
-            tlds = frozenset(tld for tld_source in tld_sources for tld in tld_source())
-
+            tld_sources = (_PublicSuffixListSource,)        
+            tlds = frozenset(binascii.a2b_qp(tld) for tld_source in tld_sources for tld in tld_source())
+            
         if not tlds:
             with pkg_resources.resource_stream(__name__, '.tld_set_snapshot') as snapshot_file:
                 self._extractor = _PublicSuffixListTLDExtractor(pickle.load(snapshot_file))
                 return self._extractor
 
-        LOG.info("computed TLDs: [%s, ...]", ', '.join(list(tlds)[:10]))
+        LOG.info("computed TLDs: [%s, ...]", b', '.join(list(tlds)[:10]))
         if LOG.isEnabledFor(logging.DEBUG):
             import difflib
             with pkg_resources.resource_stream(__name__, '.tld_set_snapshot') as snapshot_file:
@@ -175,9 +138,9 @@ class TLDExtract(object):
         try:
             with open(cached_file, 'wb') as f:
                 pickle.dump(tlds, f)
+
         except IOError as e:
             LOG.warn("unable to cache TLDs in file %s: %s", cached_file, e)
-
         self._extractor = _PublicSuffixListTLDExtractor(tlds)
         return self._extractor
 
@@ -192,15 +155,16 @@ def _PublicSuffixListSource():
     page = _fetch_page('http://mxr.mozilla.org/mozilla-central/source/netwerk/dns/effective_tld_names.dat?raw=1')
 
     tld_finder = re.compile(r'^(?P<tld>[.*!]*\w[\S]*)', re.UNICODE | re.MULTILINE)
-    tlds = [m.group('tld') for m in tld_finder.finditer(page)]
-    return tlds
+    #tlds = [m.group('tld') for m in tld_finder.finditer(page)]
+    for m in tld_finder.finditer(page):
+        yield m.group('tld')
 
 class _PublicSuffixListTLDExtractor(object):
     def __init__(self, tlds):
         self.tlds = tlds
 
     def extract(self, netloc):
-        spl = bytes(netloc).split('.')
+        spl = netloc.split(b'.')
         for i in range(len(spl)):
             maybe_tld = b'.'.join(spl[i:])
             exception_tld = b'!' + maybe_tld
@@ -208,7 +172,7 @@ class _PublicSuffixListTLDExtractor(object):
                 return b'.'.join(spl[:i+1]), '.'.join(spl[i+1:])
 
             wildcard_tld = b'*.' + b'.'.join(spl[i+1:])
-            if wildcard_tld in self.tlds or maybe_tld in self.tlds:
+            if wildcard_tld in self.tlds or maybe_tld in map(bytes, self.tlds):
                 return b'.'.join(spl[:i]), maybe_tld
 
         return netloc, b''
