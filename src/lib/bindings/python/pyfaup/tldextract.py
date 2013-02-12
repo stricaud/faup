@@ -57,6 +57,13 @@ LOG = logging.getLogger("tldextract")
 
 
 class TLDExtract(object):
+    _instance=None
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(TLDExtract, cls).__new__(
+                                cls, *args, **kwargs)
+        return cls._instance
+    
     def __init__(self, fetch=True, cache_file=''):
         """
         Constructs a callable for extracting subdomain, domain, and TLD
