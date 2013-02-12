@@ -117,15 +117,14 @@ class TLDExtract(object):
 
         tlds = frozenset()
         if self.fetch:
-            tld_sources = (_PublicSuffixListSource,)        
-            tlds = frozenset(binascii.a2b_qp(tld) for tld_source in tld_sources for tld in tld_source())
-            
+            tld_sources = (_PublicSuffixListSource,)     
+            tlds = frozenset(binascii.a2b_qp(tld) for tld_source in tld_sources for tld in tld_source())            
         if not tlds:
             with pkg_resources.resource_stream(__name__, '.tld_set_snapshot') as snapshot_file:
                 self._extractor = _PublicSuffixListTLDExtractor(pickle.load(snapshot_file))
                 return self._extractor
 
-        LOG.info("computed TLDs: [%s, ...]", b', '.join(list(tlds)[:10]))
+        LOG.info(b"computed TLDs: [%s, ...]", b', '.join(list(tlds)[:10]))
         if LOG.isEnabledFor(logging.DEBUG):
             import difflib
             with pkg_resources.resource_stream(__name__, '.tld_set_snapshot') as snapshot_file:

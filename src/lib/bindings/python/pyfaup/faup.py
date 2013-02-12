@@ -58,7 +58,7 @@ class Faup(object):
         else:
             if self.tldex==None:
                 self.tldex=TLDExtract()
-                self.tldex._extract(self.get_host())
+            self.tldex._extract(self.get_host())
             return getattr(self.tldex, 'subdomain')
 
 
@@ -74,7 +74,7 @@ class Faup(object):
         else:
             if self.tldex==None:
                 self.tldex=TLDExtract()
-                self.tldex._extract(self.get_host())
+            self.tldex._extract(self.get_host())
             return getattr(self.tldex, 'domain')
             
         
@@ -99,7 +99,7 @@ class Faup(object):
         else:
             if self.tldex==None:
                 self.tldex=TLDExtract()
-                self.tldex._extract(self.get_host())
+            self.tldex._extract(self.get_host())
             return getattr(self.tldex, 'tld')
             
     def get_port(self):
