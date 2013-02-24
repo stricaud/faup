@@ -125,13 +125,14 @@ class TLDExtract(object):
         tlds = frozenset()
         if self.fetch:
             tld_sources = (_PublicSuffixListSource,)     
-            tlds = frozenset(binascii.a2b_qp(tld) for tld_source in tld_sources for tld in tld_source())            
+            tlds = frozenset(tld for tld_source in tld_sources for tld in tld_source())
+                
         if not tlds:
             with pkg_resources.resource_stream(__name__, '.tld_set_snapshot') as snapshot_file:
                 self._extractor = _PublicSuffixListTLDExtractor(pickle.load(snapshot_file))
                 return self._extractor
 
-        LOG.info(b"computed TLDs: [%s, ...]", b', '.join(list(tlds)[:10]))
+        LOG.info("computed TLDs: [%s, ...]", ', '.join(list(tlds)[:10]))
         if LOG.isEnabledFor(logging.DEBUG):
             import difflib
             with pkg_resources.resource_stream(__name__, '.tld_set_snapshot') as snapshot_file:
@@ -177,17 +178,20 @@ def _PublicSuffixListSource():
 class _PublicSuffixListTLDExtractor(object):
     def __init__(self, tlds):
         self.tlds = tlds
-
+    
     def extract(self, netloc):
         spl = netloc.split(b'.')
         for i in range(len(spl)):
             maybe_tld = b'.'.join(spl[i:])
             exception_tld = b'!' + maybe_tld
+            exception_tld=exception_tld.decode("utf-8")
             if exception_tld in self.tlds:
-                return b'.'.join(spl[:i+1]), '.'.join(spl[i+1:])
-
+                return '.'.join(spl[:i+1]), '.'.join(spl[i+1:])
             wildcard_tld = b'*.' + b'.'.join(spl[i+1:])
-            if wildcard_tld in self.tlds or maybe_tld in map(bytes, self.tlds):
+            wildcard_tld=wildcard_tld.decode("utf-8")
+            maybe_tld=maybe_tld.decode("utf-8")
+            
+            if wildcard_tld in self.tlds or maybe_tld in self.tlds:
                 return b'.'.join(spl[:i]), maybe_tld
 
         return netloc, b''
