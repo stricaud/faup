@@ -24,14 +24,14 @@ top-level domain) from the registered domain and subdomains of a URL.
 
 from functools import wraps
 from operator import itemgetter
+import binascii
 import errno
 import logging
 import os
 import re
 import socket
 import sys
-import binascii
-
+import json
 try:
     import pickle as pickle
 except ImportError:
@@ -79,7 +79,7 @@ class TLDExtract(object):
 
         """
         self.fetch = fetch
-        self.cache_file = cache_file or os.path.join(os.path.dirname(__file__), '.tld_set')
+        self.cache_file = cache_file or os.path.join(os.path.dirname(__file__), '.tld_set.json')
         self._extractor = None
         self.tld=''
         self.domain=''
@@ -112,8 +112,10 @@ class TLDExtract(object):
 
         cached_file = self.cache_file
         try:
-            with open(cached_file) as f:
-                self._extractor = _PublicSuffixListTLDExtractor(pickle.load(f))
+            if self._extractor==None:
+                with open(cached_file,'r') as f:
+                    jsonfile=f.readlines()
+                    self._extractor = _PublicSuffixListTLDExtractor(json.loads(jsonfile[0]))
                 return self._extractor
         except IOError as ioe:
             file_not_found = ioe.errno == errno.ENOENT
@@ -122,10 +124,10 @@ class TLDExtract(object):
         except Exception as ex:
             LOG.error("error reading TLD cache file %s: %s", cached_file, ex)
 
-        tlds = frozenset()
+        
         if self.fetch:
             tld_sources = (_PublicSuffixListSource,)     
-            tlds = frozenset(tld for tld_source in tld_sources for tld in tld_source())
+            tlds = [tld for tld_source in tld_sources for tld in tld_source()]
                 
         if not tlds:
             with pkg_resources.resource_stream(__name__, '.tld_set_snapshot') as snapshot_file:
@@ -135,19 +137,31 @@ class TLDExtract(object):
         LOG.info("computed TLDs: [%s, ...]", ', '.join(list(tlds)[:10]))
         if LOG.isEnabledFor(logging.DEBUG):
             import difflib
-            with pkg_resources.resource_stream(__name__, '.tld_set_snapshot') as snapshot_file:
-                snapshot = sorted(pickle.load(snapshot_file))
+            with pkg_resources.resource_stream(__name__, '.tld_set_snapshot.json') as snapshot_file:
+                snapshot = sorted(json.load(snapshot_file))
             new = sorted(tlds)
-            for line in difflib.unified_diff(snapshot, new, fromfile=".tld_set_snapshot", tofile=cached_file):
+            for line in difflib.unified_diff(snapshot, new, fromfile=".tld_set_snapshot.json", tofile=cached_file):
                 print(line)
 
         try:
-            with open(cached_file, 'wb') as f:
-                pickle.dump(tlds, f)
-
+            with open(cached_file, 'w') as f:
+                data_to_dump={}
+                for tld in tlds:
+                    if tld.find('.') !=-1:  
+                        token=tld.split('.')
+                        tld_info=token[len(token)-1]
+                        if tld_info in data_to_dump:
+                            list_tld=data_to_dump[tld_info]
+                            list_tld.append(tld)
+                        else:
+                            data_to_dump[tld_info]=[tld]
+                    else:
+                        data_to_dump[tld]=[tld]       
+                    
+                json.dump(data_to_dump, f)
         except IOError as e:
             LOG.warn("unable to cache TLDs in file %s: %s", cached_file, e)
-        self._extractor = _PublicSuffixListTLDExtractor(tlds)
+        self._extractor = _PublicSuffixListTLDExtractor(data_to_dump)
         return self._extractor
 
 def _fetch_page(url):
@@ -181,17 +195,34 @@ class _PublicSuffixListTLDExtractor(object):
     
     def extract(self, netloc):
         spl = netloc.split(b'.')
-        for i in range(len(spl)):
-            maybe_tld = b'.'.join(spl[i:])
-            exception_tld = b'!' + maybe_tld
-            exception_tld=exception_tld.decode("utf-8")
-            if exception_tld in self.tlds:
-                return '.'.join(spl[:i+1]), '.'.join(spl[i+1:])
-            wildcard_tld = b'*.' + b'.'.join(spl[i+1:])
-            wildcard_tld=wildcard_tld.decode("utf-8")
-            maybe_tld=maybe_tld.decode("utf-8")
-            
-            if wildcard_tld in self.tlds or maybe_tld in self.tlds:
-                return b'.'.join(spl[:i]), maybe_tld
+        spl.reverse()
+        tld_level_0=spl[0]
+        tld_level_0=tld_level_0.decode('utf-8')
+        maybe_tld=tld_level_0 
+        if tld_level_0 in self.tlds:
+            list_tld=self.tlds[tld_level_0]
+            i=1
+            while i < len(spl):
+                wildcard_tld = '*.' + maybe_tld
+                maybe_tld=spl[i].decode("utf-8")+'.'+maybe_tld
+                if  maybe_tld in list_tld or wildcard_tld in list_tld:
+                    spl.reverse()
+                    return b'.'.join(spl[:i+1]),maybe_tld
+                i=i+1
+            maybe_tld=tld_level_0
+            if tld_level_0 in list_tld:
+                spl.reverse()
+                return b'.'.join(spl[:len(spl)-1]),maybe_tld
+        #for i in range(len(spl)):        
+        #    maybe_tld = b'.'.join(spl[i:])
+        #    exception_tld = b'!' + maybe_tld
+        #    exception_tld=exception_tld.decode("utf-8")
+        #    if exception_tld in self.tlds:
+        #        return '.'.join(spl[:i+1]), '.'.join(spl[i+1:])
+        #    wildcard_tld = b'*.' + b'.'.join(spl[i+1:])
+        #    wildcard_tld=wildcard_tld.decode("utf-8")
+        #    maybe_tld=maybe_tld.decode("utf-8")
+        #    if wildcard_tld in self.tlds or maybe_tld in self.tlds:
+        #            return b'.'.join(spl[:i]), maybe_tld
 
         return netloc, b''
