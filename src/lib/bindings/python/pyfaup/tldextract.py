@@ -32,6 +32,7 @@ import re
 import socket
 import sys
 import json
+
 try:
     import pickle as pickle
 except ImportError:
@@ -157,8 +158,10 @@ class TLDExtract(object):
                             data_to_dump[tld_info]=[tld]
                     else:
                         data_to_dump[tld]=[tld]       
-                    
-                json.dump(data_to_dump, f)
+                if sys.version.split('.')[0].split('.')[0]=='2':   
+                    json.dump(data_to_dump, f,encoding="utf-8",ensure_ascii=False)
+                if sys.version.split('.')[0].split('.')[0]=='3':
+                    json.dump(data_to_dump, f)
         except IOError as e:
             LOG.warn("unable to cache TLDs in file %s: %s", cached_file, e)
         self._extractor = _PublicSuffixListTLDExtractor(data_to_dump)
