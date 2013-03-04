@@ -6,7 +6,7 @@ import codecs
 import binascii
 
 f = Faup()
-file_urls=codecs.open(sys.argv[1],'r','ascii')
+file_urls=codecs.open(sys.argv[1],'r','utf-8')
 urls=file_urls.readlines()
 for url in urls:
     print("We decode the url: %s" % (url))
