@@ -73,7 +73,7 @@ class Faup(object):
         else:
             if self.tld==None:
                 self.tld=TLDExtract()
-            self.tld._extract(self.get_host())
+                self.tld._extract(self.get_host())
             return getattr(self.tld, 'domain')
             
         
@@ -98,7 +98,7 @@ class Faup(object):
         else:
             if self.tld==None:
                 self.tld=TLDExtract()
-            self.tld._extract(self.get_host())
+                self.tld._extract(self.get_host())
             return getattr(self.tld, 'tld')
             
     def get_port(self):
