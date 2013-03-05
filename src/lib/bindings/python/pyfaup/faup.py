@@ -9,7 +9,8 @@ class Faup(object):
         self.fh = faup_init()
         self.decoded = False
         self.fast=True
-        self.tld=None
+        self.tld=TLDExtract()
+        self.retval = {}
     def __del__(self):
         faup_terminate(self.fh)
     def decode(self, url,fast=True):
@@ -17,6 +18,11 @@ class Faup(object):
         faup_decode(self.fh, self.url, len(url))
         self.decoded = True
         self.fast=fast
+        self.retval = {}
+        if self.fast==False:
+            if self.tld !=None:
+                self.tld.init()
+                
         
     def get_version(self):
         return faup_get_version()
@@ -57,8 +63,10 @@ class Faup(object):
         else:
             if self.tld==None:
                 self.tld=TLDExtract()
-            self.tld._extract(self.get_host())
-            return getattr(self.tld, 'subdomain')
+            if getattr(self.tld, 'subdomain')==None:    
+                self.tld._extract(self.get_host())
+            subdomain=getattr(self.tld, 'subdomain')
+            return subdomain
 
 
 
@@ -73,8 +81,10 @@ class Faup(object):
         else:
             if self.tld==None:
                 self.tld=TLDExtract()
+            if getattr(self.tld, 'domain')==None:
                 self.tld._extract(self.get_host())
-            return getattr(self.tld, 'domain')
+            domaine=getattr(self.tld, 'domain')    
+            return domaine
             
         
     def get_host(self):
@@ -98,8 +108,10 @@ class Faup(object):
         else:
             if self.tld==None:
                 self.tld=TLDExtract()
+            if getattr(self.tld, 'tld')==None:
                 self.tld._extract(self.get_host())
-            return getattr(self.tld, 'tld')
+            tld=getattr(self.tld, 'tld')
+            return tld
             
     def get_port(self):
         if not self.decoded:
@@ -137,16 +149,14 @@ class Faup(object):
 
         return self._get_param_from_pos_and_size(pos, size)
 
-    def get(self):
-        retval = {}
-        retval["scheme"] = self.get_scheme()
-        retval["credential"] = self.get_credential()
-        retval["subdomain"] = self.get_subdomain()
-        retval["domain"] = self.get_domain()
-        retval["host"] = self.get_host()
-        retval["tld"] = self.get_tld()
-        retval["port"] = self.get_port()
-        retval["resource_path"] = self.get_resource_path()
-        retval["query_string"] = self.get_query_string()
-        retval["fragment"] = self.get_fragment()
-        return retval
+    def get(self):        
+        self.retval["scheme"] = self.get_scheme()
+        self.retval["tld"] = self.get_tld()    
+        self.retval["domain"] = self.get_domain()
+        self.retval["subdomain"] = self.get_subdomain()    
+        self.retval["host"] = self.get_host()
+        self.retval["port"] = self.get_port()
+        self.retval["resource_path"] = self.get_resource_path()
+        self.retval["query_string"] = self.get_query_string()
+        self.retval["fragment"] = self.get_fragment()
+        return self.retval
