@@ -82,9 +82,9 @@ class TLDExtract(object):
         self.fetch = fetch
         self.cache_file = cache_file or os.path.join(os.path.dirname(__file__), '.tld_set.json')
         self._extractor = None
-        self.tld=''
-        self.domain=''
-        self.subdomain=''
+        self.tld=None
+        self.domain=None
+        self.subdomain=None
     def __call__(self, host):
         """
         Takes a string URL and splits it into its subdomain, domain, and
@@ -97,14 +97,18 @@ class TLDExtract(object):
         ExtractResult(subdomain='forums', domain='bbc', tld='co.uk')
         """
         return self._extract(host)
-
+    def init(self):
+        self.domain=None
+        self.subdomain=None
+        self.tld=None
+        
     def _extract(self, host):                
         registered_domain, tld = self._get_tld_extractor().extract(host)    
         subdomain, _, domain = registered_domain.rpartition(b'.')
         self.tld=tld
         self.subdomain=subdomain
         self.domain=domain
-
+        return self.subdomain,self.domain,self.tld
 
 
     def _get_tld_extractor(self):
@@ -198,34 +202,19 @@ class _PublicSuffixListTLDExtractor(object):
     
     def extract(self, netloc):
         spl = netloc.split(b'.')
-        spl.reverse()
-        tld_level_0=spl[0]
+        tld_level_0=spl[len(spl)-1]
         tld_level_0=tld_level_0.decode('utf-8')
-        maybe_tld=tld_level_0 
         if tld_level_0 in self.tlds:
             list_tld=self.tlds[tld_level_0]
-            i=1
-            while i < len(spl):
-                wildcard_tld = '*.' + maybe_tld
-                maybe_tld=spl[i].decode("utf-8")+'.'+maybe_tld
-                if  maybe_tld in list_tld or wildcard_tld in list_tld:
-                    spl.reverse()
-                    return b'.'.join(spl[:i+1]),maybe_tld
-                i=i+1
-            maybe_tld=tld_level_0
-            if tld_level_0 in list_tld:
-                spl.reverse()
-                return b'.'.join(spl[:len(spl)-1]),maybe_tld
-        #for i in range(len(spl)):        
-        #    maybe_tld = b'.'.join(spl[i:])
-        #    exception_tld = b'!' + maybe_tld
-        #    exception_tld=exception_tld.decode("utf-8")
-        #    if exception_tld in self.tlds:
-        #        return '.'.join(spl[:i+1]), '.'.join(spl[i+1:])
-        #    wildcard_tld = b'*.' + b'.'.join(spl[i+1:])
-        #    wildcard_tld=wildcard_tld.decode("utf-8")
-        #    maybe_tld=maybe_tld.decode("utf-8")
-        #    if wildcard_tld in self.tlds or maybe_tld in self.tlds:
-        #            return b'.'.join(spl[:i]), maybe_tld
-
+            for i in range(len(spl)): 
+                maybe_tld = b'.'.join(spl[i:])
+                exception_tld = b'!' + maybe_tld
+                exception_tld=exception_tld.decode("utf-8")
+                if exception_tld in list_tld:
+                    return '.'.join(spl[:i+1]),'.'.join(spl[i+1:])
+                wildcard_tld = b'*.' + b'.'.join(spl[i+1:])
+                wildcard_tld=wildcard_tld.decode("utf-8")
+                maybe_tld=maybe_tld.decode("utf-8")
+                if wildcard_tld in list_tld or maybe_tld in list_tld:
+                    return b'.'.join(spl[:i]), maybe_tld
         return netloc, b''
