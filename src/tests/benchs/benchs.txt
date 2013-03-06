@@ -1,0 +1,24 @@
+$ time python3 test_faup.py urls.txt 
+
+real			0m2.252s
+user			0m2.128s
+sys			0m0.120s
+
+$ time python3 test_regex.py urls.txt 
+Success:680211;Failures:15842
+
+real	0m3.845s
+user	0m3.786s
+sys	0m0.057s
+
+$ time python3 ./test_urllib.py urls.txt 
+
+real	0m7.406s
+user	0m7.345s
+sys	0m0.058s
+
+$ time python3 test_qurl.py urls.txt 
+
+real			0m4.413s
+user			0m4.244s
+sys			0m0.166s
