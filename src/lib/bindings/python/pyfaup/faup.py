@@ -1,5 +1,8 @@
+import sys
+
 from .functions import *
 from .tldextract import TLDExtract
+
 class UrlNotDecoded(Exception):
     pass
 
@@ -15,7 +18,14 @@ class Faup(object):
         faup_terminate(self.fh)
 
     def decode(self, url,fast=True):
-        self.url = url
+        self.url = None
+
+        # Alright, I assume no one is using python 1.x nor 4.x
+        if sys.version.split('.')[0].split('.')[0]=='3':
+            self.url = bytes(url,'utf-8')
+        if sys.version.split('.')[0].split('.')[0]=='2':
+            self.url = bytes(url)
+
         faup_decode(self.fh, self.url, len(url))
         self.decoded = True
         self.fast=fast
