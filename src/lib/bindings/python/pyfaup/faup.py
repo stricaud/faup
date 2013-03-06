@@ -3,16 +3,17 @@ from .tldextract import TLDExtract
 class UrlNotDecoded(Exception):
     pass
 
-class Faup(object):    
-
+class Faup(object):
     def __init__(self):
         self.fh = faup_init()
         self.decoded = False
         self.fast=True
         self.tld=TLDExtract()
         self.retval = {}
+
     def __del__(self):
         faup_terminate(self.fh)
+
     def decode(self, url,fast=True):
         self.url = url
         faup_decode(self.fh, self.url, len(url))
@@ -21,8 +22,7 @@ class Faup(object):
         self.retval = {}
         if self.fast==False:
             if self.tld !=None:
-                self.tld.init()
-                
+                self.tld.init()                
         
     def get_version(self):
         return faup_get_version()
@@ -53,7 +53,6 @@ class Faup(object):
         return self._get_param_from_pos_and_size(pos, size)
 
     def get_subdomain(self):
-        
         if not self.decoded:
             raise UrlNotDecoded("You must call faup.decode() first")
         if self.fast:
