@@ -151,7 +151,7 @@ class TLDExtract(object):
         try:
             with open(cached_file, 'w') as f:
                 data_to_dump={}
-               for tld in tlds:
+                for tld in tlds:
                     if tld.find('.') !=-1:  
                         token=tld.split('.')
                         tld_info=token[len(token)-1]
