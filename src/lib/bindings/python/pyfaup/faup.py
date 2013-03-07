@@ -10,22 +10,10 @@ class Faup(object):
     def __init__(self):
         self.fh = faup_init()
         self.decoded = False
-        self.fast=False
+        self.fast=True
         self.tld=TLDExtract()
         self.retval = {}
-        self.get_domain_function='get_domain'
-        self.get_subdomain_function='get_subdomain'
-        self.get_tld_function='get_tld'
-        
-        if self.fast:
-            self.get_domain_function=self.get_domain_function+'_fast'
-            self.get_subdomain_function=self.get_subdomain_function+'_fast'
-            self.get_tld_function=self.get_tld_function+'_fast'
-        else:
-            self.get_domain_function=self.get_domain_function+'_slow'
-            self.get_subdomain_function=self.get_subdomain_function+'_slow'
-            self.get_tld_function=self.get_tld_function+'_slow'
-            
+
     def __del__(self):
         faup_terminate(self.fh)
 
@@ -42,7 +30,6 @@ class Faup(object):
         self.decoded = True
         self.fast=fast
         self.retval = {}
-
         if self.fast==False:
             if self.tld !=None:
                 self.tld.init()                
@@ -76,38 +63,39 @@ class Faup(object):
         return self._get_param_from_pos_and_size(pos, size)
 
     def get_subdomain(self):
-        return getattr(self, self.get_subdomain_function)()
-        
-    def get_subdomain_fast(self):
         if not self.decoded:
             raise UrlNotDecoded("You must call faup.decode() first")
-        pos = faup_get_subdomain_pos(self.fh)
-        size = faup_get_subdomain_size(self.fh)
-        return self._get_param_from_pos_and_size(pos, size)
-    
-    def get_subdomain_slow(self):
-        subdomain_attr=getattr(self.tld, 'subdomain')
-        if subdomain_attr is None:    
-            self.tld._extract(self.get_host())
-        return subdomain_attr
+        if self.fast:
+            pos = faup_get_subdomain_pos(self.fh)
+            size = faup_get_subdomain_size(self.fh)
+            return self._get_param_from_pos_and_size(pos, size)
+        else:
+            if self.tld==None:
+                self.tld=TLDExtract()
+            if getattr(self.tld, 'subdomain')==None:    
+                self.tld._extract(self.get_host())
+            subdomain=getattr(self.tld, 'subdomain')
+            return subdomain
+
+
 
     def get_domain(self):
-        return getattr(self, self.get_domain_function)()
-    
-    def get_domain_fast(self):
         if not self.decoded:
             raise UrlNotDecoded("You must call faup.decode() first")
-        pos = faup_get_domain_pos(self.fh)
-        size = faup_get_domain_size(self.fh)
-        return self._get_param_from_pos_and_size(pos, size)
-    
-    def get_domain_slow(self):
-        domain_attr = getattr(self.tld, 'domain')
-        
-        if domain_attr is None:
+        if self.fast:
+            pos = faup_get_domain_pos(self.fh)
+            size = faup_get_domain_size(self.fh)
+
+            return self._get_param_from_pos_and_size(pos, size)
+        else:
+            if self.tld==None:
+                self.tld=TLDExtract()
+            if getattr(self.tld, 'domain')==None:
                 self.tld._extract(self.get_host())
-        return domain_attr
-                
+            domaine=getattr(self.tld, 'domain')    
+            return domaine
+            
+        
     def get_host(self):
         if not self.decoded:
             raise UrlNotDecoded("You must call faup.decode() first")
@@ -116,22 +104,23 @@ class Faup(object):
         size = faup_get_host_size(self.fh)
 
         return self._get_param_from_pos_and_size(pos, size)
-    
+        
     def get_tld(self):
-        return getattr(self,self.get_tld_function)()
-    def get_tld_fast(self):
-        if not self.decoded:
+        if self.fast:
+            if not self.decoded:
                 raise UrlNotDecoded("You must call faup.decode() first")
 
-        pos = faup_get_tld_pos(self.fh)
-        size = faup_get_tld_size(self.fh)
-        return self._get_param_from_pos_and_size(pos, size)
-    
-    def get_tld_slow(self):
-        tld_attr=getattr(self.tld, 'tld')
-        if tld_attr is None:
-            self.tld._extract(self.get_host())
-        return tld_attr
+            pos = faup_get_tld_pos(self.fh)
+            size = faup_get_tld_size(self.fh)
+
+            return self._get_param_from_pos_and_size(pos, size)
+        else:
+            if self.tld==None:
+                self.tld=TLDExtract()
+            if getattr(self.tld, 'tld')==None:
+                self.tld._extract(self.get_host())
+            tld=getattr(self.tld, 'tld')
+            return tld
             
     def get_port(self):
         if not self.decoded:

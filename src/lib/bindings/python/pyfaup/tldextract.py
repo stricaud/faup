@@ -32,7 +32,7 @@ import re
 import socket
 import sys
 import json
-import pprint
+
 try:
     import pickle as pickle
 except ImportError:
@@ -58,7 +58,7 @@ LOG = logging.getLogger("tldextract")
 
 
 class TLDExtract(object):
-    _instance=None    
+    _instance=None
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
             cls._instance = super(TLDExtract, cls).__new__(
@@ -117,7 +117,7 @@ class TLDExtract(object):
 
         cached_file = self.cache_file
         try:
-            if self._extractor is None:
+            if self._extractor==None:
                 with open(cached_file,'r') as f:
                     jsonfile=f.readlines()
                     self._extractor = _PublicSuffixListTLDExtractor(json.loads(jsonfile[0]))
@@ -202,7 +202,8 @@ class _PublicSuffixListTLDExtractor(object):
     
     def extract(self, netloc):
         spl = netloc.split(b'.')
-        tld_level_0=spl[len(spl)-1].decode('utf-8')
+        tld_level_0=spl[len(spl)-1]
+        tld_level_0=tld_level_0.decode('utf-8')
         if tld_level_0 in self.tlds:
             list_tld=self.tlds[tld_level_0]
             for i in range(len(spl)): 
