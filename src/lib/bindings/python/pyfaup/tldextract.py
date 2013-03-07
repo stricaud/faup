@@ -151,30 +151,7 @@ class TLDExtract(object):
         try:
             with open(cached_file, 'w') as f:
                 data_to_dump={}
-                #for tld in tlds:
-#                    current=data_to_dump
-#                    tokens=tld.split('.')
-#                    tokens.reverse()
-#                    i=0
-#                    find=False
-#                    try:
-#                        while(i<len(tokens) and not find):
-#                            if i==len(tokens)-1:
-#                                current[tokens[i]]={}
-#                                find=True
-#                            if not tokens[i] in current:
-#                                current[tokens[i]]={}
-#                                i=i+1
-#                            else:
-#                                data=current[tokens[i]]
-#                                current=data
-#                                i=i+1
-#                    except:
-#                        print(tokens)    
-                   
-            
-                #data_to_dump={}
-                for tld in tlds:
+               for tld in tlds:
                     if tld.find('.') !=-1:  
                         token=tld.split('.')
                         tld_info=token[len(token)-1]
