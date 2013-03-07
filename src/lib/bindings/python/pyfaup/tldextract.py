@@ -32,7 +32,7 @@ import re
 import socket
 import sys
 import json
-
+import pprint
 try:
     import pickle as pickle
 except ImportError:
@@ -58,7 +58,7 @@ LOG = logging.getLogger("tldextract")
 
 
 class TLDExtract(object):
-    _instance=None
+    _instance=None    
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
             cls._instance = super(TLDExtract, cls).__new__(
@@ -117,7 +117,7 @@ class TLDExtract(object):
 
         cached_file = self.cache_file
         try:
-            if self._extractor==None:
+            if self._extractor is None:
                 with open(cached_file,'r') as f:
                     jsonfile=f.readlines()
                     self._extractor = _PublicSuffixListTLDExtractor(json.loads(jsonfile[0]))
@@ -151,6 +151,29 @@ class TLDExtract(object):
         try:
             with open(cached_file, 'w') as f:
                 data_to_dump={}
+                #for tld in tlds:
+#                    current=data_to_dump
+#                    tokens=tld.split('.')
+#                    tokens.reverse()
+#                    i=0
+#                    find=False
+#                    try:
+#                        while(i<len(tokens) and not find):
+#                            if i==len(tokens)-1:
+#                                current[tokens[i]]={}
+#                                find=True
+#                            if not tokens[i] in current:
+#                                current[tokens[i]]={}
+#                                i=i+1
+#                            else:
+#                                data=current[tokens[i]]
+#                                current=data
+#                                i=i+1
+#                    except:
+#                        print(tokens)    
+                   
+            
+                #data_to_dump={}
                 for tld in tlds:
                     if tld.find('.') !=-1:  
                         token=tld.split('.')
@@ -202,8 +225,7 @@ class _PublicSuffixListTLDExtractor(object):
     
     def extract(self, netloc):
         spl = netloc.split(b'.')
-        tld_level_0=spl[len(spl)-1]
-        tld_level_0=tld_level_0.decode('utf-8')
+        tld_level_0=spl[len(spl)-1].decode('utf-8')
         if tld_level_0 in self.tlds:
             list_tld=self.tlds[tld_level_0]
             for i in range(len(spl)): 
