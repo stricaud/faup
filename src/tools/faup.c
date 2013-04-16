@@ -11,6 +11,7 @@
 
 struct _faup_cli_options_t {
   int print_header;
+  int print_line;
   char sep_char;
 };
 typedef struct _faup_cli_options_t faup_cli_options_t;
@@ -29,6 +30,7 @@ typedef struct _faup_cli_options_t faup_cli_options_t;
 void init_cli_options(faup_cli_options_t *opts)
 {
   opts->print_header = 0;
+  opts->print_line = 0;
   opts->sep_char = ',';
 }
 
@@ -68,17 +70,24 @@ static char *readline(FILE *fp)
 
 void print_help(char **argv) 
 {
-	printf("Usage: %s [-p] [-d delimiter] url\n \
+	printf("Usage: %s [-pl] [-d delimiter] url\n \
 		Where:\n \
 		url is the url that you want to parse\n \
-		\t-p: print the header\n \
+		\t-h: print the header\n \
+		\t-l: prefix with the line number\n \
 		\t-d delimiter: will separate the fields with the wanted delimiter\n", argv[0]);
 }
 
-void print_header(char sep_char)
+void print_header(int print_line, char sep_char)
 {
-	printf("scheme%ccredential%csubdomain%cdomain%chost%ctld%cport%cresource_path%cquery_string%cfragment\n",
-	       sep_char,sep_char,sep_char,sep_char,sep_char,sep_char,sep_char,sep_char,sep_char);
+	if (print_line) {
+	  printf("line%cscheme%ccredential%csubdomain%cdomain%chost%ctld%cport%cresource_path%cquery_string%cfragment\n",
+		 sep_char, sep_char,sep_char,sep_char,sep_char,sep_char,sep_char,sep_char,sep_char,sep_char);
+	} else {
+	  printf("scheme%ccredential%csubdomain%cdomain%chost%ctld%cport%cresource_path%cquery_string%cfragment\n",
+		 sep_char,sep_char,sep_char,sep_char,sep_char,sep_char,sep_char,sep_char,sep_char);
+	}
+
 }
 
 int main(int argc, char **argv)
@@ -93,10 +102,13 @@ int main(int argc, char **argv)
 
 	fh = faup_init();
 
-	while ((opt = getopt(argc, argv, "pd:v")) != -1) {
+	while ((opt = getopt(argc, argv, "pld:v")) != -1) {
 	  switch(opt) {
 	  case 'p':
 	    faup_opts.print_header = 1;
+	    break;
+	  case 'l':
+	    faup_opts.print_line = 1;
 	    break;
 	  case 'd':
 	    faup_opts.sep_char = optarg[0];
@@ -116,7 +128,7 @@ int main(int argc, char **argv)
 			exit(1);
 		}
 		if (faup_opts.print_header) {
-			print_header(faup_opts.sep_char);
+		        print_header(faup_opts.print_header, faup_opts.sep_char);
 		}
 
 		if (!argv[optind]) {
@@ -124,11 +136,15 @@ int main(int argc, char **argv)
 		}
 
 		faup_decode(fh, argv[optind], strlen(argv[optind]));
+		if (faup_opts.print_line) {
+		  printf("0%c", faup_opts.sep_char);
+		}
 		faup_show(fh, faup_opts.sep_char, stdout);
 		printf("\n");
-	} else {		/* We read from stdin */
+	} else {       	/* We read from stdin */
+	        long line_nb = 1;
 		if (faup_opts.print_header) {
-			print_header(faup_opts.sep_char);
+		        print_header(faup_opts.print_line, faup_opts.sep_char);
 		}
 		while (!feof(stdin)) {
 			strbuf = readline(stdin);
@@ -140,10 +156,14 @@ int main(int argc, char **argv)
 			}
 
 			faup_decode(fh, strbuf, strlen(strbuf));			
+			if (faup_opts.print_line) {
+			        printf("%ld%c", line_nb, faup_opts.sep_char);
+			}
 			faup_show(fh, ',', stdout);
 			printf("\n");
 
 			free(strbuf);
+			line_nb++;
 		}
 	}
 
