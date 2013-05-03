@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 /*
- * From RFC 2616:
+ * From RFC 2616 (section 3.2.1):
  * The HTTP protocol does not place any a priori limit on the length of a URI. 
  * Servers MUST be able to handle the URI of any resource they serve, and SHOULD be able to handle URIs of unbounded 
  * length if they provide GET-based forms that could generate such URIs. A server SHOULD return 414 (Request-URI Too Long) 
