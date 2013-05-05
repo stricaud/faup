@@ -114,7 +114,7 @@ int main(int argc, char **argv)
 
 	fh = faup_init();
 
-	while ((opt = getopt(argc, argv, "pld:vo:")) != -1) {
+	while ((opt = getopt(argc, argv, "pld:vo:u")) != -1) {
 	  switch(opt) {
 	  case 'p':
 	    faup_opts.print_header = 1;
@@ -135,6 +135,9 @@ int main(int argc, char **argv)
 	  		exit(1);
 	  	}
 	  	break;
+	  case 'u':
+	  	faup_tld_update();
+	  	exit(0);
 	  case 'v':
 	    printf("faup v%s\n", faup_get_version());
 	    exit(0);

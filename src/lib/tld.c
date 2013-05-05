@@ -14,9 +14,10 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-#include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -76,12 +77,13 @@ int faup_tld_get_mozilla_list(char *store_to_file)
 		fprintf(stderr, "(read) Cannot read data.\n");
 	}
 
+	close(sockfd);
 	fclose(fileptr);
 
 	return 0;
 }
 
-char *faup_tld_get_file_from_home(char *append)
+char *faup_tld_home_file_exists(char *append)
 {
 	int retval;
 	char *retbuf;
@@ -98,6 +100,27 @@ char *faup_tld_get_file_from_home(char *append)
 	return NULL;
 }
 
+char *faup_tld_get_file_from_home(char *append)
+{
+	int retval;
+	char *retbuf;
+	struct passwd *pw = getpwuid(getuid());
+	const char *homedir = pw->pw_dir;
+	FILE *fp;
+
+	retval = asprintf(&retbuf, "%s%s.faup", homedir, FAUP_OS_DIRSEP);
+	retval = mkdir(retbuf, 0700);
+	free(retbuf);
+
+	retval = asprintf(&retbuf, "%s%s.faup%s%s", homedir, FAUP_OS_DIRSEP, FAUP_OS_DIRSEP, append);
+	fp = fopen(retbuf, "w");
+	if (fp) {
+		return retbuf;
+	}
+
+	return NULL;
+}
+
 char *faup_tld_get_file(char *append)
 {
 	char *dataenv_dir;
@@ -107,7 +130,7 @@ char *faup_tld_get_file(char *append)
 	dataenv_dir = getenv("FAUP_DATA_DIR");
 	if (!dataenv_dir) {
 
-		retbuf = faup_tld_get_file_from_home(append);
+		retbuf = faup_tld_home_file_exists(append);
 		if (retbuf) {
 			return retbuf;
 		}
@@ -124,4 +147,34 @@ char *faup_tld_get_file(char *append)
 	return retbuf;
 }
 
+char *faup_tld_file_to_write(void) 
+{
+	char *tld_file = NULL;
+	tld_file = faup_tld_get_file("mozilla.tlds");
+	if (tld_file) {
+		FILE *fp;
+		fp = fopen(tld_file, "w");
+		if (!fp) {
+			return faup_tld_get_file_from_home("mozilla.tlds");
+		} else {
+			return tld_file;
+			fclose(fp);
+		}
+	}
+
+	return faup_tld_get_file_from_home("mozilla.tlds");
+}
+
+int faup_tld_update(void)
+{
+	char *tld_file;
+
+	tld_file = faup_tld_file_to_write();
+	printf("tld file=%s\n", tld_file);
+	faup_tld_get_mozilla_list(tld_file);
+
+	free(tld_file);
+
+	return 0;
+}
 

@@ -31,8 +31,11 @@ extern "C" {
 
 int faup_tld_get_mozilla_list(char *store_to_file);
 
-/* Returns an allocated string */
+/* Returns allocated strings */
+char *faup_tld_get_file_from_home(char *append);
 char *faup_tld_get_file(char *append);
+char *faup_tld_file_to_write(void);
+int faup_tld_update(void);
 
 #ifdef __cplusplus
 }
