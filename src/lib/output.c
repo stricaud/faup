@@ -54,7 +54,6 @@ void _faup_output_json_single(faup_handler_t const* fh, char *faup_feature_name,
 		counter++;
 	}
 	fwrite("\",\n", 3, 1, out);
-
 }
 
 void faup_output_json(faup_handler_t const* fh, FILE* out)
