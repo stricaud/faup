@@ -8,11 +8,19 @@
 
 #include <faup/faup.h>
 #include <faup/decode.h>
+#include <faup/output.h>
+
+enum _faup_output_t {
+	FAUP_OUTPUT_CSV,
+	FAUP_OUTPUT_JSON,
+};
+typedef enum _faup_output_t faup_output_t;
 
 struct _faup_cli_options_t {
   int print_header;
   int print_line;
   char sep_char;
+  faup_output_t output;
 };
 typedef struct _faup_cli_options_t faup_cli_options_t;
 
@@ -32,6 +40,7 @@ void init_cli_options(faup_cli_options_t *opts)
   opts->print_header = 0;
   opts->print_line = 0;
   opts->sep_char = ',';
+  opts->output = FAUP_OUTPUT_CSV;
 }
 
 /* readline() - read a line from the file handle.
@@ -70,11 +79,12 @@ static char *readline(FILE *fp)
 
 void print_help(char **argv) 
 {
-	printf("Usage: %s [-pl] [-d delimiter] url\n \
+	printf("Usage: %s [-pl] [-d delimiter] [-o {csv,json}] url\n \
 		Where:\n \
 		url is the url that you want to parse\n \
 		\t-h: print the header\n \
 		\t-l: prefix with the line number\n \
+		\t-o: output csv or json at your convenience\n \
 		\t-d delimiter: will separate the fields with the wanted delimiter\n", argv[0]);
 }
 
@@ -102,7 +112,7 @@ int main(int argc, char **argv)
 
 	fh = faup_init();
 
-	while ((opt = getopt(argc, argv, "pld:v")) != -1) {
+	while ((opt = getopt(argc, argv, "pld:vo:")) != -1) {
 	  switch(opt) {
 	  case 'p':
 	    faup_opts.print_header = 1;
@@ -113,6 +123,16 @@ int main(int argc, char **argv)
 	  case 'd':
 	    faup_opts.sep_char = optarg[0];
 	    break;
+	  case 'o':
+	  	if (!strcmp("csv", optarg)) {
+	  		faup_opts.output = FAUP_OUTPUT_CSV;
+	  	} else if (!strcmp("json", optarg)) {
+	  		faup_opts.output = FAUP_OUTPUT_JSON;
+	  	} else {
+	  		fprintf(stderr, "invalid output option '%s'!\n", optarg);
+	  		exit(1);
+	  	}
+	  	break;
 	  case 'v':
 	    printf("faup v%s\n", faup_get_version());
 	    exit(0);
@@ -136,11 +156,19 @@ int main(int argc, char **argv)
 		}
 
 		faup_decode(fh, argv[optind], strlen(argv[optind]));
-		if (faup_opts.print_line) {
-		  printf("0%c", faup_opts.sep_char);
+
+		switch(faup_opts.output) {
+			case FAUP_OUTPUT_JSON:
+				faup_output_json(fh, stdout);
+				break;
+			default:
+				if (faup_opts.print_line) {
+		 			printf("0%c", faup_opts.sep_char);
+				}
+				faup_output_csv(fh, faup_opts.sep_char, stdout);
+				printf("\n");
+				break;			
 		}
-		faup_show(fh, faup_opts.sep_char, stdout);
-		printf("\n");
 	} else {       	/* We read from stdin */
 	        long line_nb = 1;
 		if (faup_opts.print_header) {
@@ -155,12 +183,19 @@ int main(int argc, char **argv)
 				break;
 			}
 
-			faup_decode(fh, strbuf, strlen(strbuf));			
-			if (faup_opts.print_line) {
-			        printf("%ld%c", line_nb, faup_opts.sep_char);
-			}
-			faup_show(fh, ',', stdout);
-			printf("\n");
+			faup_decode(fh, strbuf, strlen(strbuf));		
+			switch(faup_opts.output) {
+				case FAUP_OUTPUT_JSON:
+					faup_output_json(fh, stdout);
+					break;
+				default:
+					if (faup_opts.print_line) {
+				        printf("%ld%c", line_nb, faup_opts.sep_char);
+					}
+					faup_output_csv(fh, ',', stdout);
+					printf("\n");
+					break;
+			}	
 
 			free(strbuf);
 			line_nb++;

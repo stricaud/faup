@@ -185,13 +185,6 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 	}
 }
 
-void faup_features_show(faup_handler_t const* fh, const faup_feature_t feature, FILE* out)
-{
-	if (faup_features_exist(feature)) {
-		fwrite(fh->faup.org_str + feature.pos, feature.size, 1, out);
-	}
-}
-
 void faup_features_debug(const char *url, faup_features_t const* features)
 {
 	fprintf(stdout, "url:%s\n", url);

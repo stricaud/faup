@@ -20,6 +20,7 @@
 #include <faup/errors.h>
 #include <faup/features.h>
 #include <faup/handler.h>
+#include <faup/output.h>
 #include <faup/portable.h>
 #include <faup/version.h>
 
@@ -57,7 +58,6 @@ enum _faup_last_slash_t {
 
 faup_handler_t *faup_init(void);
 char *faup_get_version(void);
-void faup_show(faup_handler_t const* fh, const char sep_char, FILE* out);
 void faup_terminate(faup_handler_t *fh);
 
 int32_t faup_get_scheme_pos(faup_handler_t *fh);

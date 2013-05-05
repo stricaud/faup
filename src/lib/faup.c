@@ -32,31 +32,6 @@ char *faup_get_version(void)
   return FAUP_VERSION;
 }
 
-void faup_show(faup_handler_t const* fh, const char sep_char, FILE* out)
-{
-	// Output order is:
-	// scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment
-	faup_features_show(fh, fh->faup.features.scheme, out);
-	fwrite(&sep_char, 1, 1, out);
-	faup_features_show(fh, fh->faup.features.credential, out);
-	fwrite(&sep_char, 1, 1, out);
-	faup_features_show(fh, fh->faup.features.subdomain, out);
-	fwrite(&sep_char, 1, 1, out);
-	faup_features_show(fh, fh->faup.features.domain, out);
-	fwrite(&sep_char, 1, 1, out);
-	faup_features_show(fh, fh->faup.features.host, out);
-	fwrite(&sep_char, 1, 1, out);
-	faup_features_show(fh, fh->faup.features.tld, out);
-	fwrite(&sep_char, 1, 1, out);
-	faup_features_show(fh, fh->faup.features.port, out);
-	fwrite(&sep_char, 1, 1, out);
-	faup_features_show(fh, fh->faup.features.resource_path, out);
-	fwrite(&sep_char, 1, 1, out);
-	faup_features_show(fh, fh->faup.features.query_string, out);
-	fwrite(&sep_char, 1, 1, out);
-	faup_features_show(fh, fh->faup.features.fragment, out);
-}
-
 void faup_terminate(faup_handler_t *fh)
 {
 	free(fh);

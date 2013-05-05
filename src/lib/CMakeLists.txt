@@ -4,6 +4,7 @@ set(FAUP_LIB_SRC_FILES
 decode.c
 features.c
 faup.c
+output.c
 portable.c
 )
 
@@ -11,6 +12,7 @@ set(FAUP_LIB_HDR_FILES
 include/faup/features.h
 include/faup/faup.h
 include/faup/decode.h
+include/faup/output.h
 include/faup/portable.h
 )
 
