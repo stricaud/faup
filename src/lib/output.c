@@ -47,6 +47,9 @@ void _faup_output_json_single(faup_handler_t const* fh, char *faup_feature_name,
 	tmpbuf = &fh->faup.org_str[feature.pos];
 	buflen = feature.size;
 	while (counter < buflen) {
+		if (tmpbuf[counter] == '"') {
+			fwrite(&"\\", 1, 1, out);
+		}
 		fwrite(&tmpbuf[counter], 1, 1, out);
 		counter++;
 	}
