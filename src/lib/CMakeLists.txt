@@ -6,6 +6,7 @@ features.c
 faup.c
 output.c
 portable.c
+tld.c
 )
 
 set(FAUP_LIB_HDR_FILES
@@ -14,6 +15,7 @@ include/faup/faup.h
 include/faup/decode.h
 include/faup/output.h
 include/faup/portable.h
+include/faup/tld.h
 )
 
 set(FAUP_LINK_LIBRARIES

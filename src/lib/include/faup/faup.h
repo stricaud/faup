@@ -22,6 +22,7 @@
 #include <faup/handler.h>
 #include <faup/output.h>
 #include <faup/portable.h>
+#include <faup/tld.h>
 #include <faup/version.h>
 
 #include <stdio.h>
@@ -34,6 +35,10 @@ extern "C" {
 #endif
 
 #define FAUP_MAXLEN 8192
+#define FAUP_MAXPATHLEN 1024 /* Because MAXPATHLEN, MAX_PATH, PATH_MAX are all different 'standards' (ahah!) */
+
+#define FAUP_OS_DIRSEP "/"
+
 
 typedef struct _faup_t faup_t;
 typedef enum _faup_last_slash_t faup_last_slash_t;

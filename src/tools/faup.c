@@ -105,6 +105,8 @@ int main(int argc, char **argv)
 	faup_handler_t *fh;
 	char *strbuf=NULL;
 
+	char *tld_file=NULL;
+
 	faup_cli_options_t faup_opts;
 	int opt;
 
