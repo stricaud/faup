@@ -259,14 +259,19 @@ bool inTrie(TLDNode *Tree, char *tld)
  * - google.nawak => -1 (NOT FOUND)
  *
  */
-int get_tld_pos(TLDNode *Tree, char *host)
+faup_tld_tree_extracted_t faup_tld_tree_extract(TLDNode *tld_tree, const char *org_str, faup_feature_t domain)
 {
-	char *p, *last;
+	const char *p;
+	char *last;
 	bool found;
 	int step;
+	faup_tld_tree_extracted_t tld_extracted;
  
+	tld_extracted.pos = -1;
+	tld_extracted.size = 0;
+
 	last = NULL;
-	p    = host + strlen(host) -1;
+	p    = org_str + strlen(org_str) -1;
 	while( *p )
 	{
 		while( *(p-1) && (*p != '.') )
@@ -274,7 +279,7 @@ int get_tld_pos(TLDNode *Tree, char *host)
 
 		step = ( *p == '.' ) ? 1 : 0;
 
-		found = inTrie(Tree->kid, p+step);
+		found = inTrie(tld_tree->kid, (char *)p+step);
 		if( ! found )
 			break;
 		last = p+step;
@@ -282,11 +287,11 @@ int get_tld_pos(TLDNode *Tree, char *host)
 	}
 
 	if( last == NULL )
-		return -1;
+		return tld_extracted;
 
 	// here we have the longest TLD
 	// but is that an exception ? (ex: !siemens.om vs *.om)
-	found = inTrie(Tree->sibling, last);
+	found = inTrie(tld_tree->sibling, last);
 
 	if( found )
 	{
@@ -294,6 +299,7 @@ int get_tld_pos(TLDNode *Tree, char *host)
 			last++;
 		last++;
 	}
-	return (strlen(host) - strlen(last));
+	//return (strlen(org_str) - strlen(last));
+	return tld_extracted;
 }
 

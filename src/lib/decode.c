@@ -161,7 +161,7 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 									// Grab the TLD with us
 									url_features->domain.size = next_valid_token_pos - domain_pos;
 
-									// subdomain is what remains of the host
+									// subdomaing is what remains of the host
 									if (url_features->domain.pos > 1) {
 										url_features->subdomain.pos = url_features->host.pos;
 										url_features->subdomain.size = url_features->domain.pos - url_features->host.pos - 1;
@@ -237,7 +237,7 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 
 		// All the features are detected, we can do some extra operations now
 		if (options->tld_greater_extraction) {
-			//int tld_pos = get_tld_pos(tld_tree, fh->faup.org_str, url_features->domain);
+			faup_tld_tree_extracted_t tld_extracted = faup_tld_tree_extract(options->tld_tree, fh->faup.org_str, url_features->domain);
 		}
 
 		//faup_features_debug(url, url_features);

@@ -15,11 +15,17 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  * 
  */
- 
-#ifndef _H_FAUP_TLDINIT_
-#define _H_FAUP_TLDINIT_
 
-#define GENERIC_BUFF 2048
+#ifndef _FAUP_TLD_TREE_H_
+#define _FAUP_TLD_TREE_H_
+
+#include <stdint.h>
+
+#include <faup/features.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct TLDNode {
 	char c;
@@ -28,7 +34,17 @@ typedef struct TLDNode {
 	struct TLDNode *kid;  
 } TLDNode;
 
-TLDNode *faup_tld_tree_new(void);
-int get_tld_pos(TLDNode *, char *);
+struct _faup_tld_tree_extracted_t {
+	int32_t pos;
+	uint32_t size;
+};
+typedef struct _faup_tld_tree_extracted_t faup_tld_tree_extracted_t;
 
+TLDNode *faup_tld_tree_new(void);
+faup_tld_tree_extracted_t faup_tld_tree_extract(TLDNode *tld_tree, const char *org_str, faup_feature_t domain);
+
+#ifdef __cplusplus
+}
 #endif
+
+#endif	/* _FAUP_TLD_TREE_H_ */
