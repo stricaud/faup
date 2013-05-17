@@ -18,6 +18,7 @@
 #include <faup/faup.h>
 #include <faup/decode.h>
 #include <faup/features.h>
+#include <faup/tld-tree.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -91,7 +92,7 @@ bool is_ipv4(const char* str, const size_t n)
 	return ndots == 3;
 }
 
-int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len)
+int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_options_t *options)
 {
 	uint32_t total_size = 0;
 
@@ -160,7 +161,7 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len)
 									// Grab the TLD with us
 									url_features->domain.size = next_valid_token_pos - domain_pos;
 
-									// Subhost is what's remaing of the host
+									// subdomain is what remains of the host
 									if (url_features->domain.pos > 1) {
 										url_features->subdomain.pos = url_features->host.pos;
 										url_features->subdomain.size = url_features->domain.pos - url_features->host.pos - 1;
@@ -232,6 +233,11 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len)
 		if (faup_features_exist(url_features->fragment)) { 
 			total_size = url_len - url_features->fragment.pos; 
 			url_features->fragment.size = total_size;
+		}
+
+		// All the features are detected, we can do some extra operations now
+		if (options->tld_greater_extraction) {
+			//int tld_pos = get_tld_pos(tld_tree, fh->faup.org_str, url_features->domain);
 		}
 
 		//faup_features_debug(url, url_features);

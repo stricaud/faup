@@ -14,20 +14,13 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-#ifndef _FAUP_DECODE_H_
-#define _FAUP_DECODE_H_
-
-#include <faup/faup.h>
 #include <faup/options.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-int faup_decode(faup_handler_t *fh, const char *url, const size_t url_size, faup_options_t *options);
-
-#ifdef __cplusplus
+void faup_options_defaults(faup_options_t *opts)
+{
+ 	opts->print_header = 0;
+	opts->print_line = 0;
+	opts->sep_char = ',';
+	opts->output = FAUP_OUTPUT_CSV;
+	opts->tld_greater_extraction = 0;
 }
-#endif
-
-#endif	/* _FAUP_DECODE_H_ */

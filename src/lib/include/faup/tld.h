@@ -21,21 +21,26 @@
 extern "C" {
 #endif
 
-#define MAX_SOCKBUF_LINE 4096
+#define MAX_RECVBUF 4096
 
 #define MOZILLA_TLD_LIST_DOMAIN "mxr.mozilla.org"
 #define MOZILLA_TLD_LIST_IP "63.245.215.42"
 #define MOZILLA_TLD_LIST_PORT 80
 #define MOZILLA_TLD_LIST_URL "http://mxr.mozilla.org/mozilla-central/source/netwerk/dns/effective_tld_names.dat?raw=1"
-#define MOZILLA_TLD_LIST_GET "GET " MOZILLA_TLD_LIST_URL " HTTP/1.1\n\n"
+#define MOZILLA_TLD_LIST_GET "GET " MOZILLA_TLD_LIST_URL " HTTP/1.0\n\n"
 
-int faup_tld_get_mozilla_list(char *store_to_file);
+int faup_tld_download_mozilla_list(char *store_to_file);
 
 /* Returns allocated strings */
 char *faup_tld_get_file_from_home(char *append);
 char *faup_tld_get_file(char *append);
 char *faup_tld_file_to_write(void);
 int faup_tld_update(void);
+
+void faup_tld_array_populate(void);
+void faup_tld_array_destroy(void);
+void faup_tld_array_cb_to_stdout(char *tld, void *user_data);
+void faup_tld_array_foreach(void (*cb_tld_array)(char *tld, void *user_data), void *user_data);
 
 #ifdef __cplusplus
 }

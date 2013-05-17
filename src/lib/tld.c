@@ -19,6 +19,7 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 
+#include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -27,11 +28,15 @@
 #include <faup/faup.h>
 #include <faup/tld.h>
 
+#include <faup/utarray.h>
+
+static UT_array *_tlds = NULL;
+
 // FIXME: We should make this code work for native Windows API
-int faup_tld_get_mozilla_list(char *store_to_file) 
+int faup_tld_download_mozilla_list(char *store_to_file) 
 {
 	int sockfd, n;
-	char recvbuf[MAX_SOCKBUF_LINE + 1];
+	char recvbuf[MAX_RECVBUF];
 	struct sockaddr_in sin;
 
 	FILE *fileptr;
@@ -67,7 +72,7 @@ int faup_tld_get_mozilla_list(char *store_to_file)
 		}
 	}
 
-	while ( (n=read(sockfd, recvbuf, MAX_SOCKBUF_LINE)) > 0) {
+	while ( (n=recv(sockfd, recvbuf, MAX_RECVBUF, 0)) > 0) {
 		recvbuf[n] = '\0';
 		if (fputs(recvbuf, fileptr) == EOF) {
 			fprintf(stderr, "(fputs) Cannot get data.\n");
@@ -170,11 +175,72 @@ int faup_tld_update(void)
 	char *tld_file;
 
 	tld_file = faup_tld_file_to_write();
-	printf("tld file=%s\n", tld_file);
-	faup_tld_get_mozilla_list(tld_file);
+	faup_tld_download_mozilla_list(tld_file);
 
 	free(tld_file);
 
 	return 0;
 }
+
+void faup_tld_array_populate(void)
+{
+	FILE *fp;
+	char *tld_file = faup_tld_get_file("mozilla.tlds");
+
+	if (_tlds) {
+		fprintf(stderr, "The tld array has already been populated!\n");
+		return;
+	}
+	utarray_new(_tlds, &ut_str_icd);
+
+	fp = fopen(tld_file, "r");
+	if (fp) {
+		char line[524]; // We have the control over our tld file
+
+		while(fgets(line, sizeof(line), fp) != NULL) {
+			size_t line_len = strlen(line);
+
+			switch(line[0]) {
+				case '/':
+				case '\n':
+				case '\r':
+				case '0':
+				case ' ':
+					break;
+				default:
+					if (!isupper(line[0])) { // Last check: Apache banners starts with upper case, not TLDs
+						if (line_len > 0) {
+							line[line_len - 1] = '\0';
+							char *allocated_line = strdup(line);
+							utarray_push_back(_tlds, &allocated_line);
+						}						
+					}
+			}
+		}
+		fclose(fp);
+	}
+
+	free(tld_file);
+}
+
+void faup_tld_array_destroy(void)
+{
+	utarray_free(_tlds);
+}
+
+void faup_tld_array_cb_to_stdout(char *tld, void *user_data)
+{
+	fprintf(stdout, "tld:%s\n", tld);
+}
+
+void faup_tld_array_foreach(void (*cb_tld_array)(char *tld, void *user_data), void *user_data)
+{
+	char **p_tld;
+
+	p_tld = NULL;
+	while ((p_tld = (char **)utarray_next(_tlds, p_tld))) {
+		cb_tld_array(*p_tld, user_data);
+	}
+}
+
 

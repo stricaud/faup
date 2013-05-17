@@ -14,20 +14,38 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-#ifndef _FAUP_DECODE_H_
-#define _FAUP_DECODE_H_
+#ifndef _FAUP_OPTIONS_H_
+#define _FAUP_OPTIONS_H_
 
+#include <stdio.h>
 #include <faup/faup.h>
-#include <faup/options.h>
+#include <faup/tld-tree.h>
+
+enum _faup_output_t {
+	FAUP_OUTPUT_CSV,
+	FAUP_OUTPUT_JSON,
+};
+typedef enum _faup_output_t faup_output_t;
+
+struct _faup_options_t {
+  int print_header;
+  int print_line;
+  char sep_char;
+  faup_output_t output;
+  TLDNode * tld_tree;
+  int tld_greater_extraction;
+};
+typedef struct _faup_options_t faup_options_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int faup_decode(faup_handler_t *fh, const char *url, const size_t url_size, faup_options_t *options);
+void faup_options_defaults(faup_options_t *opts);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	/* _FAUP_DECODE_H_ */
+#endif	/* _FAUP_OPTIONS_H_ */
+

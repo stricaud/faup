@@ -4,18 +4,22 @@ set(FAUP_LIB_SRC_FILES
 decode.c
 features.c
 faup.c
+options.c
 output.c
 portable.c
 tld.c
+tld-tree.c
 )
 
 set(FAUP_LIB_HDR_FILES
 include/faup/features.h
 include/faup/faup.h
 include/faup/decode.h
+include/faup/options.h
 include/faup/output.h
 include/faup/portable.h
 include/faup/tld.h
+include/faup/tld-tree.h
 )
 
 set(FAUP_LINK_LIBRARIES

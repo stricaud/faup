@@ -8,21 +8,8 @@
 
 #include <faup/faup.h>
 #include <faup/decode.h>
+#include <faup/options.h>
 #include <faup/output.h>
-
-enum _faup_output_t {
-	FAUP_OUTPUT_CSV,
-	FAUP_OUTPUT_JSON,
-};
-typedef enum _faup_output_t faup_output_t;
-
-struct _faup_cli_options_t {
-  int print_header;
-  int print_line;
-  char sep_char;
-  faup_output_t output;
-};
-typedef struct _faup_cli_options_t faup_cli_options_t;
 
 /* IPv6 tests:
 
@@ -34,14 +21,6 @@ typedef struct _faup_cli_options_t faup_cli_options_t;
       http://[::FFFF:129.144.52.38]:80/index.html
       http://[2010:836B:4179::836B:4179]
  */
-
-void init_cli_options(faup_cli_options_t *opts)
-{
-  opts->print_header = 0;
-  opts->print_line = 0;
-  opts->sep_char = ',';
-  opts->output = FAUP_OUTPUT_CSV;
-}
 
 /* readline() - read a line from the file handle.
  * Return an allocated string */
@@ -85,7 +64,8 @@ void print_help(char **argv)
 		\t-h: print the header\n \
 		\t-l: prefix with the line number\n \
 		\t-o: output csv or json at your convenience\n \
-		\t-d delimiter: will separate the fields with the wanted delimiter\n", argv[0]);
+		\t-d delimiter: will separate the fields with the wanted delimiter\n \
+		\t-t: extract TLD > 1\n", argv[0]);
 }
 
 void print_header(int print_line, char sep_char)
@@ -107,14 +87,21 @@ int main(int argc, char **argv)
 
 	char *tld_file=NULL;
 
-	faup_cli_options_t faup_opts;
+	faup_options_t faup_opts;
 	int opt;
 
-	init_cli_options(&faup_opts);
+	int tld_pos;
+
+	faup_options_defaults(&faup_opts);
 
 	fh = faup_init();
 
-	while ((opt = getopt(argc, argv, "pld:vo:u")) != -1) {
+
+//	tld_tree = faup_tld_tree_new();
+//	tld_pos = get_tld_pos(tld_tree, argv[1]);
+//	printf("TLD Pos:%d\n", tld_pos);
+
+	while ((opt = getopt(argc, argv, "pld:vo:ut")) != -1) {
 	  switch(opt) {
 	  case 'p':
 	    faup_opts.print_header = 1;
@@ -135,6 +122,8 @@ int main(int argc, char **argv)
 	  		exit(1);
 	  	}
 	  	break;
+	  case 't':
+	  	faup_opts.tld_greater_extraction = 1;
 	  case 'u':
 	  	faup_tld_update();
 	  	exit(0);
@@ -160,7 +149,10 @@ int main(int argc, char **argv)
 		  exit(1);
 		}
 
-		faup_decode(fh, argv[optind], strlen(argv[optind]));
+		if (faup_opts.tld_greater_extraction) {
+			faup_opts.tld_tree = faup_tld_tree_new();
+		}
+		faup_decode(fh, argv[optind], strlen(argv[optind]), &faup_opts);
 
 		switch(faup_opts.output) {
 			case FAUP_OUTPUT_JSON:
@@ -188,7 +180,10 @@ int main(int argc, char **argv)
 				break;
 			}
 
-			faup_decode(fh, strbuf, strlen(strbuf));		
+			if (faup_opts.tld_greater_extraction) {
+				faup_opts.tld_tree = faup_tld_tree_new();
+			}
+			faup_decode(fh, strbuf, strlen(strbuf), &faup_opts);		
 			switch(faup_opts.output) {
 				case FAUP_OUTPUT_JSON:
 					faup_output_json(fh, stdout);
