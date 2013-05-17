@@ -168,7 +168,7 @@ int main(int argc, char **argv)
 				break;			
 		}
 	} else {       	/* We read from stdin */
-	        long line_nb = 1;
+		long line_nb = 1;
 		if (faup_opts.print_header) {
 		        print_header(faup_opts.print_line, faup_opts.sep_char);
 		}

@@ -28,7 +28,7 @@
 
 static UT_array *_tlds;
 
-int _allocateKid(TLDNode **Node, char c, bool EoT, bool move_cursor)
+static int _faup_tld_tree_allocate_kid(TLDNode **Node, char c, bool EoT, bool move_cursor)
 {
 	if( (*Node)->kid != NULL )
 		return -1;
@@ -45,7 +45,7 @@ int _allocateKid(TLDNode **Node, char c, bool EoT, bool move_cursor)
 	return 0;
 }
 
-int _allocateSibling(TLDNode **Node, char c, bool EoT, bool move_cursor)
+static int _faup_tld_tree_allocate_sibling(TLDNode **Node, char c, bool EoT, bool move_cursor)
 {
 	if( (*Node)->sibling != NULL )
 		return -1;
@@ -66,7 +66,7 @@ int _allocateSibling(TLDNode **Node, char c, bool EoT, bool move_cursor)
  * Add a node the the Trie (should be kid or sibling of the root)
  *
  */
-int _addNode(TLDNode **Tree, char *TLD, int tLen)
+static int _faup_tld_tree_add_node(TLDNode **Tree, char *TLD, int tLen)
 {
 	bool lastChar, nextIsDot, nextIsException;
 	char *p;
@@ -85,7 +85,7 @@ int _addNode(TLDNode **Tree, char *TLD, int tLen)
 		// char does not exist in the Trie at that position
 		if( pNode->kid == NULL ) 
 		{
-			ret = _allocateKid(&pNode, *p, lastChar | nextIsDot | nextIsException, true);
+			ret = _faup_tld_tree_allocate_kid(&pNode, *p, lastChar | nextIsDot | nextIsException, true);
 			if( ret == -1 )
 				return -1;
 		}
@@ -100,7 +100,7 @@ int _addNode(TLDNode **Tree, char *TLD, int tLen)
 			// char does not exist
 			if( pNode->c != *p )
 			{
-				ret = _allocateSibling(&pNode, *p, lastChar | nextIsDot | nextIsException, true);
+				ret = _faup_tld_tree_allocate_sibling(&pNode, *p, lastChar | nextIsDot | nextIsException, true);
 				if( ret == -1 )
 					return -1;
 			}
@@ -120,7 +120,7 @@ int _addNode(TLDNode **Tree, char *TLD, int tLen)
  * Define whether it's an exception (!<domain.tld>) or a regular TLD (including wildcards ones)
  * Exception go under the Tree root's kid part, regular under the root's sibling.
  */
-int faup_tld_tree_add_node(TLDNode **Tree, char *TLD, int tLen)
+static int faup_tld_tree_add_node(TLDNode **Tree, char *TLD, int tLen)
 {
 	TLDNode *pNode;
 
@@ -152,12 +152,12 @@ int faup_tld_tree_add_node(TLDNode **Tree, char *TLD, int tLen)
 		pNode = (*Tree)->sibling;
 	}
 
-	return _addNode(&pNode, TLD, tLen);
+	return _faup_tld_tree_add_node(&pNode, TLD, tLen);
 }
 
 
 
-void faup_tld_tree_add_tld(char *tld, void *user_data)
+static void faup_tld_tree_add_tld(char *tld, void *user_data)
 {
 	int retval;
 
@@ -209,7 +209,7 @@ TLDNode *faup_tld_tree_new(void)
  * FALSE in any other case (no match)
  *
  */
-bool inTrie(TLDNode *Tree, const char *tld)
+static bool faup_tld_tree_tld_exists(TLDNode *Tree, const char *tld)
 {
 	TLDNode *pNode = Tree;
 	const char *p;
@@ -279,7 +279,7 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(TLDNode *tld_tree, const char *o
 
 		step = ( *p == '.' ) ? 1 : 0;
 
-		found = inTrie(tld_tree->kid, p + step);
+		found = faup_tld_tree_tld_exists(tld_tree->kid, p + step);
 		if( ! found )
 			break;
 		last = (char *) p + step;
@@ -291,7 +291,7 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(TLDNode *tld_tree, const char *o
 
 	// here we have the longest TLD
 	// but is that an exception ? (ex: !siemens.om vs *.om)
-	found = inTrie(tld_tree->sibling, last);
+	found = faup_tld_tree_tld_exists(tld_tree->sibling, last);
 
 	if( found )
 	{
