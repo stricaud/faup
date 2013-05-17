@@ -123,6 +123,7 @@ int main(int argc, char **argv)
 	  	}
 	  	break;
 	  case 't':
+	  	faup_opts.tld_tree = faup_tld_tree_new();
 	  	faup_opts.tld_greater_extraction = 1;
 	  	break;
 	  case 'u':
@@ -152,9 +153,6 @@ int main(int argc, char **argv)
 		  exit(1);
 		}
 
-		if (faup_opts.tld_greater_extraction) {
-			faup_opts.tld_tree = faup_tld_tree_new();
-		}
 		faup_decode(fh, argv[optind], strlen(argv[optind]), &faup_opts);
 
 		switch(faup_opts.output) {
@@ -183,9 +181,6 @@ int main(int argc, char **argv)
 				break;
 			}
 
-			if (faup_opts.tld_greater_extraction) {
-				faup_opts.tld_tree = faup_tld_tree_new();
-			}
 			faup_decode(fh, strbuf, strlen(strbuf), &faup_opts);		
 			switch(faup_opts.output) {
 				case FAUP_OUTPUT_JSON:
