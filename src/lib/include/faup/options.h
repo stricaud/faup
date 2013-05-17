@@ -42,6 +42,7 @@ extern "C" {
 #endif
 
 void faup_options_defaults(faup_options_t *opts);
+void faup_options_debug(faup_options_t *opts);
 
 #ifdef __cplusplus
 }

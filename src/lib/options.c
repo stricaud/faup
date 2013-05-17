@@ -24,3 +24,12 @@ void faup_options_defaults(faup_options_t *opts)
 	opts->output = FAUP_OUTPUT_CSV;
 	opts->tld_greater_extraction = 0;
 }
+
+void faup_options_debug(faup_options_t *opts)
+{
+	printf("opts->print_header:%d\n", opts->print_header);
+	printf("opts->print_line:%d\n", opts->print_line);
+	printf("opts->sep_char:%c\n", opts->sep_char);
+	printf("opts->output:%d\n", opts->output);
+	printf("opts->tld_greater_extraction:%d\n", opts->tld_greater_extraction);
+}

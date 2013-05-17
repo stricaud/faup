@@ -124,12 +124,15 @@ int main(int argc, char **argv)
 	  	break;
 	  case 't':
 	  	faup_opts.tld_greater_extraction = 1;
+	  	break;
 	  case 'u':
 	  	faup_tld_update();
 	  	exit(0);
+	  	break;
 	  case 'v':
 	    printf("faup v%s\n", faup_get_version());
 	    exit(0);
+	    break;
 	  default:
 	    print_help(argv);
 	    exit(1);

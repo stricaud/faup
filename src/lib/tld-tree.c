@@ -209,10 +209,10 @@ TLDNode *faup_tld_tree_new(void)
  * FALSE in any other case (no match)
  *
  */
-bool inTrie(TLDNode *Tree, char *tld)
+bool inTrie(TLDNode *Tree, const char *tld)
 {
 	TLDNode *pNode = Tree;
-	char *p;
+	const char *p;
 	int tLen;
 	bool wildcard;
 
@@ -259,7 +259,7 @@ bool inTrie(TLDNode *Tree, char *tld)
  * - google.nawak => -1 (NOT FOUND)
  *
  */
-faup_tld_tree_extracted_t faup_tld_tree_extract(TLDNode *tld_tree, const char *org_str, faup_feature_t domain)
+faup_tld_tree_extracted_t faup_tld_tree_extract(TLDNode *tld_tree, const char *org_str, faup_feature_t host)
 {
 	const char *p;
 	char *last;
@@ -271,7 +271,7 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(TLDNode *tld_tree, const char *o
 	tld_extracted.size = 0;
 
 	last = NULL;
-	p    = org_str + strlen(org_str) -1;
+	p    = org_str + host.pos + host.size - 1;
 	while( *p )
 	{
 		while( *(p-1) && (*p != '.') )
@@ -279,10 +279,10 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(TLDNode *tld_tree, const char *o
 
 		step = ( *p == '.' ) ? 1 : 0;
 
-		found = inTrie(tld_tree->kid, (char *)p+step);
+		found = inTrie(tld_tree->kid, p + step);
 		if( ! found )
 			break;
-		last = p+step;
+		last = (char *) p + step;
 		p--;
 	}
 
@@ -299,7 +299,10 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(TLDNode *tld_tree, const char *o
 			last++;
 		last++;
 	}
-	//return (strlen(org_str) - strlen(last));
+
+	tld_extracted.size = strlen(last);
+	tld_extracted.pos = host.pos + host.size - tld_extracted.size;
+
 	return tld_extracted;
 }
 

@@ -41,7 +41,7 @@ struct _faup_tld_tree_extracted_t {
 typedef struct _faup_tld_tree_extracted_t faup_tld_tree_extracted_t;
 
 TLDNode *faup_tld_tree_new(void);
-faup_tld_tree_extracted_t faup_tld_tree_extract(TLDNode *tld_tree, const char *org_str, faup_feature_t domain);
+faup_tld_tree_extracted_t faup_tld_tree_extract(TLDNode *tld_tree, const char *org_str, faup_feature_t host);
 
 #ifdef __cplusplus
 }

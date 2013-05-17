@@ -141,15 +141,27 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 					const char *tld = (const char*) memrchr(host, '.', url_features->host.size);
 					if (tld) {
 						tld++;
-						const uint32_t tld_pos = (uint32_t) (((uintptr_t)tld)-((uintptr_t)host));
+						uint32_t tld_pos = (uint32_t) (((uintptr_t)tld)-((uintptr_t)host));
 						uintptr_t tld_len = url_features->host.size - tld_pos;
 						if (tld_len>1) {
 							/* We sometime have no resource_path after but a trailing slash ('www.honeynet.org/') */
 							if (tld[tld_len-1] == '/') {
 								tld_len--;
 							}
-							url_features->tld.pos = tld_pos + url_features->host.pos;
-							url_features->tld.size = tld_len;
+
+							// All the features are detected, we can do some extra operations now
+							if (options->tld_greater_extraction) {
+								faup_tld_tree_extracted_t tld_extracted = faup_tld_tree_extract(options->tld_tree, fh->faup.org_str, url_features->host);
+								url_features->tld.pos = tld_extracted.pos;
+								url_features->tld.size = tld_extracted.size;
+
+								tld_pos = tld_extracted.pos;
+								tld_len = tld_extracted.size;
+
+							} else {
+								url_features->tld.pos = tld_pos + url_features->host.pos;
+								url_features->tld.size = tld_len;
+							}
 
 							// Extract the domain (google.com)
 							const char* domain = (const char*) memrchr(host, '.', url_features->host.size - tld_len - 1);
@@ -233,11 +245,6 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 		if (faup_features_exist(url_features->fragment)) { 
 			total_size = url_len - url_features->fragment.pos; 
 			url_features->fragment.size = total_size;
-		}
-
-		// All the features are detected, we can do some extra operations now
-		if (options->tld_greater_extraction) {
-			faup_tld_tree_extracted_t tld_extracted = faup_tld_tree_extract(options->tld_tree, fh->faup.org_str, url_features->domain);
 		}
 
 		//faup_features_debug(url, url_features);
