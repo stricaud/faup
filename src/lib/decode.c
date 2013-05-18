@@ -155,8 +155,14 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 								url_features->tld.pos = tld_extracted.pos;
 								url_features->tld.size = tld_extracted.size;
 
-								tld_pos = tld_extracted.pos;
-								tld_len = tld_extracted.size;
+								// Since we have the -t option checks if the TLD wasn't > 1
+								if (tld_extracted.pos >= 0) {
+									tld_pos = tld_extracted.pos;
+									tld_len = tld_extracted.size;
+								} else {
+									url_features->tld.pos = tld_pos + url_features->host.pos;
+									url_features->tld.size = tld_len;
+								}
 
 							} else {
 								url_features->tld.pos = tld_pos + url_features->host.pos;
