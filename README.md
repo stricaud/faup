@@ -75,4 +75,4 @@ to build the binary in the source directory, you have to create a build director
     cd faup
     mkdir build
     cd build
-    cmake ..
+    cmake .. && make
