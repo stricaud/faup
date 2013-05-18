@@ -64,3 +64,15 @@ Again, things are basic:
        faup_show(fh, ',', stdout);
 
        faup_terminate(fh);
+
+Building faup
+-------------
+
+To get and build faup, you need [cmake](http://www.cmake.org/). As cmake doesn't allow
+to build the binary in the source directory, you have to create a build directory.
+
+    git clone git://github.com/stricaud/faup.git
+    cd faup
+    mkdir build
+    cd build
+    cmake .. && make
