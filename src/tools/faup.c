@@ -61,7 +61,7 @@ void print_help(char **argv)
 	printf("Usage: %s [-pl] [-d delimiter] [-o {csv,json}] url\n \
 		Where:\n \
 		url is the url that you want to parse\n \
-		\t-h: print the header\n \
+		\t-p: print the header\n \
 		\t-l: prefix with the line number\n \
 		\t-o: output csv or json at your convenience\n \
 		\t-d delimiter: will separate the fields with the wanted delimiter\n \
