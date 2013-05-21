@@ -103,20 +103,40 @@ void _faup_output_json_single(faup_handler_t const* fh, char *faup_feature_name,
 	fwrite("\",\n", 3, 1, out);
 }
 
-void faup_output_json(faup_handler_t const* fh, FILE* out)
+void faup_output_json(faup_handler_t const* fh, faup_options_t *opts, FILE* out)
 {	
 
 	fwrite(&"{\n", 2, 1, out);
-	_faup_output_json_single(fh, "scheme", fh->faup.features.scheme, out);
-	_faup_output_json_single(fh, "credential", fh->faup.features.credential, out);
-	_faup_output_json_single(fh, "subdomain", fh->faup.features.subdomain, out);
-	_faup_output_json_single(fh, "domain", fh->faup.features.domain, out);
-	_faup_output_json_single(fh, "host", fh->faup.features.host, out);
-	_faup_output_json_single(fh, "tld", fh->faup.features.tld, out);
-	_faup_output_json_single(fh, "port", fh->faup.features.port, out);
-	_faup_output_json_single(fh, "resource_path", fh->faup.features.resource_path, out);
-	_faup_output_json_single(fh, "query_string", fh->faup.features.query_string, out);
-	_faup_output_json_single(fh, "fragment", fh->faup.features.fragment, out);
+	if (opts->fields & FAUP_URL_FIELD_SCHEME) {
+		_faup_output_json_single(fh, "scheme", fh->faup.features.scheme, out);
+	}
+	if (opts->fields & FAUP_URL_FIELD_CREDENTIAL) {	
+		_faup_output_json_single(fh, "credential", fh->faup.features.credential, out);
+	}
+	if (opts->fields & FAUP_URL_FIELD_SUBDOMAIN) {
+		_faup_output_json_single(fh, "subdomain", fh->faup.features.subdomain, out);
+	}
+	if (opts->fields & FAUP_URL_FIELD_DOMAIN) {
+		_faup_output_json_single(fh, "domain", fh->faup.features.domain, out);
+	}
+	if (opts->fields & FAUP_URL_FIELD_HOST) {
+		_faup_output_json_single(fh, "host", fh->faup.features.host, out);
+	}
+	if (opts->fields & FAUP_URL_FIELD_TLD) {	
+		_faup_output_json_single(fh, "tld", fh->faup.features.tld, out);
+	}
+	if (opts->fields & FAUP_URL_FIELD_PORT) {
+		_faup_output_json_single(fh, "port", fh->faup.features.port, out);
+	}
+	if (opts->fields & FAUP_URL_FIELD_RESOURCE_PATH) {
+		_faup_output_json_single(fh, "resource_path", fh->faup.features.resource_path, out);
+	}
+	if (opts->fields & FAUP_URL_FIELD_QUERY_STRING) {
+		_faup_output_json_single(fh, "query_string", fh->faup.features.query_string, out);
+	}
+	if (opts->fields & FAUP_URL_FIELD_FRAGMENT) {
+		_faup_output_json_single(fh, "fragment", fh->faup.features.fragment, out);
+	}
 
 
 	fwrite(&"\n}\n", 3, 1, out);
@@ -142,7 +162,7 @@ void faup_output(faup_handler_t const* fh, faup_options_t *opts, FILE* out)
 			faup_output_csv(fh, opts, out);
 			break;
 		case FAUP_OUTPUT_JSON:
-			faup_output_json(fh, out);
+			faup_output_json(fh, opts, out);
 			break;
 		default:
 			fprintf(stderr, "Error: unknown output option %d\n", opts->output);
