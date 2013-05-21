@@ -58,26 +58,15 @@ static char *readline(FILE *fp)
 
 void print_help(char **argv) 
 {
-	printf("Usage: %s [-pl] [-d delimiter] [-o {csv,json}] url\n \
+	printf("Usage: %s [-pl] [-d delimiter] [-o {csv,json}] [-f {scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment}] url\n \
 		Where:\n \
 		url is the url that you want to parse\n \
 		\t-h: print the header\n \
+		\t-f: fields to extract\n \
 		\t-l: prefix with the line number\n \
 		\t-o: output csv or json at your convenience\n \
 		\t-d delimiter: will separate the fields with the wanted delimiter\n \
 		\t-t: extract TLD > 1\n", argv[0]);
-}
-
-void print_header(int print_line, char sep_char)
-{
-	if (print_line) {
-	  printf("line%cscheme%ccredential%csubdomain%cdomain%chost%ctld%cport%cresource_path%cquery_string%cfragment\n",
-		 sep_char, sep_char,sep_char,sep_char,sep_char,sep_char,sep_char,sep_char,sep_char,sep_char);
-	} else {
-	  printf("scheme%ccredential%csubdomain%cdomain%chost%ctld%cport%cresource_path%cquery_string%cfragment\n",
-		 sep_char,sep_char,sep_char,sep_char,sep_char,sep_char,sep_char,sep_char,sep_char);
-	}
-
 }
 
 int main(int argc, char **argv)
@@ -101,7 +90,7 @@ int main(int argc, char **argv)
 //	tld_pos = get_tld_pos(tld_tree, argv[1]);
 //	printf("TLD Pos:%d\n", tld_pos);
 
-	while ((opt = getopt(argc, argv, "pld:vo:ut")) != -1) {
+	while ((opt = getopt(argc, argv, "pld:vo:utf:")) != -1) {
 	  switch(opt) {
 	  case 'p':
 	    faup_opts.print_header = 1;
@@ -113,6 +102,38 @@ int main(int argc, char **argv)
 	  case 'd':
 	    faup_opts.sep_char = optarg[0];
 	    break;
+	  case 'f':
+	  	if (!strcmp("scheme", optarg)) {
+	  		faup_opts.fields = FAUP_URL_FIELD_SCHEME;
+	  	}
+	  	if (!strcmp("credential", optarg)) {
+	  		faup_opts.fields = FAUP_URL_FIELD_CREDENTIAL;
+	  	}
+	  	if (!strcmp("subdomain", optarg)) {
+	  		faup_opts.fields = FAUP_URL_FIELD_SUBDOMAIN;
+	  	}
+	  	if (!strcmp("domain", optarg)) {
+	  		faup_opts.fields = FAUP_URL_FIELD_DOMAIN;
+	  	}
+	  	if (!strcmp("host", optarg)) {
+	  		faup_opts.fields = FAUP_URL_FIELD_HOST;
+	  	}
+	  	if (!strcmp("tld", optarg)) {
+	  		faup_opts.fields = FAUP_URL_FIELD_TLD;
+	  	}
+	  	if (!strcmp("port", optarg)) {
+	  		faup_opts.fields = FAUP_URL_FIELD_PORT;
+	  	}
+	  	if (!strcmp("resource_path", optarg)) {
+	  		faup_opts.fields = FAUP_URL_FIELD_RESOURCE_PATH;
+	  	}
+	  	if (!strcmp("query_string", optarg)) {
+	  		faup_opts.fields = FAUP_URL_FIELD_QUERY_STRING;
+	  	}
+	  	if (!strcmp("fragment", optarg)) {
+	  		faup_opts.fields = FAUP_URL_FIELD_FRAGMENT;
+	  	}
+	  	break;
 	  case 'o':
 	  	if (!strcmp("csv", optarg)) {
 	  		faup_opts.output = FAUP_OUTPUT_CSV;
