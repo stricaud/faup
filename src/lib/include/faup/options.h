@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <faup/faup.h>
 #include <faup/tld-tree.h>
+#include <faup/features.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,6 +71,7 @@ typedef struct _faup_options_t faup_options_t;
 void faup_options_defaults(faup_options_t *opts);
 void faup_options_debug(faup_options_t *opts);
 int faup_options_url_field_has_greater_than(faup_options_t *opts, faup_url_field_t field);
+faup_feature_t faup_options_field_get_feature(faup_handler_t const *fh, faup_url_field_t field);
 
 #ifdef __cplusplus
 }

@@ -43,3 +43,43 @@ int faup_options_url_field_has_greater_than(faup_options_t *opts, faup_url_field
 
 	return retval;
 }
+
+faup_feature_t faup_options_field_get_feature(faup_handler_t const *fh, faup_url_field_t field)
+{
+	faup_feature_t error;
+	error.pos = -1;
+	error.size = -1;
+
+	if (field & FAUP_URL_FIELD_SCHEME) {
+		return fh->faup.features.scheme;
+	}
+	if (field & FAUP_URL_FIELD_CREDENTIAL) {
+		return fh->faup.features.credential;
+	}
+	if (field & FAUP_URL_FIELD_SUBDOMAIN) {
+		return fh->faup.features.subdomain;
+	}
+	if (field & FAUP_URL_FIELD_DOMAIN) {
+		return fh->faup.features.domain;
+	}
+	if (field & FAUP_URL_FIELD_HOST) {
+		return fh->faup.features.host;
+	}
+	if (field & FAUP_URL_FIELD_TLD) {
+		return fh->faup.features.tld;
+	}
+	if (field & FAUP_URL_FIELD_PORT) {
+		return fh->faup.features.port;
+	}
+	if (field & FAUP_URL_FIELD_RESOURCE_PATH) {
+		return fh->faup.features.resource_path;
+	}
+	if (field & FAUP_URL_FIELD_QUERY_STRING) {
+		return fh->faup.features.query_string;
+	}
+	if (field & FAUP_URL_FIELD_FRAGMENT) {
+		return fh->faup.features.fragment;
+	}
+
+	return error;
+}

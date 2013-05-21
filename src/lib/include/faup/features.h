@@ -23,7 +23,6 @@
 
 #include <faup/faup.h>
 #include <faup/handler.h>
-#include <faup/options.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -63,7 +62,6 @@ void faup_features_debug(const char *url, faup_features_t const* features);
 int faup_features_exist(faup_feature_t feature);
 void faup_features_show(faup_handler_t const* fh, const faup_feature_t feature, FILE* out);
 int faup_features_errors_lookup(faup_features_t const* url_features);
-//faup_feature_t faup_features_get_from_field(faup_handler_t *fh, faup_url_field_t field);
 
 #ifdef __cplusplus
 }

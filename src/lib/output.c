@@ -28,16 +28,14 @@ void faup_output_show(faup_handler_t const* fh, const faup_feature_t feature, FI
 
 void _faup_output_csv_single(faup_handler_t const* fh, faup_options_t *opts, FILE *out, faup_url_field_t field)
 {
-#if 0
 		if (opts->fields & field) {
-			faup_output_show(fh, faup_features_get_from_field(field), out);
+			faup_output_show(fh, faup_options_field_get_feature(fh, field), out);
 			if (faup_options_url_field_has_greater_than(opts, field)) {
 				fwrite(&opts->sep_char, 1, 1, out);
 			} else {
 				fwrite("\n", 1, 1, out);
 			}
 	}
-#endif
 }
 
 void _faup_output_csv_header_single(faup_options_t *opts, FILE *out, faup_url_field_t field, char *string)
@@ -72,31 +70,16 @@ void faup_output_csv_header(faup_handler_t const* fh, faup_options_t *opts, FILE
 void faup_output_csv(faup_handler_t const* fh, faup_options_t *opts, FILE* out)
 {
 
-	//_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_SCHEME);
-
-	// Output order is:
-	// scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment
-	faup_output_show(fh, fh->faup.features.scheme, out);
-	fwrite(&opts->sep_char, 1, 1, out);
-	faup_output_show(fh, fh->faup.features.credential, out);
-	fwrite(&opts->sep_char, 1, 1, out);
-	faup_output_show(fh, fh->faup.features.subdomain, out);
-	fwrite(&opts->sep_char, 1, 1, out);
-	faup_output_show(fh, fh->faup.features.domain, out);
-	fwrite(&opts->sep_char, 1, 1, out);
-	faup_output_show(fh, fh->faup.features.host, out);
-	fwrite(&opts->sep_char, 1, 1, out);
-	faup_output_show(fh, fh->faup.features.tld, out);
-	fwrite(&opts->sep_char, 1, 1, out);
-	faup_output_show(fh, fh->faup.features.port, out);
-	fwrite(&opts->sep_char, 1, 1, out);
-	faup_output_show(fh, fh->faup.features.resource_path, out);
-	fwrite(&opts->sep_char, 1, 1, out);
-	faup_output_show(fh, fh->faup.features.query_string, out);
-	fwrite(&opts->sep_char, 1, 1, out);
-	faup_output_show(fh, fh->faup.features.fragment, out);
-	fwrite("\n", 1, 1, out);
-
+	_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_SCHEME);
+	_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_CREDENTIAL);
+	_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_SUBDOMAIN);
+	_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_DOMAIN);
+	_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_HOST);
+	_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_TLD);
+	_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_PORT);
+	_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_RESOURCE_PATH);
+	_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_QUERY_STRING);
+	_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_FRAGMENT);
 }
 
 void _faup_output_json_single(faup_handler_t const* fh, char *faup_feature_name, const faup_feature_t feature, FILE *out)
