@@ -259,7 +259,7 @@ static bool faup_tld_tree_tld_exists(TLDNode *Tree, const char *tld)
  * - google.nawak => -1 (NOT FOUND)
  *
  */
-faup_tld_tree_extracted_t faup_tld_tree_extract(TLDNode *tld_tree, const char *org_str, faup_feature_t host)
+faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld_tree, const char *org_str)
 {
 	const char *p;
 	char *last;
@@ -271,7 +271,7 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(TLDNode *tld_tree, const char *o
 	tld_extracted.size = 0;
 
 	last = NULL;
-	p    = org_str + host.pos + host.size - 1;
+	p    = org_str + fh->faup.features.host.pos + fh->faup.features.host.size - 1;
 	while( *p )
 	{
 		while( *(p-1) && (*p != '.') )
@@ -301,7 +301,7 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(TLDNode *tld_tree, const char *o
 	}
 
 	tld_extracted.size = strlen(last);
-	tld_extracted.pos = host.pos + host.size - tld_extracted.size;
+	tld_extracted.pos = fh->faup.features.host.pos + fh->faup.features.host.size - tld_extracted.size;
 
 	return tld_extracted;
 }

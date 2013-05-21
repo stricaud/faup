@@ -21,23 +21,24 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <faup/faup.h>
 #include <faup/handler.h>
+#include <faup/options.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct _faup_feature_t faup_feature_t;
 // This will be aligned on 8 bytes on 64-bit platforms, that's
 // why 'size' is not of type size_t.
 struct _faup_feature_t {
 	int32_t pos;
 	uint32_t size;
 };
+typedef struct _faup_feature_t faup_feature_t;
 
 /* int is better since we can know if we have those features
    and store the position */
-typedef struct _faup_features_t faup_features_t;
 struct _faup_features_t {
 	faup_feature_t scheme;
 	faup_feature_t hierarchical;
@@ -51,6 +52,7 @@ struct _faup_features_t {
 	faup_feature_t query_string;
 	faup_feature_t fragment;
 };
+typedef struct _faup_features_t faup_features_t;
 
 void faup_features_init(faup_features_t* features);
 /**
@@ -61,6 +63,7 @@ void faup_features_debug(const char *url, faup_features_t const* features);
 int faup_features_exist(faup_feature_t feature);
 void faup_features_show(faup_handler_t const* fh, const faup_feature_t feature, FILE* out);
 int faup_features_errors_lookup(faup_features_t const* url_features);
+//faup_feature_t faup_features_get_from_field(faup_handler_t *fh, faup_url_field_t field);
 
 #ifdef __cplusplus
 }

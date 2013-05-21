@@ -21,7 +21,7 @@
 
 #include <stdint.h>
 
-#include <faup/features.h>
+#include <faup/faup.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,7 +41,7 @@ struct _faup_tld_tree_extracted_t {
 typedef struct _faup_tld_tree_extracted_t faup_tld_tree_extracted_t;
 
 TLDNode *faup_tld_tree_new(void);
-faup_tld_tree_extracted_t faup_tld_tree_extract(TLDNode *tld_tree, const char *org_str, faup_feature_t host);
+faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld_tree, const char *org_str);
 
 #ifdef __cplusplus
 }

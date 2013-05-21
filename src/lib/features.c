@@ -185,6 +185,41 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 	}
 }
 
+// faup_feature_t faup_features_get_from_field(faup_handler_t *fh, faup_url_field_t field)
+// {
+// 	if (field & FAUP_URL_FIELD_SCHEME) {
+// 		return fh->faup.features.scheme;
+// 	}
+// 	if (field & FAUP_URL_FIELD_CREDENTIAL) {
+// 		return fh->faup.features.credential;
+// 	}
+// 	if (field & FAUP_URL_FIELD_SUBDOMAIN) {
+// 		return fh->faup.features.subdomain;
+// 	}
+// 	if (field & FAUP_URL_FIELD_DOMAIN) {
+// 		return fh->faup.features.domain;
+// 	}
+// 	if (field & FAUP_URL_FIELD_HOST) {
+// 		return fh->faup.features.host;
+// 	}
+// 	if (field & FAUP_URL_FIELD_TLD) {
+// 		return fh->faup.features.tld;
+// 	}
+// 	if (field & FAUP_URL_FIELD_PORT) {
+// 		return fh->faup.features.port;
+// 	}
+// 	if (field & FAUP_URL_FIELD_RESOURCE_PATH) {
+// 		return fh->faup.features.resource_path;
+// 	}
+// 	if (field & FAUP_URL_FIELD_QUERY_STRING) {
+// 		return fh->faup.features.query_string;
+// 	}
+// 	if (field & FAUP_URL_FIELD_FRAGMENT) {
+// 		return fh->faup.features.fragment;
+// 	}
+// }
+
+
 void faup_features_debug(const char *url, faup_features_t const* features)
 {
 	fprintf(stdout, "url:%s\n", url);

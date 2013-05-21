@@ -20,7 +20,6 @@
 #include <faup/errors.h>
 #include <faup/features.h>
 #include <faup/handler.h>
-#include <faup/output.h>
 #include <faup/portable.h>
 #include <faup/tld.h>
 #include <faup/version.h>

@@ -19,13 +19,13 @@
 
 #include <stdio.h>
 #include <faup/faup.h>
+#include <faup/options.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void faup_output_csv(faup_handler_t const* fh, const char sep_char, FILE* out);
-void faup_output_json(faup_handler_t const* fh, FILE* out);
+void faup_output(faup_handler_t const* fh, faup_options_t *opts, FILE* out);
 
 #ifdef __cplusplus
 }

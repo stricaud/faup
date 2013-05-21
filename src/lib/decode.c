@@ -151,7 +151,7 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 
 							// All the features are detected, we can do some extra operations now
 							if (options->tld_greater_extraction) {
-								faup_tld_tree_extracted_t tld_extracted = faup_tld_tree_extract(options->tld_tree, fh->faup.org_str, url_features->host);
+								faup_tld_tree_extracted_t tld_extracted = faup_tld_tree_extract(fh, options->tld_tree, fh->faup.org_str);
 								url_features->tld.pos = tld_extracted.pos;
 								url_features->tld.size = tld_extracted.size;
 

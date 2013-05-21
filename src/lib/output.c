@@ -26,29 +26,77 @@ void faup_output_show(faup_handler_t const* fh, const faup_feature_t feature, FI
 	}
 }
 
-void faup_output_csv(faup_handler_t const* fh, const char sep_char, FILE* out)
+void _faup_output_csv_single(faup_handler_t const* fh, faup_options_t *opts, FILE *out, faup_url_field_t field)
 {
+#if 0
+		if (opts->fields & field) {
+			faup_output_show(fh, faup_features_get_from_field(field), out);
+			if (faup_options_url_field_has_greater_than(opts, field)) {
+				fwrite(&opts->sep_char, 1, 1, out);
+			} else {
+				fwrite("\n", 1, 1, out);
+			}
+	}
+#endif
+}
+
+void _faup_output_csv_header_single(faup_options_t *opts, FILE *out, faup_url_field_t field, char *string)
+{
+		if (opts->fields & field) {
+		fprintf(out, "%s", string);
+		if (faup_options_url_field_has_greater_than(opts, field)) {
+			fwrite(&opts->sep_char, 1, 1, out);
+		} else {
+			fwrite("\n", 1, 1, out);
+		}
+	}
+}
+
+void faup_output_csv_header(faup_handler_t const* fh, faup_options_t *opts, FILE *out) \
+{
+	if (!opts->print_header) return;
+
+	_faup_output_csv_header_single(opts, out, FAUP_URL_FIELD_LINE, "line");
+	_faup_output_csv_header_single(opts, out, FAUP_URL_FIELD_SCHEME, "scheme");
+	_faup_output_csv_header_single(opts, out, FAUP_URL_FIELD_CREDENTIAL, "credential");
+	_faup_output_csv_header_single(opts, out, FAUP_URL_FIELD_SUBDOMAIN, "subdomain");
+	_faup_output_csv_header_single(opts, out, FAUP_URL_FIELD_DOMAIN, "domain");
+	_faup_output_csv_header_single(opts, out, FAUP_URL_FIELD_HOST, "host");	
+	_faup_output_csv_header_single(opts, out, FAUP_URL_FIELD_TLD, "tld");
+	_faup_output_csv_header_single(opts, out, FAUP_URL_FIELD_PORT, "port");
+	_faup_output_csv_header_single(opts, out, FAUP_URL_FIELD_RESOURCE_PATH, "resource_path");
+	_faup_output_csv_header_single(opts, out, FAUP_URL_FIELD_QUERY_STRING, "query_string");
+	_faup_output_csv_header_single(opts, out, FAUP_URL_FIELD_FRAGMENT, "fragment");
+}
+
+void faup_output_csv(faup_handler_t const* fh, faup_options_t *opts, FILE* out)
+{
+
+	//_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_SCHEME);
+
 	// Output order is:
 	// scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment
 	faup_output_show(fh, fh->faup.features.scheme, out);
-	fwrite(&sep_char, 1, 1, out);
+	fwrite(&opts->sep_char, 1, 1, out);
 	faup_output_show(fh, fh->faup.features.credential, out);
-	fwrite(&sep_char, 1, 1, out);
+	fwrite(&opts->sep_char, 1, 1, out);
 	faup_output_show(fh, fh->faup.features.subdomain, out);
-	fwrite(&sep_char, 1, 1, out);
+	fwrite(&opts->sep_char, 1, 1, out);
 	faup_output_show(fh, fh->faup.features.domain, out);
-	fwrite(&sep_char, 1, 1, out);
+	fwrite(&opts->sep_char, 1, 1, out);
 	faup_output_show(fh, fh->faup.features.host, out);
-	fwrite(&sep_char, 1, 1, out);
+	fwrite(&opts->sep_char, 1, 1, out);
 	faup_output_show(fh, fh->faup.features.tld, out);
-	fwrite(&sep_char, 1, 1, out);
+	fwrite(&opts->sep_char, 1, 1, out);
 	faup_output_show(fh, fh->faup.features.port, out);
-	fwrite(&sep_char, 1, 1, out);
+	fwrite(&opts->sep_char, 1, 1, out);
 	faup_output_show(fh, fh->faup.features.resource_path, out);
-	fwrite(&sep_char, 1, 1, out);
+	fwrite(&opts->sep_char, 1, 1, out);
 	faup_output_show(fh, fh->faup.features.query_string, out);
-	fwrite(&sep_char, 1, 1, out);
+	fwrite(&opts->sep_char, 1, 1, out);
 	faup_output_show(fh, fh->faup.features.fragment, out);
+	fwrite("\n", 1, 1, out);
+
 }
 
 void _faup_output_json_single(faup_handler_t const* fh, char *faup_feature_name, const faup_feature_t feature, FILE *out)
@@ -89,4 +137,31 @@ void faup_output_json(faup_handler_t const* fh, FILE* out)
 
 
 	fwrite(&"\n}\n", 3, 1, out);
+}
+
+void faup_output(faup_handler_t const* fh, faup_options_t *opts, FILE* out)
+{
+	switch(opts->output) {
+		case FAUP_OUTPUT_CSV:
+			faup_output_csv_header(fh, opts, out);
+
+			if (opts->print_line) {
+					switch(opts->input_source) {
+						case FAUP_INPUT_SOURCE_ARGUMENT:
+							printf("0%c", opts->sep_char);
+							break;
+						case FAUP_INPUT_SOURCE_PIPE:
+						case FAUP_INPUT_SOURCE_FILE:
+							printf("%ld%c", opts->current_line, opts->sep_char);
+							break;
+					}
+			}
+			faup_output_csv(fh, opts, out);
+			break;
+		case FAUP_OUTPUT_JSON:
+			faup_output_json(fh, out);
+			break;
+		default:
+			fprintf(stderr, "Error: unknown output option %d\n", opts->output);
+	}
 }

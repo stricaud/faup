@@ -107,6 +107,7 @@ int main(int argc, char **argv)
 	    faup_opts.print_header = 1;
 	    break;
 	  case 'l':
+	  	faup_opts.fields |= FAUP_URL_FIELD_LINE;
 	    faup_opts.print_line = 1;
 	    break;
 	  case 'd':
@@ -141,12 +142,11 @@ int main(int argc, char **argv)
 	}
 
 	if (isatty(fileno(stdin))) {
+		faup_opts.input_source = FAUP_INPUT_SOURCE_ARGUMENT;
+
 		if (argc < 2) {
 			print_help(argv);
 			exit(1);
-		}
-		if (faup_opts.print_header) {
-		        print_header(faup_opts.print_header, faup_opts.sep_char);
 		}
 
 		if (!argv[optind]) {
@@ -155,23 +155,10 @@ int main(int argc, char **argv)
 
 		faup_decode(fh, argv[optind], strlen(argv[optind]), &faup_opts);
 
-		switch(faup_opts.output) {
-			case FAUP_OUTPUT_JSON:
-				faup_output_json(fh, stdout);
-				break;
-			default:
-				if (faup_opts.print_line) {
-		 			printf("0%c", faup_opts.sep_char);
-				}
-				faup_output_csv(fh, faup_opts.sep_char, stdout);
-				printf("\n");
-				break;			
-		}
+		faup_output(fh, &faup_opts, stdout);
 	} else {       	/* We read from stdin */
-		long line_nb = 1;
-		if (faup_opts.print_header) {
-		        print_header(faup_opts.print_line, faup_opts.sep_char);
-		}
+		faup_opts.input_source = FAUP_INPUT_SOURCE_PIPE;
+
 		while (!feof(stdin)) {
 			strbuf = readline(stdin);
 			if (!strbuf) {
@@ -181,22 +168,12 @@ int main(int argc, char **argv)
 				break;
 			}
 
-			faup_decode(fh, strbuf, strlen(strbuf), &faup_opts);		
-			switch(faup_opts.output) {
-				case FAUP_OUTPUT_JSON:
-					faup_output_json(fh, stdout);
-					break;
-				default:
-					if (faup_opts.print_line) {
-				        printf("%ld%c", line_nb, faup_opts.sep_char);
-					}
-					faup_output_csv(fh, ',', stdout);
-					printf("\n");
-					break;
-			}	
+			faup_decode(fh, strbuf, strlen(strbuf), &faup_opts);
+
+			faup_output(fh, &faup_opts, stdout);
 
 			free(strbuf);
-			line_nb++;
+			faup_opts.current_line++;
 		}
 	}
 
