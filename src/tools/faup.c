@@ -85,11 +85,6 @@ int main(int argc, char **argv)
 
 	fh = faup_init();
 
-
-//	tld_tree = faup_tld_tree_new();
-//	tld_pos = get_tld_pos(tld_tree, argv[1]);
-//	printf("TLD Pos:%d\n", tld_pos);
-
 	while ((opt = getopt(argc, argv, "pld:vo:utf:")) != -1) {
 	  switch(opt) {
 	  case 'p':
