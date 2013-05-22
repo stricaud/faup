@@ -30,13 +30,50 @@ Command line usage
 
 Simply pipe or give your url as a parameter:
 
-	$ echo "www.github.com" |faup
+	$ echo "www.github.com" |faup -p
 	scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment
 	,,www,github.com,www.github.com,com,,,,
 
 	$ faup www.github.com
-	scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment
 	,,www,github.com,www.github.com,com,,,,
+
+Extract TLD > 1
++++++++++++++++
+
+We use the mozilla list that you can update like this:
+
+      $ faup -u
+
+Then the -t flag will search for TLDs against the mozilla list (and we output as json for clarity):
+
+     $ faup -o json -t http://www.google.co.uk
+     {
+	"scheme": "http",
+	"credential": "",
+	"subdomain": "www",
+	"domain": "google.co.uk",
+	"host": "www.google.co.uk",
+	"tld": "co.uk",
+	"port": "",
+	"resource_path": "",
+	"query_string": "",
+	"fragment": "",
+     }
+
+Extract only the TLD field
+++++++++++++++++++++++++++
+
+	$ faup -f tld slashdot.org
+	org
+
+	$ faup -f tld www.bbc.co.uk
+	uk
+
+	$ faup -f tld -t www.bbc.co.uk
+	co.uk
+
+Of course, without the -t flag we are faster because we are not checking against a list.
+
 
 Python bindings
 ---------------
