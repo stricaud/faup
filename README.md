@@ -38,7 +38,7 @@ Simply pipe or give your url as a parameter:
 	,,www,github.com,www.github.com,com,,,,
 
 Extract TLD > 1
-+++++++++++++++
+---------------
 
 We use the mozilla list that you can update like this:
 
@@ -61,7 +61,7 @@ Then the -t flag will search for TLDs against the mozilla list (and we output as
      }
 
 Extract only the TLD field
-++++++++++++++++++++++++++
+--------------------------
 
 	$ faup -f tld slashdot.org
 	org
