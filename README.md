@@ -1,16 +1,20 @@
 <p align="center"><img src="doc/images/faup-logo.png"/></p>
 
+**Faup** stands for Finally An Url Parser and is a library and command line tool to parse URLs and normalize fields with two constraints:
+ 1. Work with real-life urls (resilient to badly formated ones)
+ 2. Be fast: no allocation for string parsing and read characters only once
+
+
  * **Source**: [https://github.com/stricaud/faup][github]
  * **Issues**: [https://github.com/stricaud/faup/issues][issues]
  * **Mailing List**: [libfaup@googlegroups.com](https://groups.google.com/d/forum/libfaup)
 
-## Faup: Finally an url parser! Library and Tools
+## Documentation
 
-Faup is a library and command line tool to parse URLs and normalize fields with two constraints:
+* [Library API documentation][libdoc]
+* [Command Line Tool][clidoc]
 
- 1. Work with real-life urls (resilient to badly formated ones)
-
- 2. Be fast: no allocation for string parsing and read characters only once
+## Quick Start
 
 What is provided?
 -----------------
@@ -30,15 +34,6 @@ Architecture
 ------------
 
 [ URL ] -> [ Features discovery ] -> [ Decoding ] -> [ URL Fields ]
-
-Documentation
-=============
-
-* [Library API documentation][libdoc]
-* [Command Line Tool][clidoc]
-
-Quick Start
-===========
 
 Command line usage
 ------------------
