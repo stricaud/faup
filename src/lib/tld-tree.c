@@ -270,6 +270,11 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 	tld_extracted.pos = -1;
 	tld_extracted.size = 0;
 
+	if (!tld_tree->kid) {
+		fprintf(stderr, "(Warning) Cannot extract TLD > 1. Mozilla list does not exists. Please download it (faup -u)\n");
+		return tld_extracted;
+	}
+
 	last = NULL;
 	p    = org_str + fh->faup.features.host.pos + fh->faup.features.host.size - 1;
 	while( *p )

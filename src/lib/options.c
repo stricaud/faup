@@ -25,6 +25,7 @@ void faup_options_defaults(faup_options_t *opts)
 	opts->current_line = 1;
 	opts->output = FAUP_OUTPUT_CSV;
 	opts->tld_greater_extraction = 0;
+	opts->tld_tree = NULL;
 	opts->fields = FAUP_URL_FIELD_SCHEME | FAUP_URL_FIELD_CREDENTIAL | FAUP_URL_FIELD_SUBDOMAIN | FAUP_URL_FIELD_DOMAIN | FAUP_URL_FIELD_HOST | FAUP_URL_FIELD_TLD | FAUP_URL_FIELD_PORT | FAUP_URL_FIELD_RESOURCE_PATH | FAUP_URL_FIELD_QUERY_STRING | FAUP_URL_FIELD_FRAGMENT;
 }
 
