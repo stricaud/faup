@@ -1,17 +1,23 @@
-Faup: Finally an url parser! Library and Tools
-==============================================
+<p align="center"><img src="doc/images/faup-logo.png"/></p>
 
-The Faup Library provides:
+ * **Source**: [https://github.com/stricaud/faup][github]
+ * **Issues**: [https://github.com/stricaud/faup/issues][issues]
+ * **Mailing List**: [libfaup@googlegroups.com](https://groups.google.com/d/forum/libfaup)
+
+## Faup: Finally an url parser! Library and Tools
+
+Faup is a library and command line tool to parse URLs and normalize fields with two constraints:
+
+ 1. Work with real-life urls (resilient to badly formated ones)
+
+ 2. Be fast: no allocation for string parsing and read characters only once
+
+What is provided?
+-----------------
 
 * A static library you can embed in your software (faup_static)
 * A dynamic library you can get along with (faupl)
 * A command line tool you can use to extract various parts of a url (faup)
-
-Mission
--------
-
-Faup is written to be fast and resilient to badly formated URL. It extract any 
-required url field by checking each character once.
 
 Why Yet Another URL Extraction Library?
 ---------------------------------------
@@ -24,6 +30,15 @@ Architecture
 ------------
 
 [ URL ] -> [ Features discovery ] -> [ Decoding ] -> [ URL Fields ]
+
+Documentation
+=============
+
+* [Library API documentation][libdoc]
+* [Command Line Tool][clidoc]
+
+Quick Start
+===========
 
 Command line usage
 ------------------
@@ -113,3 +128,8 @@ to build the binary in the source directory, you have to create a build director
     mkdir build
     cd build
     cmake .. && make
+
+[github]: https://github.com/stricaud/faup
+[issues]: https://github.com/stricaud/faup/issues
+[libdoc]: doc/library.md
+[clidoc]: doc/cli.md

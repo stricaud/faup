@@ -58,7 +58,7 @@ static char *readline(FILE *fp)
 
 void print_help(char **argv) 
 {
-	printf("Usage: %s [-pl] [-d delimiter] [-o {csv,json}] [-f {scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment}] url\n \
+	printf("Usage: %s [-plu] [-d delimiter] [-o {csv,json}] [-f {scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment}] url\n \
 		Where:\n \
 		url is the url that you want to parse\n \
 		\t-d delimiter: will separate the fields with the wanted delimiter\n \
