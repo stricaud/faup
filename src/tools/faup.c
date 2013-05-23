@@ -61,13 +61,14 @@ void print_help(char **argv)
 	printf("Usage: %s [-pl] [-d delimiter] [-o {csv,json}] [-f {scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment}] url\n \
 		Where:\n \
 		url is the url that you want to parse\n \
-		\t-h: print the header\n \
+		\t-d delimiter: will separate the fields with the wanted delimiter\n \
 		\t-f: fields to extract\n \
-		\t-p: print the header\n \
+		\t-h: print the header\n \
 		\t-l: prefix with the line number\n \
 		\t-o: output csv or json at your convenience\n \
-		\t-d delimiter: will separate the fields with the wanted delimiter\n \
-		\t-t: extract TLD > 1\n", argv[0]);
+		\t-p: print the header\n \
+		\t-t: extract TLD > 1\n \
+		\t-u: update the mozilla list\n", argv[0]);
 }
 
 int main(int argc, char **argv)
