@@ -17,3 +17,4 @@ http://www.google.com/aclk?sa=l&ai=CYXXXXXXXXXXXpa7lo0Epsa91UHFisELCAAQAVD2kfW1_
 sip://example.co.uk/user1
 //foo.local:80
 http://12344322345/blah.html
+tagadatsouintsouin://éé.lovemetender.co.uk:pfiew/rahh.txt

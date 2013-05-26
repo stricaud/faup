@@ -4,6 +4,7 @@
 # Version 2, December 2004 
 #
 # Copyright (C) 2012 Adrien Guinet <adrien@guinet.me>
+# Copyright (C) 2013 Sebastien Tricaud <sebastien@honeynet.org>
 #
 # Everyone is permitted to copy and distribute verbatim or modified 
 # copies of this license document, and changing it is allowed as long 
@@ -24,14 +25,66 @@
 
 # Get script absolute directory
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+FAUP_TOOL="$SCRIPTDIR/../../build/src/tools/faup"
 URLS="$SCRIPTDIR/urls.txt"
 URLS_CMP="$SCRIPTDIR/urls.txt.cmp"
-URLS_REF="$SCRIPTDIR/urls.txt.ref"
 
-# Execute faup on urls.txt and compare to the reference output
-"$SCRIPTDIR/../tools/faup" <"$URLS" >"$URLS_CMP" ||exit $1
-diff -u "$URLS_CMP" "$URLS_REF" >/dev/null
-RET=$?
-if [ $RET -eq 0 ]; then rm "$URLS_CMP"; fi
+function test_generic
+{
+    FAUP_OPTS=$1
+    URLS_REF=$2
 
-exit $RET
+    CMD="$FAUP_TOOL $FAUP_OPTS"
+
+    # Execute faup on urls.txt and compare to the reference output
+    $CMD < "$URLS" > "$URLS_CMP" ||exit $1
+    diff -u "$URLS_CMP" "$URLS_REF" >/dev/null
+    RET=$?
+    if [ $RET -eq 0 ]; then rm "$URLS_CMP"; fi
+
+    exit $RET
+}
+
+function test_vanilla
+{
+    test_generic "" "$SCRIPTDIR/ref-files/urls.txt.vanilla"
+}
+
+function test_tld_one_only
+{
+    test_generic "-t" "$SCRIPTDIR/ref-files/urls.txt.tld_one_only"
+}
+
+function test_json
+{
+    test_generic "-o json" "$SCRIPTDIR/ref-files/urls.txt.json"
+}
+
+
+function test_json_tld_one_only
+{
+    test_generic "-o json -t" "$SCRIPTDIR/ref-files/urls.txt.json_tld_one_only"
+}
+
+
+#
+# Main
+#
+
+if [ $# -lt 1 ]
+then
+    echo "$0 test_type"
+    echo "Where test_type can be one of them: vanilla, tld_one_only, json, json_tld_one_only"
+    exit 42
+fi
+
+case $1 in
+    vanilla) test_vanilla;;
+    tld_one_only) test_tld_one_only;;
+    json) test_json;;
+    json_tld_one_only) test_json_tld_one_only;;
+    *) echo "Unknown option '$1'"
+    exit 42
+    ;;
+esac
+
