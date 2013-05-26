@@ -203,6 +203,11 @@ TLDNode *faup_tld_tree_new(void)
 }
 
 
+void faup_tld_tree_free(TLDNode *Tree)
+{
+	free(Tree);
+}
+
 /*
  * Return TRUE if the provided tld is found in the provided Tree.
  * or if the provided tld match a wildcard tld in the Tree.

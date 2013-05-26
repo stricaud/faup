@@ -67,7 +67,7 @@ void print_help(char **argv)
 		\t-l: prefix with the line number\n \
 		\t-o: output csv or json at your convenience\n \
 		\t-p: print the header\n \
-		\t-t: extract TLD > 1\n \
+		\t-t: Do not extract TLD > 1 (eg. only get 'uk' instead of 'co.uk')\n \
 		\t-u: update the mozilla list\n", argv[0]);
 }
 
@@ -142,8 +142,7 @@ int main(int argc, char **argv)
 	  	}
 	  	break;
 	  case 't':
-	  	faup_opts.tld_tree = faup_tld_tree_new();
-	  	faup_opts.tld_greater_extraction = 1;
+	  	faup_options_disable_tld_above_one(&faup_opts);
 	  	break;
 	  case 'u':
 	  	faup_tld_update();

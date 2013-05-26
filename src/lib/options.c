@@ -14,6 +14,7 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
+#include <faup/tld-tree.h>
 #include <faup/options.h>
 
 void faup_options_defaults(faup_options_t *opts)
@@ -24,9 +25,22 @@ void faup_options_defaults(faup_options_t *opts)
 	opts->input_source = FAUP_INPUT_SOURCE_ARGUMENT;
 	opts->current_line = 1;
 	opts->output = FAUP_OUTPUT_CSV;
-	opts->tld_greater_extraction = 0;
-	opts->tld_tree = NULL;
+
+	faup_options_enable_tld_above_one(opts);
+
 	opts->fields = FAUP_URL_FIELD_SCHEME | FAUP_URL_FIELD_CREDENTIAL | FAUP_URL_FIELD_SUBDOMAIN | FAUP_URL_FIELD_DOMAIN | FAUP_URL_FIELD_HOST | FAUP_URL_FIELD_TLD | FAUP_URL_FIELD_PORT | FAUP_URL_FIELD_RESOURCE_PATH | FAUP_URL_FIELD_QUERY_STRING | FAUP_URL_FIELD_FRAGMENT;
+}
+
+void faup_options_enable_tld_above_one(faup_options_t *opts)
+{
+	opts->tld_greater_extraction = 1;
+	opts->tld_tree = faup_tld_tree_new();
+}
+
+void faup_options_disable_tld_above_one(faup_options_t *opts)
+{
+	opts->tld_greater_extraction = 0;
+	faup_tld_tree_free(opts->tld_tree);
 }
 
 void faup_options_debug(faup_options_t *opts)
