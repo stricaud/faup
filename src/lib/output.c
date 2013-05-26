@@ -28,6 +28,8 @@ void faup_output_show(faup_handler_t const* fh, const faup_feature_t feature, FI
 
 void _faup_output_csv_single(faup_handler_t const* fh, faup_options_t *opts, FILE *out, faup_url_field_t field)
 {
+
+
 		if (opts->fields & field) {
 			faup_output_show(fh, faup_options_field_get_feature(fh, field), out);
 			if (faup_options_url_field_has_greater_than(opts, field)) {
@@ -91,16 +93,20 @@ void _faup_output_json_single(faup_handler_t const* fh, char *faup_feature_name,
 	fwrite(&"\t\"", 2, 1, out);
 	fwrite(faup_feature_name, strlen(faup_feature_name), 1, out);
 	fwrite("\": \"", 4, 1, out);
+
 	tmpbuf = &fh->faup.org_str[feature.pos];
 	buflen = feature.size;
-	while (counter < buflen) {
-		if (tmpbuf[counter] == '"') {
-			fwrite(&"\\", 1, 1, out);
+	if (faup_features_exist(feature)) {
+		while (counter < buflen) {
+			if (tmpbuf[counter] == '"') {
+				fwrite(&"\\", 1, 1, out);
+			}
+			fwrite(&tmpbuf[counter], 1, 1, out);
+			counter++;
 		}
-		fwrite(&tmpbuf[counter], 1, 1, out);
-		counter++;
 	}
 	fwrite("\",\n", 3, 1, out);
+
 }
 
 void faup_output_json(faup_handler_t const* fh, faup_options_t *opts, FILE* out)
