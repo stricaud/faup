@@ -23,11 +23,12 @@
 # $ ./add_url.sh http://www.test.com/myweirdurl
 # It will basically add http://www.test.com/myweirdurl to urls.txt, and the output of faup to urls.txt.ref
 
-# Get script absolute directory
-SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-FAUP_TOOL="$SCRIPTDIR/../../build/src/tools/faup"
-URLS="$SCRIPTDIR/urls.txt"
-URLS_CMP="$SCRIPTDIR/urls.txt.cmp"
+SRC_TEST_DIR="${faup-project_SOURCE_DIR}/src/tests"
+BIN_TEST_DIR="${faup-project_BINARY_DIR}/src/tests"
+FAUP_TOOL="${faup-project_BINARY_DIR}/src/tools/faup"
+
+URLS="$SRC_TEST_DIR/urls.txt"
+URLS_CMP="$BIN_TEST_DIR/urls.txt.cmp"
 
 function test_generic
 {
@@ -47,23 +48,23 @@ function test_generic
 
 function test_vanilla
 {
-    test_generic "" "$SCRIPTDIR/ref-files/urls.txt.vanilla"
+    test_generic "" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla"
 }
 
 function test_tld_one_only
 {
-    test_generic "-t" "$SCRIPTDIR/ref-files/urls.txt.tld_one_only"
+    test_generic "-t" "$SRC_TEST_DIR/ref-files/urls.txt.tld_one_only"
 }
 
 function test_json
 {
-    test_generic "-o json" "$SCRIPTDIR/ref-files/urls.txt.json"
+    test_generic "-o json" "$SRC_TEST_DIR/ref-files/urls.txt.json"
 }
 
 
 function test_json_tld_one_only
 {
-    test_generic "-o json -t" "$SCRIPTDIR/ref-files/urls.txt.json_tld_one_only"
+    test_generic "-o json -t" "$SRC_TEST_DIR/ref-files/urls.txt.json_tld_one_only"
 }
 
 

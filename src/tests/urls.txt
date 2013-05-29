@@ -18,3 +18,9 @@ sip://example.co.uk/user1
 //foo.local:80
 http://12344322345/blah.html
 tagadatsouintsouin://éé.lovemetender.co.uk:pfiew/rahh.txt
+www.sptest.co.
+www.test.jet.uk
+www.test.jet.uk/blah.html
+foo.ity.kawasaki.jp
+ity.kawasaki.jp/fdswer
+www.test.jp

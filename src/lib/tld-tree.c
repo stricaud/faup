@@ -214,44 +214,47 @@ void faup_tld_tree_free(TLDNode *Tree)
  * FALSE in any other case (no match)
  *
  */
-static bool faup_tld_tree_tld_exists(TLDNode *Tree, const char *tld)
+static bool faup_tld_tree_tld_exists(TLDNode *Tree, const char *tld, int tld_len)
 {
 	TLDNode *pNode = Tree;
 	const char *p;
-	int tLen;
 	bool wildcard;
+	int lenght = 0;
 
-	tLen = strlen(tld);
-	p    = tld + tLen-1;
-	while( tLen-- )
+	p    = tld + tld_len - 1;
+	while( lenght < tld_len )
 	{
 		wildcard = false;
 		pNode    = pNode->kid;
 
-		while( pNode && (pNode->c != *p) )
+		while( pNode && (pNode->c != p[-lenght]) )
 		{
-			if( pNode->c == '*' )
+			if( pNode->c == '*' ) {
 				wildcard = true;
+			}
 			pNode = pNode->sibling;
 		}
 		if( ! pNode )
 		{
 			if( wildcard ) 
 			{
-				while( tLen-- )
+				while( tld_len-- )
 				{
-					if( tLen && (*(--p) == '.') )
+					if( tld_len && (p[-lenght] == '.') ) {
 						return false;
+					}
 				}
 				return true;
 			}
 			return false;
 		}
-		p--;
+		lenght++;
 	}
 
-	if( pNode->EoT )
+	if( pNode->EoT ) {
 		return true;
+	}
+
 	return false;
 }
 
@@ -267,11 +270,15 @@ static bool faup_tld_tree_tld_exists(TLDNode *Tree, const char *tld)
 faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld_tree, const char *org_str)
 {
 	const char *p;
+	int32_t host_last_pos;
 	char *last;
 	bool found;
-	int step;
+	uint32_t step = 0;
+	uint32_t tld_len = 0;
 	faup_tld_tree_extracted_t tld_extracted;
- 
+
+	uint32_t counter;
+
 	tld_extracted.pos = -1;
 	tld_extracted.size = 0;
 
@@ -281,37 +288,54 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 	}
 
 	last = NULL;
-	p    = org_str + fh->faup.features.host.pos + fh->faup.features.host.size - 1;
-	while( *p )
+
+	host_last_pos = fh->faup.features.host.pos + fh->faup.features.host.size;
+
+	p = org_str + host_last_pos - 1; 
+
+	counter = fh->faup.features.host.size - 1;
+
+	while( counter )
 	{
-		while( *(p-1) && (*p != '.') )
+		while( *(p-1) && (*p != '.') ) {
 			p--;
+			counter--;
+		}
 
 		step = ( *p == '.' ) ? 1 : 0;
-
-		found = faup_tld_tree_tld_exists(tld_tree->kid, p + step);
-		if( ! found )
+		
+		found = faup_tld_tree_tld_exists(tld_tree->kid, p + step, fh->faup.features.host.size - counter - 1);
+		if( ! found ) {
 			break;
+		} else {
+			tld_len = fh->faup.features.host.size - counter - 1;
+		}
+
 		last = (char *) p + step;
+
 		p--;
+		counter--;
 	}
 
-	if( last == NULL )
+	if( last == NULL ) {
 		return tld_extracted;
+	}
 
 	// here we have the longest TLD
 	// but is that an exception ? (ex: !siemens.om vs *.om)
-	found = faup_tld_tree_tld_exists(tld_tree->sibling, last);
-
+	counter = 0;
+	found = faup_tld_tree_tld_exists(tld_tree->sibling, last, fh->faup.features.host.size - 1);
 	if( found )
 	{
-		while( *(last) != '.' )
+		while( *(last) != '.' ) {
 			last++;
-		last++;
+			counter++;
+		}
+		counter++;
 	}
 
-	tld_extracted.size = strlen(last);
-	tld_extracted.pos = fh->faup.features.host.pos + fh->faup.features.host.size - tld_extracted.size;
+	tld_extracted.size = tld_len;
+	tld_extracted.pos = fh->faup.features.host.pos + fh->faup.features.host.size - tld_extracted.size + counter;
 
 	return tld_extracted;
 }
