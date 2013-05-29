@@ -24,3 +24,4 @@ www.test.jet.uk/blah.html
 foo.ity.kawasaki.jp
 ity.kawasaki.jp/fdswer
 www.test.jp
+http://www.test.com.uk

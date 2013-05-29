@@ -86,27 +86,31 @@ static int _faup_tld_tree_add_node(TLDNode **Tree, char *TLD, int tLen)
 		if( pNode->kid == NULL ) 
 		{
 			ret = _faup_tld_tree_allocate_kid(&pNode, *p, lastChar | nextIsDot | nextIsException, true);
-			if( ret == -1 )
+			if( ret == -1 ) {
 				return -1;
+			}
 		}
 		// char may exist in the Trie
 		else 
 		{
 			pNode = pNode->kid;
 
-			while( (pNode->sibling != NULL) && (pNode->c != *p) )
+			while( (pNode->sibling != NULL) && (pNode->c != *p) ) {
 				pNode = pNode->sibling;
+			}
 
 			// char does not exist
 			if( pNode->c != *p )
 			{
 				ret = _faup_tld_tree_allocate_sibling(&pNode, *p, lastChar | nextIsDot | nextIsException, true);
-				if( ret == -1 )
+				if( ret == -1 ) {
 					return -1;
+				}
 			}
 			// char already exist at that position but not necessary as an ended one.
-			else if( lastChar || nextIsDot || nextIsException )
+			else if( lastChar || nextIsDot || nextIsException ) {
 				pNode->EoT = true;
+			}
 		}
 		p--;
 	}
@@ -131,8 +135,9 @@ static int faup_tld_tree_add_node(TLDNode **Tree, char *TLD, int tLen)
 		if( (*Tree)->kid == NULL ) 
 		{
 			(*Tree)->kid = calloc(1, sizeof(TLDNode));
-			if( (*Tree)->kid == NULL )
+			if( (*Tree)->kid == NULL ) {
 				return -1;
+			}
 
 			(*Tree)->kid->c = '\0'; 
 		}
@@ -144,8 +149,9 @@ static int faup_tld_tree_add_node(TLDNode **Tree, char *TLD, int tLen)
 		if( (*Tree)->sibling == NULL ) 
 		{
 			(*Tree)->sibling = calloc(1, sizeof(TLDNode));
-			if( (*Tree)->sibling == NULL )
+			if( (*Tree)->sibling == NULL ) {
 				return -1;
+			}
 
 			(*Tree)->sibling->c = '\0'; 
 		}
@@ -221,26 +227,23 @@ static bool faup_tld_tree_tld_exists(TLDNode *Tree, const char *tld, int tld_len
 	bool wildcard;
 	int lenght = 0;
 
-	p    = tld + tld_len - 1;
-	while( lenght < tld_len )
-	{
-		wildcard = false;
-		pNode    = pNode->kid;
 
-		while( pNode && (pNode->c != p[-lenght]) )
-		{
-			if( pNode->c == '*' ) {
+	p = tld + tld_len - 1;
+	while (tld_len--) {
+		wildcard = false;
+		pNode = pNode->kid;
+
+		while( pNode && (pNode->c != *p) ) {
+			if (pNode->c == '*') {
 				wildcard = true;
 			}
 			pNode = pNode->sibling;
 		}
-		if( ! pNode )
-		{
-			if( wildcard ) 
-			{
-				while( tld_len-- )
-				{
-					if( tld_len && (p[-lenght] == '.') ) {
+
+		if( ! pNode ) {
+			if( wildcard ) {
+				while( tld_len-- ) {
+					if( tld_len && (*(--p) == '.') ) {
 						return false;
 					}
 				}
@@ -248,7 +251,8 @@ static bool faup_tld_tree_tld_exists(TLDNode *Tree, const char *tld, int tld_len
 			}
 			return false;
 		}
-		lenght++;
+
+		p--;
 	}
 
 	if( pNode->EoT ) {
@@ -324,7 +328,7 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 	// here we have the longest TLD
 	// but is that an exception ? (ex: !siemens.om vs *.om)
 	counter = 0;
-	found = faup_tld_tree_tld_exists(tld_tree->sibling, last, fh->faup.features.host.size - 1);
+	found = faup_tld_tree_tld_exists(tld_tree->sibling, last, strlen(last));
 	if( found )
 	{
 		while( *(last) != '.' ) {
@@ -333,6 +337,7 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 		}
 		counter++;
 	}
+
 
 	tld_extracted.size = tld_len;
 	tld_extracted.pos = fh->faup.features.host.pos + fh->faup.features.host.size - tld_extracted.size + counter;
