@@ -1,7 +1,6 @@
 import sys
 
 from .functions import *
-from .tldextract import TLDExtract
 
 class UrlNotDecoded(Exception):
     pass
@@ -9,15 +8,15 @@ class UrlNotDecoded(Exception):
 class Faup(object):
     def __init__(self):
         self.fh = faup_init()
+        self.options = faup_options_new()
         self.decoded = False
-        self.fast=True
-        self.tld=TLDExtract()
         self.retval = {}
 
     def __del__(self):
         faup_terminate(self.fh)
+        faup_options_free(self.options)
 
-    def decode(self, url,fast=True):
+    def decode(self, url):
         self.url = None
 
         # Alright, I assume no one is using python 1.x nor 4.x
@@ -26,13 +25,9 @@ class Faup(object):
         if sys.version.split('.')[0].split('.')[0]=='2':
             self.url = bytes(url)
 
-        faup_decode(self.fh, self.url, len(url))
+        faup_decode(self.fh, self.url, len(url), self.options)
         self.decoded = True
-        self.fast=fast
         self.retval = {}
-        if self.fast==False:
-            if self.tld !=None:
-                self.tld.init()                
         
     def get_version(self):
         return faup_get_version()
@@ -65,36 +60,20 @@ class Faup(object):
     def get_subdomain(self):
         if not self.decoded:
             raise UrlNotDecoded("You must call faup.decode() first")
-        if self.fast:
-            pos = faup_get_subdomain_pos(self.fh)
-            size = faup_get_subdomain_size(self.fh)
-            return self._get_param_from_pos_and_size(pos, size)
-        else:
-            if self.tld==None:
-                self.tld=TLDExtract()
-            if getattr(self.tld, 'subdomain')==None:    
-                self.tld._extract(self.get_host())
-            subdomain=getattr(self.tld, 'subdomain')
-            return subdomain
 
 
+        pos = faup_get_subdomain_pos(self.fh)
+        size = faup_get_subdomain_size(self.fh)
+        return self._get_param_from_pos_and_size(pos, size)
 
     def get_domain(self):
         if not self.decoded:
             raise UrlNotDecoded("You must call faup.decode() first")
-        if self.fast:
-            pos = faup_get_domain_pos(self.fh)
-            size = faup_get_domain_size(self.fh)
 
-            return self._get_param_from_pos_and_size(pos, size)
-        else:
-            if self.tld==None:
-                self.tld=TLDExtract()
-            if getattr(self.tld, 'domain')==None:
-                self.tld._extract(self.get_host())
-            domaine=getattr(self.tld, 'domain')    
-            return domaine
-            
+        pos = faup_get_domain_pos(self.fh)
+        size = faup_get_domain_size(self.fh)
+
+        return self._get_param_from_pos_and_size(pos, size)
         
     def get_host(self):
         if not self.decoded:
@@ -106,21 +85,13 @@ class Faup(object):
         return self._get_param_from_pos_and_size(pos, size)
         
     def get_tld(self):
-        if self.fast:
-            if not self.decoded:
-                raise UrlNotDecoded("You must call faup.decode() first")
+        if not self.decoded:
+            raise UrlNotDecoded("You must call faup.decode() first")
 
-            pos = faup_get_tld_pos(self.fh)
-            size = faup_get_tld_size(self.fh)
+        pos = faup_get_tld_pos(self.fh)
+        size = faup_get_tld_size(self.fh)
 
-            return self._get_param_from_pos_and_size(pos, size)
-        else:
-            if self.tld==None:
-                self.tld=TLDExtract()
-            if getattr(self.tld, 'tld')==None:
-                self.tld._extract(self.get_host())
-            tld=getattr(self.tld, 'tld')
-            return tld
+        return self._get_param_from_pos_and_size(pos, size)
             
     def get_port(self):
         if not self.decoded:

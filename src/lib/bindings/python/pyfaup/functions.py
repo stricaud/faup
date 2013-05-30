@@ -6,7 +6,7 @@ from .bind import *
 
 faup_get_version = bind("faup_get_version", c_char_p)
 faup_init = bind("faup_init", c_void_p)
-faup_decode = bind("faup_decode", None, c_void_p, c_char_p, c_size_t)
+faup_decode = bind("faup_decode", None, c_void_p, c_char_p, c_size_t, c_void_p)
 faup_terminate = bind("faup_terminate", None, c_void_p)
 
 faup_get_scheme_pos = bind("faup_get_scheme_pos", c_int, c_void_p)
@@ -29,3 +29,6 @@ faup_get_query_string_pos = bind("faup_get_query_string_pos", c_int, c_void_p)
 faup_get_query_string_size = bind("faup_get_query_string_size", c_uint, c_void_p)
 faup_get_fragment_pos = bind("faup_get_fragment_pos", c_int, c_void_p)
 faup_get_fragment_size = bind("faup_get_fragment_size", c_uint, c_void_p)
+
+faup_options_new = bind("faup_options_new", c_void_p)
+faup_options_free = bind("faup_options_free", None, c_void_p)

@@ -68,6 +68,8 @@ struct _faup_options_t {
 };
 typedef struct _faup_options_t faup_options_t;
 
+faup_options_t *faup_options_new(void);
+void faup_options_free(faup_options_t *opts);
 void faup_options_defaults(faup_options_t *opts);
 void faup_options_enable_tld_above_one(faup_options_t *opts);
 void faup_options_disable_tld_above_one(faup_options_t *opts);

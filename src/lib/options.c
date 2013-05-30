@@ -14,8 +14,29 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
+#include <stdlib.h>
+
 #include <faup/tld-tree.h>
 #include <faup/options.h>
+
+faup_options_t *faup_options_new(void)
+{
+	faup_options_t *opts;
+
+	opts = malloc(sizeof(faup_options_t));
+	if (!opts) {
+		return NULL;
+	}
+
+	faup_options_defaults(opts);
+
+	return opts;
+}
+
+void faup_options_free(faup_options_t *opts)
+{
+	free(opts);
+}
 
 void faup_options_defaults(faup_options_t *opts)
 {
