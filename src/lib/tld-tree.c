@@ -282,6 +282,7 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 	faup_tld_tree_extracted_t tld_extracted;
 
 	uint32_t counter;
+	bool has_a_dot = false;
 
 	tld_extracted.pos = -1;
 	tld_extracted.size = 0;
@@ -331,13 +332,19 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 	found = faup_tld_tree_tld_exists(tld_tree->sibling, last, strlen(last));
 	if( found )
 	{
-		while( *(last) != '.' ) {
-			last++;
+		while (counter < tld_len) {
+			if (*last != '.') {
+				last++;
+			} else {
+				has_a_dot = true;
+			}
 			counter++;
 		}
-		counter++;
 	}
 
+	if (!has_a_dot) { 
+		counter = 0;
+	}
 
 	tld_extracted.size = tld_len;
 	tld_extracted.pos = fh->faup.features.host.pos + fh->faup.features.host.size - tld_extracted.size + counter;
