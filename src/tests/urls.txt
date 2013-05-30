@@ -21,7 +21,11 @@ tagadatsouintsouin://éé.lovemetender.co.uk:pfiew/rahh.txt
 www.sptest.co.
 www.test.jet.uk
 www.test.jet.uk/blah.html
-foo.ity.kawasaki.jp
-ity.kawasaki.jp/fdswer
+foo.city.kawasaki.jp
+city.kawasaki.jp/fdswer
 www.test.jp
 http://www.test.com.uk
+www.tagada.om
+www.tagada.om/blah
+www.tagada.siemens.om
+www.tagada.siemens.om/klmfds

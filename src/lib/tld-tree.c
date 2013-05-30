@@ -279,6 +279,8 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 	bool found;
 	uint32_t step = 0;
 	uint32_t tld_len = 0;
+	uint32_t tld_exception_len = 0;
+	uint32_t last_len_just_for_host = 0;
 	faup_tld_tree_extracted_t tld_extracted;
 
 	uint32_t counter;
@@ -299,7 +301,6 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 	p = org_str + host_last_pos - 1; 
 
 	counter = fh->faup.features.host.size - 1;
-
 	while( counter )
 	{
 		while( *(p-1) && (*p != '.') ) {
@@ -326,17 +327,24 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 		return tld_extracted;
 	}
 
-	// here we have the longest TLD
-	// but is that an exception ? (ex: !siemens.om vs *.om)
+
 	counter = 0;
-	found = faup_tld_tree_tld_exists(tld_tree->sibling, last, strlen(last));
+	// We want to retrieve the size of the tld without the useless chars the come afterwards
+	// www.foo.siemens.om/tagada != www.foo.siemens.om
+	last_len_just_for_host = strlen(last) - (strlen(org_str) - (fh->faup.features.host.pos + fh->faup.features.host.size));
+
+	found = faup_tld_tree_tld_exists(tld_tree->sibling, last, last_len_just_for_host);
 	if( found )
 	{
+		// here we have the longest TLD
+		// but is that an exception ? (ex: !siemens.om vs *.om)
 		while (counter < tld_len) {
 			if (*last != '.') {
 				last++;
+				tld_exception_len++;
 			} else {
 				has_a_dot = true;
+				break;
 			}
 			counter++;
 		}
@@ -346,8 +354,15 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 		counter = 0;
 	}
 
-	tld_extracted.size = tld_len;
-	tld_extracted.pos = fh->faup.features.host.pos + fh->faup.features.host.size - tld_extracted.size + counter;
+	tld_extracted.size = tld_len - tld_exception_len;
+	if (!tld_extracted.size) {
+		tld_extracted.size = tld_len;
+	}
+
+	//printf("fh->faup.features.host.pos(%zd), fh->faup.features.host.size(%zd), tld_extracted.size(%zd), counter(%zd)\n", fh->faup.features.host.pos, fh->faup.features.host.size, tld_extracted.size, counter);
+	tld_extracted.pos = fh->faup.features.host.pos + fh->faup.features.host.size - tld_extracted.size;
+
+//	printf("tld_extracted.size=%zd;tld_extracted.pos=%zd\n", tld_extracted.size, tld_extracted.pos);
 
 	return tld_extracted;
 }
