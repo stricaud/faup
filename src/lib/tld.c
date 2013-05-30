@@ -19,6 +19,7 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 
+#include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
@@ -211,7 +212,7 @@ void faup_tld_array_populate(void)
 					if (!isupper(line[0])) { // Last check: Apache banners starts with upper case, not TLDs
 						if (line_len > 0) {
 							line[line_len - 1] = '\0';
-							char *allocated_line = strdup(line);
+							char *allocated_line = strdup((const char *)line);
 							utarray_push_back(_tlds, &allocated_line);
 						}						
 					}
