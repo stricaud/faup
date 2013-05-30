@@ -350,10 +350,6 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 		}
 	}
 
-	if (!has_a_dot) { 
-		counter = 0;
-	}
-
 	tld_extracted.size = tld_len - tld_exception_len;
 	if (!tld_extracted.size) {
 		tld_extracted.size = tld_len;
