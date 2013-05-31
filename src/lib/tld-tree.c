@@ -199,8 +199,9 @@ TLDNode *faup_tld_tree_new(void)
 
 	// Initialize the tree
 	Tree = calloc(1, sizeof(TLDNode));
-	if( Tree == NULL )
+	if( Tree == NULL ) {
 		return NULL;
+	}
 	Tree->c = '\0'; 
 
 	faup_tld_array_populate();

@@ -35,7 +35,9 @@ faup_options_t *faup_options_new(void)
 
 void faup_options_free(faup_options_t *opts)
 {
-        faup_options_disable_tld_above_one(opts);
+	if (opts) {
+		faup_options_disable_tld_above_one(opts);		
+	}
 	free(opts);
 }
 void faup_options_defaults(faup_options_t *opts)
@@ -63,6 +65,7 @@ void faup_options_disable_tld_above_one(faup_options_t *opts)
 {
 	opts->tld_greater_extraction = 0;
 	faup_tld_tree_free(opts->tld_tree);
+	opts->tld_tree = NULL;
 }
 
 void faup_options_debug(faup_options_t *opts)

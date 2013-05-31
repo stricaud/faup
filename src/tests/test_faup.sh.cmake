@@ -25,6 +25,7 @@
 
 SRC_TEST_DIR="${faup-project_SOURCE_DIR}/src/tests"
 BIN_TEST_DIR="${faup-project_BINARY_DIR}/src/tests"
+FAUP_DATA_DIR="${faup-project_SOURCE_DIR}/src/data"
 FAUP_TOOL="${faup-project_BINARY_DIR}/src/tools/faup"
 
 URLS="$SRC_TEST_DIR/urls.txt"
