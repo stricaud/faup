@@ -78,103 +78,113 @@ int main(int argc, char **argv)
 
 	char *tld_file=NULL;
 
-	faup_options_t faup_opts;
+	faup_options_t *faup_opts;
 	int opt;
 
 	int tld_pos;
 
-	faup_options_defaults(&faup_opts);
+	faup_opts = faup_options_new();
+	if (!faup_opts) {
+	  fprintf(stderr, "Error: cannot allocate faup options!\n" );
+	  return -1;
+	}
 
 	fh = faup_init();
 
 	while ((opt = getopt(argc, argv, "pld:vo:utf:")) != -1) {
 	  switch(opt) {
 	  case 'p':
-	    faup_opts.print_header = 1;
+	    faup_opts->print_header = 1;
 	    break;
 	  case 'l':
-	  	faup_opts.fields |= FAUP_URL_FIELD_LINE;
-	    faup_opts.print_line = 1;
+	  	faup_opts->fields |= FAUP_URL_FIELD_LINE;
+	    faup_opts->print_line = 1;
 	    break;
 	  case 'd':
-	    faup_opts.sep_char = optarg[0];
+	    faup_opts->sep_char = optarg[0];
 	    break;
 	  case 'f':
 	  	if (!strcmp("scheme", optarg)) {
-	  		faup_opts.fields = FAUP_URL_FIELD_SCHEME;
+	  		faup_opts->fields = FAUP_URL_FIELD_SCHEME;
 	  	}
 	  	if (!strcmp("credential", optarg)) {
-	  		faup_opts.fields = FAUP_URL_FIELD_CREDENTIAL;
+	  		faup_opts->fields = FAUP_URL_FIELD_CREDENTIAL;
 	  	}
 	  	if (!strcmp("subdomain", optarg)) {
-	  		faup_opts.fields = FAUP_URL_FIELD_SUBDOMAIN;
+	  		faup_opts->fields = FAUP_URL_FIELD_SUBDOMAIN;
 	  	}
 	  	if (!strcmp("domain", optarg)) {
-	  		faup_opts.fields = FAUP_URL_FIELD_DOMAIN;
+	  		faup_opts->fields = FAUP_URL_FIELD_DOMAIN;
 	  	}
 	  	if (!strcmp("host", optarg)) {
-	  		faup_opts.fields = FAUP_URL_FIELD_HOST;
+	  		faup_opts->fields = FAUP_URL_FIELD_HOST;
 	  	}
 	  	if (!strcmp("tld", optarg)) {
-	  		faup_opts.fields = FAUP_URL_FIELD_TLD;
+	  		faup_opts->fields = FAUP_URL_FIELD_TLD;
 	  	}
 	  	if (!strcmp("port", optarg)) {
-	  		faup_opts.fields = FAUP_URL_FIELD_PORT;
+	  		faup_opts->fields = FAUP_URL_FIELD_PORT;
 	  	}
 	  	if (!strcmp("resource_path", optarg)) {
-	  		faup_opts.fields = FAUP_URL_FIELD_RESOURCE_PATH;
+	  		faup_opts->fields = FAUP_URL_FIELD_RESOURCE_PATH;
 	  	}
 	  	if (!strcmp("query_string", optarg)) {
-	  		faup_opts.fields = FAUP_URL_FIELD_QUERY_STRING;
+	  		faup_opts->fields = FAUP_URL_FIELD_QUERY_STRING;
 	  	}
 	  	if (!strcmp("fragment", optarg)) {
-	  		faup_opts.fields = FAUP_URL_FIELD_FRAGMENT;
+	  		faup_opts->fields = FAUP_URL_FIELD_FRAGMENT;
 	  	}
 	  	break;
 	  case 'o':
 	  	if (!strcmp("csv", optarg)) {
-	  		faup_opts.output = FAUP_OUTPUT_CSV;
+	  		faup_opts->output = FAUP_OUTPUT_CSV;
 	  	} else if (!strcmp("json", optarg)) {
-	  		faup_opts.output = FAUP_OUTPUT_JSON;
+	  		faup_opts->output = FAUP_OUTPUT_JSON;
 	  	} else {
 	  		fprintf(stderr, "invalid output option '%s'!\n", optarg);
+			faup_options_free(faup_opts);
 	  		exit(1);
 	  	}
 	  	break;
 	  case 't':
-	  	faup_options_disable_tld_above_one(&faup_opts);
+	  	faup_options_disable_tld_above_one(faup_opts);
 	  	break;
 	  case 'u':
 	  	faup_tld_update();
+		faup_options_free(faup_opts);
 	  	exit(0);
 	  	break;
 	  case 'v':
 	    printf("faup v%s\n", faup_get_version());
+	    faup_options_free(faup_opts);
 	    exit(0);
 	    break;
 	  default:
 	    print_help(argv);
+	    faup_options_free(faup_opts);
 	    exit(1);
 	  }
 	}
 
 	if (isatty(fileno(stdin))) {
-		faup_opts.input_source = FAUP_INPUT_SOURCE_ARGUMENT;
+		faup_opts->input_source = FAUP_INPUT_SOURCE_ARGUMENT;
 
 		if (argc < 2) {
 			print_help(argv);
+			faup_options_free(faup_opts);
 			exit(1);
 		}
 
 		if (!argv[optind]) {
+		  faup_options_free(faup_opts);
 		  exit(1);
 		}
 
-		faup_decode(fh, argv[optind], strlen(argv[optind]), &faup_opts);
+		faup_decode(fh, argv[optind], strlen(argv[optind]), faup_opts);
 
-		faup_output(fh, &faup_opts, stdout);
+		faup_output(fh, faup_opts, stdout);
 	} else {       	/* We read from stdin */
-		faup_opts.input_source = FAUP_INPUT_SOURCE_PIPE;
+		faup_opts->input_source = FAUP_INPUT_SOURCE_PIPE;
 
 		while (!feof(stdin)) {
 			strbuf = readline(stdin);
@@ -185,15 +195,16 @@ int main(int argc, char **argv)
 				break;
 			}
 
-			faup_decode(fh, strbuf, strlen(strbuf), &faup_opts);
+			faup_decode(fh, strbuf, strlen(strbuf), faup_opts);
 
-			faup_output(fh, &faup_opts, stdout);
+			faup_output(fh, faup_opts, stdout);
 
 			free(strbuf);
-			faup_opts.current_line++;
+			faup_opts->current_line++;
 		}
 	}
 
+	faup_options_free(faup_opts);
 	faup_terminate(fh);
 
 	return 0;

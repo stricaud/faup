@@ -161,6 +161,7 @@ char *faup_tld_file_to_write(void)
 		FILE *fp;
 		fp = fopen(tld_file, "w");
 		if (!fp) {
+		        free(tld_file);
 			return faup_tld_get_file_from_home("mozilla.tlds");
 		} else {
 			return tld_file;
@@ -185,16 +186,20 @@ int faup_tld_update(void)
 
 void faup_tld_array_populate(void)
 {
+
+  return;
 	FILE *fp;
 	char *tld_file = faup_tld_get_file("mozilla.tlds");
 
 	if (_tlds) {
 		fprintf(stderr, "The tld array has already been populated!\n");
+		free(tld_file);
 		return;
 	}
 	utarray_new(_tlds, &ut_str_icd);
 
 	fp = fopen(tld_file, "r");
+	free(tld_file);
 	if (fp) {
 		char line[524]; // We have the control over our tld file
 
@@ -221,12 +226,13 @@ void faup_tld_array_populate(void)
 		fclose(fp);
 	}
 
-	free(tld_file);
 }
 
 void faup_tld_array_destroy(void)
 {
+    if (_tlds) {
 	utarray_free(_tlds);
+    }
 }
 
 void faup_tld_array_cb_to_stdout(char *tld, void *user_data)
@@ -237,6 +243,11 @@ void faup_tld_array_cb_to_stdout(char *tld, void *user_data)
 void faup_tld_array_foreach(void (*cb_tld_array)(char *tld, void *user_data), void *user_data)
 {
 	char **p_tld;
+
+	if (!_tlds) {
+	  fprintf(stderr, "Error: the TLD array has not been populated!\n");
+	  return;
+	}
 
 	p_tld = NULL;
 	while ((p_tld = (char **)utarray_next(_tlds, p_tld))) {

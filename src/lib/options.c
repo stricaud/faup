@@ -35,9 +35,9 @@ faup_options_t *faup_options_new(void)
 
 void faup_options_free(faup_options_t *opts)
 {
+        faup_options_disable_tld_above_one(opts);
 	free(opts);
 }
-
 void faup_options_defaults(faup_options_t *opts)
 {
  	opts->print_header = 0;
@@ -50,6 +50,7 @@ void faup_options_defaults(faup_options_t *opts)
 	faup_options_enable_tld_above_one(opts);
 
 	opts->fields = FAUP_URL_FIELD_SCHEME | FAUP_URL_FIELD_CREDENTIAL | FAUP_URL_FIELD_SUBDOMAIN | FAUP_URL_FIELD_DOMAIN | FAUP_URL_FIELD_HOST | FAUP_URL_FIELD_TLD | FAUP_URL_FIELD_PORT | FAUP_URL_FIELD_RESOURCE_PATH | FAUP_URL_FIELD_QUERY_STRING | FAUP_URL_FIELD_FRAGMENT;
+
 }
 
 void faup_options_enable_tld_above_one(faup_options_t *opts)
