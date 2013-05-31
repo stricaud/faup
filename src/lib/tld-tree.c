@@ -66,17 +66,17 @@ static int _faup_tld_tree_allocate_sibling(TLDNode **Node, char c, bool EoT, boo
  * Add a node the the Trie (should be kid or sibling of the root)
  *
  */
-static int _faup_tld_tree_add_node(TLDNode **Tree, char *TLD, int tLen)
+static int _faup_tld_tree_add_node(TLDNode **Tree, char *tld, int tld_len)
 {
 	bool lastChar, nextIsDot, nextIsException;
 	char *p;
 	int ret;
 	TLDNode *pNode  = *Tree;
-
+	int counter = 0;
 
 	// Add the TLD to the Trie in reverse order
-	p = TLD +tLen -1;
-	while( *p )
+	p = tld + tld_len -1;
+	while( (*p) && (counter < tld_len - 1) )
 	{
 		lastChar        =  *(p-1)         ? false : true;
 		nextIsDot       = (*(p-1) == '.') ? true  : false;
@@ -112,6 +112,8 @@ static int _faup_tld_tree_add_node(TLDNode **Tree, char *TLD, int tLen)
 				pNode->EoT = true;
 			}
 		}
+
+		counter++;
 		p--;
 	}
 
@@ -124,7 +126,7 @@ static int _faup_tld_tree_add_node(TLDNode **Tree, char *TLD, int tLen)
  * Define whether it's an exception (!<domain.tld>) or a regular TLD (including wildcards ones)
  * Exception go under the Tree root's kid part, regular under the root's sibling.
  */
-static int faup_tld_tree_add_node(TLDNode **Tree, char *TLD, int tLen)
+static int faup_tld_tree_add_node(TLDNode **Tree, char *TLD, int tld_len)
 {
 	TLDNode *pNode;
 
@@ -158,7 +160,7 @@ static int faup_tld_tree_add_node(TLDNode **Tree, char *TLD, int tLen)
 		pNode = (*Tree)->sibling;
 	}
 
-	return _faup_tld_tree_add_node(&pNode, TLD, tLen);
+	return _faup_tld_tree_add_node(&pNode, TLD, tld_len);
 }
 
 
