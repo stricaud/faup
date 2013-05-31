@@ -103,6 +103,7 @@ char *faup_tld_home_file_exists(char *append)
 		return retbuf;
 	}
 
+	free(retbuf);
 	return NULL;
 }
 
@@ -187,7 +188,6 @@ int faup_tld_update(void)
 void faup_tld_array_populate(void)
 {
 
-  return;
 	FILE *fp;
 	char *tld_file = faup_tld_get_file("mozilla.tlds");
 
