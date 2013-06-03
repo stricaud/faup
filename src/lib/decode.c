@@ -253,6 +253,12 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 			url_features->fragment.size = total_size;
 		}
 
+		// If no domain was found, and no subdomain, then our domain == host (see issue 24)
+		if (!faup_features_exist(url_features->domain) && (!faup_features_exist(url_features->subdomain))) {
+			url_features->domain.pos = url_features->host.pos;
+			url_features->domain.size = url_features->host.size;
+		}
+
 		//faup_features_debug(url, url_features);
 		return 0;
 	}
