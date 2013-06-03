@@ -68,6 +68,24 @@ function test_json_tld_one_only
     test_generic "-o json -t" "$SRC_TEST_DIR/ref-files/urls.txt.json_tld_one_only"
 }
 
+function test_issue
+{
+    ISSUE_NB=$1
+
+    FAUP_OPTIONS=$(cat $SRC_TEST_DIR/issues/$1.options)
+    REF_FILE="$SRC_TEST_DIR/issues/$1.ref"
+    URLS_FILE="$SRC_TEST_DIR/issues/$1"
+
+    CMD="$FAUP_TOOL $FAUP_OPTIONS"
+
+    # Execute faup on issues/ticket-id and compare to the reference output
+    $CMD < "$URLS_FILE" > "$URLS_CMP" ||exit $1
+    diff -u "$URLS_CMP" "$REF_FILE" >/dev/null
+    RET=$?
+    if [ $RET -eq 0 ]; then rm "$URLS_CMP"; fi
+
+    exit $RET
+}
 
 #
 # Main
@@ -85,6 +103,7 @@ case $1 in
     tld_one_only) test_tld_one_only;;
     json) test_json;;
     json_tld_one_only) test_json_tld_one_only;;
+    issue) test_issue $2;;
     *) echo "Unknown option '$1'"
     exit 42
     ;;
