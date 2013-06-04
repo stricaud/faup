@@ -16,3 +16,6 @@ cat urls.txt |$FAUP -o json  > ./ref-files/urls.txt.json
 # JSON TLD One Only
 cat urls.txt |$FAUP -o json -t  > ./ref-files/urls.txt.json_tld_one_only
 
+# Argument + File Argument
+$FAUP "http://foo:bar@www3.altavista.digital.com:8080/index.php1?tada=da&fremo=genial#anchor1234" > ./ref-files/argument.txt
+

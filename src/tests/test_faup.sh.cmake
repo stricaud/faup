@@ -39,7 +39,20 @@ function test_generic
     CMD="$FAUP_TOOL $FAUP_OPTS"
 
     # Execute faup on urls.txt and compare to the reference output
-    $CMD < "$URLS" > "$URLS_CMP" ||exit $1
+    $CMD < "$URLS" > "$URLS_CMP" ||exit $?
+    diff -u "$URLS_CMP" "$URLS_REF" >/dev/null
+    RET=$?
+    if [ $RET -eq 0 ]; then rm "$URLS_CMP"; fi
+
+    exit $RET
+}
+
+function test_argument
+{
+    ARGV1=$1
+    URLS_REF=$2
+
+    $FAUP_TOOL $ARGV1 > $URLS_CMP ||exit $?
     diff -u "$URLS_CMP" "$URLS_REF" >/dev/null
     RET=$?
     if [ $RET -eq 0 ]; then rm "$URLS_CMP"; fi
@@ -104,6 +117,8 @@ case $1 in
     json) test_json;;
     json_tld_one_only) test_json_tld_one_only;;
     issue) test_issue $2;;
+    url_arg) test_argument "http://foo:bar@www3.altavista.digital.com:8080/index.php1?tada=da&fremo=genial#anchor1234" "$SRC_TEST_DIR/ref-files/argument.txt";;
+    file_arg) test_argument $URLS "$SRC_TEST_DIR/ref-files/urls.txt.vanilla";;
     *) echo "Unknown option '$1'"
     exit 42
     ;;

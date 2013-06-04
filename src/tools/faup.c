@@ -56,11 +56,36 @@ static char *readline(FILE *fp)
         return str;
 }
 
+static int run_from_stream(faup_handler_t *fh, faup_options_t *options, FILE *stream) 
+{
+		char *strbuf=NULL;
+
+		while (!feof(stream)) {
+			strbuf = readline(stream);
+			if (!strbuf) {
+				break;
+			}
+			if (strbuf[0] == '\0') {
+				break;
+			}
+
+			faup_decode(fh, strbuf, strlen(strbuf), options);
+
+			faup_output(fh, options, stdout);
+
+			options->print_header = 0; // We don't need to output the header anymore!
+			free(strbuf);
+			options->current_line++;
+		}
+	return 0;
+}
+
 void print_help(char **argv) 
 {
 	printf("Usage: %s [-plu] [-d delimiter] [-o {csv,json}] [-f {scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment}] url\n \
 		Where:\n \
 		url is the url that you want to parse\n \
+		\t-a: skip provided argument file open check\n \
 		\t-d delimiter: will separate the fields with the wanted delimiter\n \
 		\t-f: fields to extract\n \
 		\t-h: print the header\n \
@@ -74,12 +99,12 @@ void print_help(char **argv)
 int main(int argc, char **argv)
 {
 	faup_handler_t *fh;
-	char *strbuf=NULL;
 
 	char *tld_file=NULL;
 
 	faup_options_t *faup_opts;
 	int opt;
+	int skip_file_check = 0;
 
 	int tld_pos;
 
@@ -91,8 +116,11 @@ int main(int argc, char **argv)
 
 	fh = faup_init();
 
-	while ((opt = getopt(argc, argv, "pld:vo:utf:")) != -1) {
+	while ((opt = getopt(argc, argv, "apld:vo:utf:")) != -1) {
 	  switch(opt) {
+	  case 'a':
+	  	skip_file_check = 1;
+	  	break;
 	  case 'p':
 	    faup_opts->print_header = 1;
 	    break;
@@ -180,28 +208,23 @@ int main(int argc, char **argv)
 		  exit(1);
 		}
 
+		if (!skip_file_check) {
+			if (strlen(argv[optind]) < FAUP_MAXPATHLEN) {
+				FILE *fp = fopen(argv[optind], "r");
+				if (fp) {
+					int ret = run_from_stream(fh, faup_opts, fp);
+					fclose(fp);
+					return ret;
+				}
+			}
+		}
+
 		faup_decode(fh, argv[optind], strlen(argv[optind]), faup_opts);
 
 		faup_output(fh, faup_opts, stdout);
 	} else {       	/* We read from stdin */
 		faup_opts->input_source = FAUP_INPUT_SOURCE_PIPE;
-
-		while (!feof(stdin)) {
-			strbuf = readline(stdin);
-			if (!strbuf) {
-				break;
-			}
-			if (strbuf[0] == '\0') {
-				break;
-			}
-
-			faup_decode(fh, strbuf, strlen(strbuf), faup_opts);
-
-			faup_output(fh, faup_opts, stdout);
-
-			free(strbuf);
-			faup_opts->current_line++;
-		}
+		run_from_stream(fh, faup_opts, stdin);
 	}
 
 	faup_options_free(faup_opts);

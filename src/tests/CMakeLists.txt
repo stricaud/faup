@@ -8,4 +8,9 @@ add_test(Vanilla           ${TEST_FAUP_SCRIPT} vanilla)
 add_test(TLD_One_Only      ${TEST_FAUP_SCRIPT} tld_one_only)
 add_test(JSON              ${TEST_FAUP_SCRIPT} json)
 add_test(JSON_TLD_One_Only ${TEST_FAUP_SCRIPT} json_tld_one_only)
-add_test(Issue24 ${TEST_FAUP_SCRIPT} issue 24)
+add_test(Url_Argument      ${TEST_FAUP_SCRIPT} url_arg)
+add_test(File_Argument     ${TEST_FAUP_SCRIPT} file_arg)
+
+# Cover all the issues that we had (if applicable)
+add_test(Issue24           ${TEST_FAUP_SCRIPT} issue 24)
+
