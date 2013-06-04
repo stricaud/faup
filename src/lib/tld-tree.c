@@ -40,8 +40,9 @@ static int _faup_tld_tree_allocate_kid(TLDNode **Node, char c, bool EoT, bool mo
 	((TLDNode *)(*Node)->kid)->c   = c;
 	((TLDNode *)(*Node)->kid)->EoT = EoT;
 
-	if( move_cursor )
+	if( move_cursor ) {
 		*Node = (TLDNode *)(*Node)->kid;
+	}
 	return 0;
 }
 
@@ -51,14 +52,16 @@ static int _faup_tld_tree_allocate_sibling(TLDNode **Node, char c, bool EoT, boo
 		return -1;
 	
 	(*Node)->sibling = calloc(1, sizeof(TLDNode));
-	if( (*Node)->sibling== NULL )
+	if( (*Node)->sibling== NULL ) {
 		return -1;
+	}
 
 	((TLDNode *)(*Node)->sibling)->c   = c;
 	((TLDNode *)(*Node)->sibling)->EoT = EoT;
 
-	if( move_cursor )
+	if( move_cursor ) {
 		*Node = (TLDNode *)(*Node)->sibling;
+	}
 	return 0;
 }
 			
