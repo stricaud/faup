@@ -213,6 +213,7 @@ int main(int argc, char **argv)
 			if (strlen(argv[optind]) < FAUP_MAXPATHLEN) {
 				FILE *fp = fopen(argv[optind], "r");
 				if (fp) {
+					faup_opts->input_source = FAUP_INPUT_SOURCE_FILE;
 					int ret = run_from_stream(fh, faup_opts, fp);
 					fclose(fp);
 					return ret;
