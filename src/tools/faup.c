@@ -83,12 +83,12 @@ static int run_from_stream(faup_handler_t *fh, faup_options_t *options, FILE *st
 
 void print_help(char **argv) 
 {
-	printf("Usage: %s [-plu] [-d delimiter] [-o {csv,json}] [-f {scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment}] url|file\n \
+	printf("Usage: %s [-plu] [-d delimiter] [-o {csv|json}] [-f {scheme|credential|subdomain|domain|host|tld|port|resource_path|query_string|fragment}] url|file\n \
 		Where:\n \
 		url is the url that you want to parse\n \
 		\t-a: skip provided argument file open check\n \
 		\t-d delimiter: will separate the fields with the wanted delimiter\n \
-		\t-f: fields to extract\n \
+		\t-f: field to extract\n \
 		\t-h: print the header\n \
 		\t-l: prefix with the line number\n \
 		\t-o: output csv or json at your convenience\n \
