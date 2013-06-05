@@ -133,6 +133,11 @@ static int faup_tld_tree_add_node(TLDNode **Tree, char *TLD, int tld_len)
 {
 	TLDNode *pNode;
 
+	if (!Tree) {
+		fprintf("%s Tree does not exists!\n", __FUNCTION__);
+		return -1;
+	}
+
 	// regular tld
 	if( *TLD != '!' ) 
 	{
