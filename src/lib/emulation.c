@@ -115,8 +115,6 @@ char *faup_emulation_internet_explorer(faup_handler_t const* fh, const faup_feat
 						new_readpos++;
 					}
 					new_string[feature_readpos + new_readpos] = '\0';
-
-					feature_readpos += 2;
 				}
 			}
 		}
