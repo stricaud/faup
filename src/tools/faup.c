@@ -100,6 +100,7 @@ void print_help(char **argv)
 int main(int argc, char **argv)
 {
 	faup_handler_t *fh;
+	int ret = 0;
 
 	char *tld_file=NULL;
 
@@ -214,9 +215,9 @@ int main(int argc, char **argv)
 				FILE *fp = fopen(argv[optind], "r");
 				if (fp) {
 					faup_opts->input_source = FAUP_INPUT_SOURCE_FILE;
-					int ret = run_from_stream(fh, faup_opts, fp);
+					ret = run_from_stream(fh, faup_opts, fp);
 					fclose(fp);
-					return ret;
+					goto terminate;
 				}
 			}
 		}
@@ -229,8 +230,9 @@ int main(int argc, char **argv)
 		run_from_stream(fh, faup_opts, stdin);
 	}
 
+terminate:
 	faup_options_free(faup_opts);
 	faup_terminate(fh);
 
-	return 0;
+	return ret;
 }
