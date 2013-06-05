@@ -28,9 +28,25 @@
 extern "C" {
 #endif
 
+enum _faup_features_field_t {
+	FAUP_FEATURES_FIELD_SCHEME,
+	FAUP_FEATURES_FIELD_HIERARCHICAL,
+	FAUP_FEATURES_FIELD_CREDENTIAL,
+	FAUP_FEATURES_FIELD_SUBDOMAIN,
+	FAUP_FEATURES_FIELD_DOMAIN,
+	FAUP_FEATURES_FIELD_HOST,
+	FAUP_FEATURES_FIELD_TLD,
+	FAUP_FEATURES_FIELD_PORT,
+	FAUP_FEATURES_FIELD_RESOURCE_PATH,
+	FAUP_FEATURES_FIELD_QUERY_STRING,
+	FAUP_FEATURES_FIELD_FRAGMENT,
+};
+typedef enum _faup_features_field_t faup_features_field_t;
+
 // This will be aligned on 8 bytes on 64-bit platforms, that's
 // why 'size' is not of type size_t.
 struct _faup_feature_t {
+	faup_features_field_t field;
 	int32_t pos;
 	uint32_t size;
 };

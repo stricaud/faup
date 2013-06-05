@@ -83,11 +83,12 @@ static int run_from_stream(faup_handler_t *fh, faup_options_t *options, FILE *st
 
 void print_help(char **argv) 
 {
-	printf("Usage: %s [-plu] [-d delimiter] [-o {csv|json}] [-f {scheme|credential|subdomain|domain|host|tld|port|resource_path|query_string|fragment}] url|file\n \
+	printf("Usage: %s [-plu] [-e {ie}] [-d delimiter] [-o {csv|json}] [-f {scheme|credential|subdomain|domain|host|tld|port|resource_path|query_string|fragment}] url|file\n \
 		Where:\n \
 		url is the url that you want to parse\n \
 		\t-a: skip provided argument file open check\n \
 		\t-d delimiter: will separate the fields with the wanted delimiter\n \
+		\t-e browser_name: Emulate the browser name ('ie' for internet explorer)\n \
 		\t-f: field to extract\n \
 		\t-h: print the header\n \
 		\t-l: prefix with the line number\n \
@@ -118,10 +119,20 @@ int main(int argc, char **argv)
 
 	fh = faup_init();
 
-	while ((opt = getopt(argc, argv, "apld:vo:utf:")) != -1) {
+	while ((opt = getopt(argc, argv, "ape:ld:vo:utf:")) != -1) {
 	  switch(opt) {
 	  case 'a':
 	  	skip_file_check = 1;
+	  	break;
+	  case 'd':
+	  	if (optarg) {
+	    	faup_opts->sep_char = optarg[0];
+	    }
+	    break;	 
+	  case 'e':
+	  	if (!strcmp("ie", optarg)) {
+	  		faup_opts->emulation = FAUP_BROWSER_EMULATION_IE;
+	  	}
 	  	break;
 	  case 'p':
 	    faup_opts->print_header = 1;
@@ -129,9 +140,6 @@ int main(int argc, char **argv)
 	  case 'l':
 	  	faup_opts->fields |= FAUP_URL_FIELD_LINE;
 	    faup_opts->print_line = 1;
-	    break;
-	  case 'd':
-	    faup_opts->sep_char = optarg[0];
 	    break;
 	  case 'f':
 	  	if (!strcmp("scheme", optarg)) {

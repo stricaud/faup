@@ -15,14 +15,49 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <faup/faup.h>
 #include <faup/output.h>
+#include <faup/emulation.h>
 
-void faup_output_show(faup_handler_t const* fh, const faup_feature_t feature, FILE* out)
+void faup_output_show(faup_handler_t const* fh, faup_options_t *opts, const faup_feature_t feature, FILE* out)
 {
 	if (faup_features_exist(feature)) {
+		char *emulation_str = NULL;
+
+		switch (opts->emulation) {
+			case FAUP_BROWSER_EMULATION_IE:
+				emulation_str = faup_emulation_internet_explorer(fh, feature);
+				if (emulation_str) {
+					fprintf(out, "%s", emulation_str);
+					free(emulation_str);
+					return;
+				} 
+			break;
+			case FAUP_BROWSER_EMULATION_SAFARI:
+				emulation_str = faup_emulation_safari(fh, feature);
+				if (emulation_str) {
+					fprintf(out, "%s", emulation_str);
+					free(emulation_str);
+					return;
+				} 
+			break;
+			case FAUP_BROWSER_EMULATION_FIREFOX:
+				emulation_str = faup_emulation_firefox(fh, feature);
+				if (emulation_str) {
+					fprintf(out, "%s", emulation_str);
+					free(emulation_str);
+					return;
+				} 
+			break;						
+			case FAUP_BROWSER_EMULATION_NONE:
+			default:
+				break;
+		}
+
 		fwrite(fh->faup.org_str + feature.pos, feature.size, 1, out);
+
 	}
 }
 
@@ -31,7 +66,7 @@ void _faup_output_csv_single(faup_handler_t const* fh, faup_options_t *opts, FIL
 
 
 		if (opts->fields & field) {
-			faup_output_show(fh, faup_options_field_get_feature(fh, field), out);
+			faup_output_show(fh, opts, faup_options_field_get_feature(fh, field), out);
 			if (faup_options_url_field_has_greater_than(opts, field)) {
 				fwrite(&opts->sep_char, 1, 1, out);
 			} else {

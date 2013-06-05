@@ -55,6 +55,15 @@ enum _faup_input_source_t {
 };
 typedef enum _faup_input_source_t faup_input_source_t;
 
+enum _faup_browser_emulation_t {
+	FAUP_BROWSER_EMULATION_NONE,
+	FAUP_BROWSER_EMULATION_ALL,		
+	FAUP_BROWSER_EMULATION_IE,
+	FAUP_BROWSER_EMULATION_SAFARI,
+	FAUP_BROWSER_EMULATION_FIREFOX,
+};
+typedef enum _faup_browser_emulation_t faup_browser_emulation_t;
+
 struct _faup_options_t {
   int print_header;
   int print_line;
@@ -65,6 +74,7 @@ struct _faup_options_t {
   void *tld_tree; /* TLDNode */
   int tld_greater_extraction;
   faup_url_field_t fields;
+  faup_browser_emulation_t emulation;
 };
 typedef struct _faup_options_t faup_options_t;
 

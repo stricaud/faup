@@ -33,6 +33,18 @@ void faup_features_init(faup_features_t* features)
 	features->query_string.pos  = -1;
 	features->fragment.pos      = -1;
 	features->tld.pos           = -1;
+
+	features->scheme.field        = FAUP_FEATURES_FIELD_SCHEME;
+	features->hierarchical.field  = FAUP_FEATURES_FIELD_HIERARCHICAL;
+	features->credential.field    = FAUP_FEATURES_FIELD_CREDENTIAL;
+	features->host.field          = FAUP_FEATURES_FIELD_HOST;
+	features->subdomain.field     = FAUP_FEATURES_FIELD_SUBDOMAIN;
+	features->domain.field        = FAUP_FEATURES_FIELD_DOMAIN;
+	features->port.field          = FAUP_FEATURES_FIELD_PORT;
+	features->resource_path.field = FAUP_FEATURES_FIELD_RESOURCE_PATH;
+	features->query_string.field  = FAUP_FEATURES_FIELD_QUERY_STRING;
+	features->fragment.field      = FAUP_FEATURES_FIELD_FRAGMENT;
+	features->tld.field           = FAUP_FEATURES_FIELD_TLD;
 }
 
 static inline char get_last_c(const char *buffer, size_t pos)

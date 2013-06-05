@@ -2,6 +2,7 @@ include_directories(AFTER "include/" ${FAUP_INCLUDE_DIRS})
 
 set(FAUP_LIB_SRC_FILES
 decode.c
+emulation.c
 features.c
 faup.c
 options.c
@@ -12,9 +13,10 @@ tld-tree.c
 )
 
 set(FAUP_LIB_HDR_FILES
+include/faup/decode.h
+include/faup/emulation.h
 include/faup/features.h
 include/faup/faup.h
-include/faup/decode.h
 include/faup/options.h
 include/faup/output.h
 include/faup/portable.h
