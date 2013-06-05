@@ -6,6 +6,9 @@ class UrlNotDecoded(Exception):
     pass
 
 class Faup(object):
+    """
+    Faup Python Library 
+    """
     def __init__(self):
         self.fh = faup_init()
         self.options = faup_options_new()
@@ -17,6 +20,11 @@ class Faup(object):
         faup_options_free(self.options)
 
     def decode(self, url):
+        """
+        This function creates a dict of all the url fields.
+
+        :param url: The URL to normalize
+        """
         self.url = None
 
         # Alright, I assume no one is using python 1.x nor 4.x
@@ -40,6 +48,11 @@ class Faup(object):
             return self.url[pos:(pos+size)]
 
     def get_scheme(self):
+        """
+        Get the scheme of the url given in the decode function
+
+        :returns: The URL scheme
+        """
         if not self.decoded:
             raise UrlNotDecoded("You must call faup.decode() first")
 
