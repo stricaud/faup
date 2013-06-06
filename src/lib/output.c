@@ -54,7 +54,7 @@ void faup_output_show(faup_handler_t const* fh, faup_options_t *opts, const faup
 					free(emulation_str);
 					return;
 				} 
-			break;						
+			break;
 			case FAUP_BROWSER_EMULATION_NONE:
 			default:
 				break;

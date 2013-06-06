@@ -17,7 +17,7 @@
  *
  * Implements the browser emulation of uri handling in some particular cases.
  * Naturally, this kind of url will be handled by faup this way:
- * $ faup http://www.example.com?foo:bar |cut -d, -f6
+ * $ faup -f tld http://www.example.com?foo:bar
  * com?foo
  *
  * While we all recognized this is not a problem in faup, it is still a problem

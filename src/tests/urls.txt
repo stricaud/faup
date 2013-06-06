@@ -29,3 +29,7 @@ www.tagada.om
 www.tagada.om/blah
 www.tagada.siemens.om
 www.tagada.siemens.om/klmfds
+http://www.example.com/sample/
+http://www.EXAMPLE.com/sample/#
+Http://www.ex%41mple.com/s%61mple/
+http://www.example.com/sample/arbitrary/.%2e/
