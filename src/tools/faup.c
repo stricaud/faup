@@ -26,34 +26,35 @@
  * Return an allocated string */
 static char *readline(FILE *fp)
 {
-        char *str = (char *)NULL;
-        int ch = 0, len = 256, step = 256, i = 0;
+	char *str = (char *)NULL;
+	int ch = 0, len = 256, step = 256, i = 0;
 
-        str = (char *)malloc(len);
-        if (str == NULL)
-                return str;
+	str = (char *)malloc(len);
+	if (str == NULL)
+		return str;
 
-        while (1) {
-                ch = fgetc(fp);
-                if (feof(fp)) {
+	while (1) {
+		ch = fgetc(fp);
+		if (feof(fp)) {
 			str[i] = '\0';
-                        break;
+			break;
 		}
-                if (ch == '\n' || ch == '\r') {
-                        str[i++] = 0;
-                        break;
-                }
-                str[i++] = ch;
-                if (i == len - 2) {
-                        len += step;
-                        str = (char *)realloc(str, len);
-                        if (str == NULL) {
-                                fclose(fp);
-                                return str;
-                        }
-                }
-        }
-        return str;
+		if (ch == '\n' || ch == '\r') {
+			str[i++] = 0;
+			break;
+		}
+		str[i++] = ch;
+		if (i == len - 2) {
+			len += step;
+			str = (char *)realloc(str, len);
+			if (str == NULL) {
+				fclose(fp);
+				return str;
+			}
+		}
+	}
+
+	return str;
 }
 
 static int run_from_stream(faup_handler_t *fh, faup_options_t *options, FILE *stream) 
@@ -66,8 +67,9 @@ static int run_from_stream(faup_handler_t *fh, faup_options_t *options, FILE *st
 				break;
 			}
 			if (strbuf[0] == '\0') {
-			        free(strbuf);
-				break;
+			    free(strbuf);
+			    // We can have an empty line but other after (see #27)
+				continue;
 			}
 
 			faup_decode(fh, strbuf, strlen(strbuf), options);
