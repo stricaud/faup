@@ -98,7 +98,7 @@ char *faup_emulation_internet_explorer(faup_handler_t const* fh, const faup_feat
 		if (new_string[feature_readpos] == '%') {
 			// We don't want blah.loca%4
 			if (feature_readpos < feature.size - 2) {
-				if (ishexnumber(new_string[feature_readpos + 1]) && ishexnumber(new_string[feature_readpos + 2])) {
+				if (isxdigit(new_string[feature_readpos + 1]) && isxdigit(new_string[feature_readpos + 2])) {
 					int converted;
 					uint32_t new_readpos = 1;
 
