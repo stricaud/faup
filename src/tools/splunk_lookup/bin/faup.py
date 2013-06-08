@@ -3,6 +3,7 @@
 import csv
 import sys
 import os
+import json
 import logging, logging.handlers
 import envoy
 
@@ -21,6 +22,27 @@ def setup_logger():
         logger.addHandler(file_handler)
 
         return logger
+
+
+def run_faup(logger, url_value):
+	url_value.replace("'", "''")
+	url_value.replace('"', '""')
+	url_value.decode('utf-8', 'ignore')
+	run_command = 'echo -n "%s" |faup -o json' % (url_value)
+	try:
+		faup_r = envoy.run(run_command)
+		json_from_faup = faup_r.std_out
+	except:
+		logger.info("Error with: %s" % run_command)
+		return None
+
+	try:
+		json_tree = json.loads(json_from_faup)
+		return json_tree
+	except:
+		logger.info("ERROR TO LOAD JSON: %s" % (json_from_faup))
+
+	return None
 
 
 def main():
@@ -79,31 +101,23 @@ def main():
 
 	# If we have an URL, split it using faup
         if len(result[urlColumn]):
-		try:
-			faup_r = envoy.run("echo %s |faup" % (url_value))
-			faup_url_results = faup_r.std_out.rstrip().split(',')
+		json_tree = run_faup(logger, url_value)
 
-			# Make sure empty stuff are not empty
-			counter = 0
-			while (counter < len(faup_url_results)):
-				if len(faup_url_results[counter]) == 0:
-					faup_url_results[counter] = " "
-				counter += 1
+		if json_tree is None:
+			writer.writerow(result)
+			return
 
-			result[SchemeColumn]       = faup_url_results[0]
-			result[CredentialColumn]   = faup_url_results[1]
-			result[SubdomainColumn]    = faup_url_results[2]
-			result[DomainColumn]       = faup_url_results[3]
-			result[HostColumn]         = faup_url_results[4]
-			result[TLDColumn]          = faup_url_results[5]
-			result[PortColumn]         = faup_url_results[6]
-			result[ResourcePathColumn] = faup_url_results[7]
-			result[QueryStringColumn]  = faup_url_results[8]
-			result[FragmentColumn]     = faup_url_results[9]
-
-		except:
-			logger.error("Cannot normalize url: %s" % (url_value))
-
+		result[SchemeColumn]       = json_tree['scheme']
+		result[CredentialColumn]   = json_tree['credential']
+		result[SubdomainColumn]    = json_tree['subdomain']
+		result[DomainColumn]       = json_tree['domain']
+		result[HostColumn]         = json_tree['host']
+		result[TLDColumn]          = json_tree['tld']
+		result[PortColumn]         = json_tree['port']
+		result[ResourcePathColumn] = json_tree['resource_path']
+		result[QueryStringColumn]  = json_tree['query_string']
+		result[FragmentColumn]     = json_tree['fragment']
+			
 		writer.writerow(result)
 	else:
 		writer.writerow(result)
