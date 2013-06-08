@@ -1,0 +1,8 @@
+[lookups]
+export = system
+
+[workflow_actions/faup]
+access = read : [ * ]
+export = system
+owner = admin
+
