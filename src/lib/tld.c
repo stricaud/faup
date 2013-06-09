@@ -14,20 +14,29 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
+#ifdef WIN32
+ 	#include <winsock2.h>
+ 	#pragma comment(lib,"ws2_32.lib")
+#else
+	#include <netinet/in.h>
+	#include <arpa/inet.h>
+	#include <sys/socket.h>
+	#include <sys/stat.h>
+#endif
 
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifndef WIN32
 #include <unistd.h>
 #include <pwd.h>
+#endif // WIN32
 
 #include <faup/faup.h>
 #include <faup/tld.h>
+#include <faup/compat.h>
 
 #include <faup/utarray.h>
 
@@ -42,6 +51,11 @@ int faup_tld_download_mozilla_list(char *store_to_file)
 
 	FILE *fileptr;
 
+#ifdef WIN32
+	WSADATA wsaData;
+	WSAStartup(0x0202, &wsaData);
+#endif
+
 	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 		fprintf(stderr, "(socket) Cannot connect outside.\n");
 		return -1;
@@ -50,6 +64,7 @@ int faup_tld_download_mozilla_list(char *store_to_file)
 	memset(&sin, 0, sizeof(sin));
 	sin.sin_family = AF_INET;
 	sin.sin_port = htons(MOZILLA_TLD_LIST_PORT);
+
 	if (inet_pton(AF_INET, MOZILLA_TLD_LIST_IP, &sin.sin_addr) <= 0) {
 		fprintf(stderr, "(inet_pton) Cannot connect outside.\n");
 		return -1;
@@ -83,7 +98,13 @@ int faup_tld_download_mozilla_list(char *store_to_file)
 		fprintf(stderr, "(read) Cannot read data.\n");
 	}
 
+#ifdef WIN32
+	closesocket(sockfd);
+	WSACleanup();
+#else
 	close(sockfd);
+#endif
+
 	fclose(fileptr);
 
 	return 0;
@@ -91,6 +112,7 @@ int faup_tld_download_mozilla_list(char *store_to_file)
 
 char *faup_tld_home_file_exists(char *append)
 {
+#ifndef WIN32
 	int retval;
 	char *retbuf;
 	struct passwd *pw = getpwuid(getuid());
@@ -104,11 +126,13 @@ char *faup_tld_home_file_exists(char *append)
 	}
 
 	free(retbuf);
+#endif // WIN32
 	return NULL;
 }
 
 char *faup_tld_get_file_from_home(char *append)
 {
+#ifndef WIN32
 	int retval;
 	char *retbuf;
 	struct passwd *pw = getpwuid(getuid());
@@ -124,7 +148,7 @@ char *faup_tld_get_file_from_home(char *append)
 	if (fp) {
 		return retbuf;
 	}
-
+#endif
 	return NULL;
 }
 
@@ -162,7 +186,7 @@ char *faup_tld_file_to_write(void)
 		FILE *fp;
 		fp = fopen(tld_file, "w");
 		if (!fp) {
-		        free(tld_file);
+		    free(tld_file);
 			return faup_tld_get_file_from_home("mozilla.tlds");
 		} else {
 			return tld_file;
@@ -178,9 +202,12 @@ int faup_tld_update(void)
 	char *tld_file;
 
 	tld_file = faup_tld_file_to_write();
-	faup_tld_download_mozilla_list(tld_file);
-
-	free(tld_file);
+	if (tld_file) {
+		faup_tld_download_mozilla_list(tld_file);
+		free(tld_file);
+	} else {
+		return -1;
+	}
 
 	return 0;
 }
@@ -205,6 +232,7 @@ void faup_tld_array_populate(void)
 
 		while(fgets(line, sizeof(line), fp) != NULL) {
 			size_t line_len = strlen(line);
+			char *allocated_line = NULL;
 
 			switch(line[0]) {
 				case '/':
@@ -217,7 +245,7 @@ void faup_tld_array_populate(void)
 					if (!isupper(line[0])) { // Last check: Apache banners starts with upper case, not TLDs
 						if (line_len > 0) {
 							line[line_len - 1] = '\0';
-							char *allocated_line = strdup((const char *)line);
+							allocated_line = strdup((const char *)line);
 							utarray_push_back(_tlds, &allocated_line);
 						}						
 					}

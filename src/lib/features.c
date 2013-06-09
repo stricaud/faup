@@ -47,7 +47,11 @@ void faup_features_init(faup_features_t* features)
 	features->tld.field           = FAUP_FEATURES_FIELD_TLD;
 }
 
+#ifdef WIN32
+static __inline char get_last_c(const char *buffer, size_t pos)
+#else
 static inline char get_last_c(const char *buffer, size_t pos)
+#endif
 {
 	if (pos > 0) {
 		return buffer[pos-1];
@@ -75,7 +79,6 @@ int faup_features_errors_lookup(faup_features_t const* url_features)
 void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_len)
 {
 	faup_features_t* url_features = &fh->faup.features;
-	faup_features_init(url_features);
 	char c;
 	size_t nb_slashes = 0;
 	//int char_counter[128];
@@ -87,8 +90,12 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 
 	ssize_t current_pos = 0;
 	ssize_t buffer_pos = 0;
+	size_t i;
 
-	for (size_t i = 0; i < url_len; i++) {
+
+	faup_features_init(url_features);
+
+	for (i = 0; i < url_len; i++) {
 		c = url[i];
 		if (c == '/') {
 			nb_slashes++;

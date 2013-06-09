@@ -19,8 +19,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 
+#include <faup/faup.h>
 #include <faup/tld.h>
 #include <faup/tld-tree.h>
 

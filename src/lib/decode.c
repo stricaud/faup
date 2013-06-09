@@ -23,13 +23,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <ctype.h>
 
 uint32_t powui(uint32_t base, uint32_t n)
 {
 	uint32_t ret = 1;
-	for (uint32_t i = 0; i < n; i++) {
+	uint32_t i;
+
+	for (i = 0; i < n; i++) {
 		ret *= base;
 	}
 	return ret;
@@ -37,19 +38,21 @@ uint32_t powui(uint32_t base, uint32_t n)
 
 bool is_ipv4(const char* str, const size_t n)
 {
-	if (n > 15) {
-		return false;
-	}
-
 	// TODO: vectorize this
 	uint32_t ndots = 0;
 	uint32_t nip = 0;
 	int32_t cur_d = 2;
 	size_t i = 0;
+	char prev_c = 0;
+
+	if (n > 15) {
+		return false;
+	}
+
 	while ((i < n) && isspace(str[i])) {
 		i++;
 	}
-	char prev_c = 0;
+
 	for (; i < n; i++) {
 		const char c = str[i];
 		if (c == '.') {
@@ -98,13 +101,16 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 
 	int next_valid_token_pos = 0;
 
+	faup_features_t *url_features = NULL;
+
 	if (!url) {
 		return FAUP_URL_EMPTY;
 	}
 
 	fh->faup.org_str = url;
 	faup_features_find(fh, url, url_len);
-	faup_features_t* url_features = &fh->faup.features;
+	url_features = &fh->faup.features;
+
 	if (!faup_features_errors_lookup(url_features)) {
 		if ((faup_features_exist(url_features->scheme)) && (faup_features_exist(url_features->hierarchical))) { 
 			total_size = url_features->hierarchical.pos - url_features->scheme.pos; 
@@ -132,18 +138,23 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 			}
 
 			if (next_valid_token_pos > url_features->host.pos) {
+				const char *host;
+
+
 				total_size = next_valid_token_pos - url_features->host.pos;
 				url_features->host.size = total_size;
 				/* Check if we are dealing with an IPv(4|6) */
-				const char* host = url + url_features->host.pos;
+				host = url + url_features->host.pos;
 				if (!is_ipv4(host, total_size)) {
 					 /* Extract the TLD now */
 					const char *tld = (const char*) memrchr(host, '.', url_features->host.size);
 					if (tld) {
-						tld++;
 						uint32_t tld_pos = (uint32_t) (((uintptr_t)tld)-((uintptr_t)host));
 						uintptr_t tld_len = url_features->host.size - tld_pos;
+
+						tld++;
 						if (tld_len>1) {
+							const char* domain;
 							/* We sometime have no resource_path after but a trailing slash ('www.honeynet.org/') */
 							if (tld[tld_len-1] == '/') {
 								tld_len--;
@@ -170,7 +181,7 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 							}
 
 							// Extract the domain (google.com)
-							const char* domain = (const char*) memrchr(host, '.', url_features->host.size - tld_len - 1);
+							domain = (const char*) memrchr(host, '.', url_features->host.size - tld_len - 1);
 							if (domain) {
 								uint32_t domain_pos = (uint32_t) (((uintptr_t)domain)-((uintptr_t)host));
 								if (tld_pos > domain_pos) {

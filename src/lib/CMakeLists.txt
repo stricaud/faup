@@ -1,6 +1,9 @@
 include_directories(AFTER "include/" ${FAUP_INCLUDE_DIRS})
 
 set(FAUP_LIB_SRC_FILES
+compat/bsd-asprintf.c
+compat/inet_pton.c
+compat/memrchr.c
 decode.c
 emulation.c
 features.c
@@ -13,6 +16,7 @@ tld-tree.c
 )
 
 set(FAUP_LIB_HDR_FILES
+include/faup/compat.h
 include/faup/decode.h
 include/faup/emulation.h
 include/faup/features.h
@@ -37,6 +41,6 @@ add_library(faupl SHARED ${FAUP_LIB_SRC_FILES})
 set_target_properties(faupl PROPERTIES SOVERSION 1)
 target_link_libraries(faupl ${FAUP_LINK_LIBRARIES})
 
-
-install(TARGETS faupl LIBRARY DESTINATION lib)
-
+if(NOT WIN32)
+	install(TARGETS faupl LIBRARY DESTINATION lib)
+endif()

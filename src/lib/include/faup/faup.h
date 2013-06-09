@@ -29,6 +29,28 @@
 #include <stddef.h>
 #include <sys/types.h>
 
+#ifdef WIN32
+ 	#ifndef bool
+ 		#define bool int
+ 	#endif // bool
+	#ifndef true
+		#define true 1
+	#endif // true
+	#ifndef false
+ 		#define false 0
+ 	#endif // false
+#else
+ 	#include <stdbool.h>
+#endif // WIN32
+
+#ifdef WIN32
+	#include <windows.h>
+#endif
+
+#ifdef WIN32
+	#define ssize_t SSIZE_T
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
