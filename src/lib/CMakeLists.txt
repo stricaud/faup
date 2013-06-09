@@ -1,9 +1,17 @@
 include_directories(AFTER "include/" ${FAUP_INCLUDE_DIRS})
 
-set(FAUP_LIB_SRC_FILES
+if(WIN32)
+set(WIN32_PORTABLE
 compat/bsd-asprintf.c
 compat/inet_pton.c
 compat/memrchr.c
+)
+else()
+set(WIN32_PORTABLE)
+endif(WIN32)
+
+set(FAUP_LIB_SRC_FILES
+${WIN32_PORTABLE}
 decode.c
 emulation.c
 features.c

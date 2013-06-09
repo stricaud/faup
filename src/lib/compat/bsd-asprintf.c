@@ -97,3 +97,5 @@ int asprintf(char **str, const char *fmt, ...)
 	return ret;
 }
 #endif
+
+#endif
