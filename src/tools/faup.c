@@ -201,6 +201,7 @@ int main(int argc, char **argv)
 	  	break;
 	  case 'v':
 	    printf("faup v%s\n", faup_get_version());
+	    faup_tld_datadir_print();
 	    faup_options_free(faup_opts);
 	    exit(0);
 	    break;
