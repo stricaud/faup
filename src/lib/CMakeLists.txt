@@ -3,6 +3,7 @@ include_directories(AFTER "include/" ${FAUP_INCLUDE_DIRS})
 if(WIN32)
 set(WIN32_PORTABLE
 compat/bsd-asprintf.c
+compat/bsd-snprintf.c
 compat/inet_pton.c
 compat/memrchr.c
 )

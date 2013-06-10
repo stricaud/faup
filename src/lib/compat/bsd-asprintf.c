@@ -81,7 +81,6 @@ fail:
 	va_end(ap2);
 	return (-1);
 }
-#endif
 
 #ifndef HAVE_ASPRINTF
 int asprintf(char **str, const char *fmt, ...)
@@ -98,4 +97,4 @@ int asprintf(char **str, const char *fmt, ...)
 }
 #endif
 
-#endif
+#endif 

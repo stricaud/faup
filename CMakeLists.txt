@@ -57,7 +57,7 @@ set(FAUP_INCLUDE_DIRS "${faup-project_SOURCE_DIR}/src/lib/include/" "${faup-proj
 
 set(FAUP_LIBRARY "${faup-project_BINARY_DIR}/src/lib/libfaupl.so")
 if(WIN32)
-	set(FAUP_LIBRARY "${faup-project_BINARY_DIR}/src/lib/${CMAKE_BUILD_TYPE}/faupl.lib")
+	set(FAUP_LIBRARY "${faup-project_BINARY_DIR}/src/lib/${CMAKE_BUILD_TYPE}/faup_static.lib")
 endif(WIN32)
 if(APPLE)
 	set(FAUP_LIBRARY "${faup-project_BINARY_DIR}/src/lib/libfaupl.dylib")

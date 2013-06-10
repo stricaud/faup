@@ -3,12 +3,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-#include <getopt.h>
+
+#ifdef WIN32
+	#include "win32-getopt.h"
+#else
+	#include <getopt.h>
+#endif
 
 #include <faup/faup.h>
 #include <faup/decode.h>
 #include <faup/options.h>
 #include <faup/output.h>
+
 
 /* IPv6 tests:
 
