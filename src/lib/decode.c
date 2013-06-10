@@ -146,13 +146,16 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 				/* Check if we are dealing with an IPv(4|6) */
 				host = url + url_features->host.pos;
 				if (!is_ipv4(host, total_size)) {
+					uint32_t tld_pos;
+					uintptr_t tld_len;
 					 /* Extract the TLD now */
 					const char *tld = (const char*) memrchr(host, '.', url_features->host.size);
 					if (tld) {
-						uint32_t tld_pos = (uint32_t) (((uintptr_t)tld)-((uintptr_t)host));
-						uintptr_t tld_len = url_features->host.size - tld_pos;
-
 						tld++;
+						
+						tld_pos = (uint32_t) (((uintptr_t)tld)-((uintptr_t)host));
+						tld_len = url_features->host.size - tld_pos;
+
 						if (tld_len>1) {
 							const char* domain;
 							/* We sometime have no resource_path after but a trailing slash ('www.honeynet.org/') */
