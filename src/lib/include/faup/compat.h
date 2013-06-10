@@ -17,9 +17,9 @@ extern "C" {
 int vasprintf(char **, const char *, va_list);
 #endif
 
-#ifndef HAVE_VSNPRINTF
-int vsnprintf(char *, size_t, const char *, va_list);
-#endif
+//#ifndef HAVE_VSNPRINTF
+//int vsnprintf(char *, size_t, const char *, va_list);
+//#endif
 
 #ifndef HAVE_SNPRINTF
 int snprintf(char *, size_t, const char *, ...);

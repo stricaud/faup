@@ -112,6 +112,7 @@
 #if !defined(HAVE_SNPRINTF) || !defined(HAVE_VSNPRINTF)
 
 #include <ctype.h>
+#include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
@@ -825,12 +826,14 @@ fmtfp (char *buffer, size_t *currlen, size_t maxlen,
 }
 #endif /* !defined(HAVE_SNPRINTF) || !defined(HAVE_VSNPRINTF) */
 
+#if 0
 #if !defined(HAVE_VSNPRINTF)
 int
 vsnprintf (char *str, size_t count, const char *fmt, va_list args)
 {
 	return dopr(str, count, fmt, args);
 }
+#endif
 #endif
 
 #if !defined(HAVE_SNPRINTF)

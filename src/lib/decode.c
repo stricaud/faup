@@ -20,6 +20,10 @@
 #include <faup/features.h>
 #include <faup/tld-tree.h>
 
+#ifdef WIN32
+#include <faup/compat.h>
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
