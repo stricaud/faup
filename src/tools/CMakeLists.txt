@@ -11,4 +11,4 @@ endif(WIN32)
 add_executable(faup faup.c ${WIN32_PORTABLE})
 target_link_libraries(faup ${FAUP_LIBRARY})
 
-install(TARGETS faup DESTINATION bin)
+install(TARGETS faup DESTINATION bin COMPONENT Application)
