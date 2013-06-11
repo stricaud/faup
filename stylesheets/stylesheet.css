@@ -155,6 +155,9 @@ a.button span {
 #download-win32 span {
   background: transparent url(../images/win-icon.png) 12px 50% no-repeat;
 }
+#download-macos span {
+  background: transparent url(../images/macos-icon.png) 12px 50% no-repeat;
+}
 #download-zip span {
   background: transparent url(../images/zip-icon.png) 12px 50% no-repeat;
 }
