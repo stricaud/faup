@@ -1,0 +1,14 @@
+Q: When a run 'make package' on MacOSX, I have "CPack Error: Cannot find PackageMaker compiler"
+A:
+    (from http://www.cmake.org/pipermail/cmake-commits/2012-March/012366.html)
+
+    PackageMaker is installed as a separate program, and may be installed
+    anywhere. It is not installed with Xcode 4.3 by default anymore.
+    Download the "Auxiliary Tools for Xcode" to get PackageMaker.
+    Put PackageMaker inside the Xcode.app bundle, in its nested Applications
+    folder, or put it alongside Xcode in "/Applications" and CMake will find
+    it.
+    
+    Update references to "find" paths: add new possible locations for finding
+    Xcode.app and PackageMaker.app. Prefer the most recent version's locations
+    first, but keep the old locations as fallback search paths, too.
