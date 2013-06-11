@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Faup by stricaud</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Faup</h1>
+          <h2>Fast URL decoder library</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/stricaud/faup/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/stricaud/faup/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/stricaud/faup" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <p align="center"><img src="doc/images/faup-logo.png"></p>
+
+<p><strong>Faup</strong> stands for Finally An Url Parser and is a library and command line tool to parse URLs and normalize fields with two constraints:</p>
+
+<ol>
+<li>Work with real-life urls (resilient to badly formated ones)</li>
+<li>Be fast: no allocation for string parsing and read characters only once</li>
+</ol><ul>
+<li>
+<strong>Source</strong>: <a href="https://github.com/stricaud/faup">https://github.com/stricaud/faup</a>
+</li>
+<li>
+<strong>Issues</strong>: <a href="https://github.com/stricaud/faup/issues">https://github.com/stricaud/faup/issues</a>
+</li>
+<li>
+<strong>Mailing List</strong>: <a href="https://groups.google.com/d/forum/libfaup">libfaup@googlegroups.com</a>
+</li>
+</ul><h2>
+<a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h2>
+
+<ul>
+<li><a href="doc/library.md">Library API documentation</a></li>
+<li><a href="doc/cli.md">Command Line Tool</a></li>
+</ul><h2>
+<a name="quick-start" class="anchor" href="#quick-start"><span class="octicon octicon-link"></span></a>Quick Start</h2>
+
+<h2>
+<a name="what-is-provided" class="anchor" href="#what-is-provided"><span class="octicon octicon-link"></span></a>What is provided?</h2>
+
+<ul>
+<li>A static library you can embed in your software (faup_static)</li>
+<li>A dynamic library you can get along with (faupl)</li>
+<li>A command line tool you can use to extract various parts of a url (faup)</li>
+</ul><h2>
+<a name="why-yet-another-url-extraction-library" class="anchor" href="#why-yet-another-url-extraction-library"><span class="octicon octicon-link"></span></a>Why Yet Another URL Extraction Library?</h2>
+
+<p>Because they all suck. Find a library that can extract, say, a TLD even if you have 
+an IP address, or http://localhost, or anything that may confuse your regex so much
+that you end up with an unmaintainable one.</p>
+
+<h2>
+<a name="architecture" class="anchor" href="#architecture"><span class="octicon octicon-link"></span></a>Architecture</h2>
+
+<p>[ URL ] -&gt; [ Features discovery ] -&gt; [ Decoding ] -&gt; [ URL Fields ]</p>
+
+<h2>
+<a name="command-line-usage" class="anchor" href="#command-line-usage"><span class="octicon octicon-link"></span></a>Command line usage</h2>
+
+<p>Simply pipe or give your url as a parameter:</p>
+
+<pre><code>$ echo "www.github.com" |faup -p
+scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment
+,,www,github.com,www.github.com,com,,,,
+
+$ faup www.github.com
+,,www,github.com,www.github.com,com,,,,
+</code></pre>
+
+<h2>
+<a name="extract-tld--1" class="anchor" href="#extract-tld--1"><span class="octicon octicon-link"></span></a>Extract TLD &gt; 1</h2>
+
+<p>We use the mozilla list that you can update like this:</p>
+
+<pre><code>  $ faup -u
+</code></pre>
+
+<p>Then the -t flag will search for TLDs against the mozilla list (and we output as json for clarity):</p>
+
+<pre><code> $ faup -o json -t http://www.google.co.uk
+ {
+"scheme": "http",
+"credential": "",
+"subdomain": "www",
+"domain": "google.co.uk",
+"host": "www.google.co.uk",
+"tld": "co.uk",
+"port": "",
+"resource_path": "",
+"query_string": "",
+"fragment": "",
+ }
+</code></pre>
+
+<h2>
+<a name="extract-only-the-tld-field" class="anchor" href="#extract-only-the-tld-field"><span class="octicon octicon-link"></span></a>Extract only the TLD field</h2>
+
+<pre><code>$ faup -f tld slashdot.org
+org
+
+$ faup -f tld www.bbc.co.uk
+uk
+
+$ faup -f tld -t www.bbc.co.uk
+co.uk
+</code></pre>
+
+<p>Of course, without the -t flag we are faster because we are not checking against a list.</p>
+
+<h2>
+<a name="python-bindings" class="anchor" href="#python-bindings"><span class="octicon octicon-link"></span></a>Python bindings</h2>
+
+<p>Here's what you can do:</p>
+
+<pre><code>   &gt;&gt;&gt; from pyfaup.faup import Faup
+   &gt;&gt;&gt; f = Faup()
+   &gt;&gt;&gt; f.decode("https://www.slashdot.org")
+   &gt;&gt;&gt; f.get()
+   {'credential': None, 'domain': 'slashdot.org', 'subdomain': 'www', 'fragment': None, 'host': 'www.slashdot.org', 'resource_path': None, 'tld': 'org', 'query_string': None, 'scheme': 'https', 'port': None}
+   &gt;&gt;&gt; 
+</code></pre>
+
+<h2>
+<a name="c-api" class="anchor" href="#c-api"><span class="octicon octicon-link"></span></a>C API</h2>
+
+<p>Again, things are basic:</p>
+
+<pre><code>   faup_handler_t *fh;
+
+   fh = faup_init();
+   faup_decode(fh, "https://wallinfire.net", strlen("https://wallinfire.net"));
+   tld_pos = faup_get_tld_pos(fh); /* will return 19 */       
+   tld_size = faup_get_tld_size(fh); /* will return 3 */       
+   faup_show(fh, ',', stdout);
+
+   faup_terminate(fh);
+</code></pre>
+
+<h2>
+<a name="building-faup" class="anchor" href="#building-faup"><span class="octicon octicon-link"></span></a>Building faup</h2>
+
+<p>To get and build faup, you need <a href="http://www.cmake.org/">cmake</a>. As cmake doesn't allow
+to build the binary in the source directory, you have to create a build directory.</p>
+
+<pre><code>git clone git://github.com/stricaud/faup.git
+cd faup
+mkdir build
+cd build
+cmake .. &amp;&amp; make
+</code></pre>
+        </section>
+
+        <footer>
+          Faup is maintained by <a href="https://github.com/stricaud">stricaud</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
