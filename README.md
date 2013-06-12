@@ -4,6 +4,7 @@
  1. Work with real-life urls (resilient to badly formated ones)
  2. Be fast: no allocation for string parsing and read characters only once
 
+ * **Webpage**: [http://stricaud.github.io/faup/](http://stricaud.github.io/faup/)
 
  * **Source**: [https://github.com/stricaud/faup][github]
  * **Issues**: [https://github.com/stricaud/faup/issues][issues]
