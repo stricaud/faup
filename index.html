@@ -33,130 +33,92 @@
         <section id="main_content">
           <p align="center"><img src="doc/images/faup-logo.png"></p>
 
-<p><strong>Faup</strong> stands for Finally An Url Parser and is a library and command line tool to parse URLs and normalize fields with two constraints:</p>
+<p><strong>Faup</strong> stands for Finally An Url Parser and is a <strong>library</strong> and <strong>command line tool</strong> to parse URLs and normalize fields with two constraints:</p>
 
 <ol>
 <li>Work with real-life urls (resilient to badly formated ones)</li>
 <li>Be fast: no allocation for string parsing and read characters only once</li>
 </ol><ul>
 <li>
-<strong>Source</strong>: <a href="https://github.com/stricaud/faup">https://github.com/stricaud/faup</a>
-</li>
-<li>
-<strong>Issues</strong>: <a href="https://github.com/stricaud/faup/issues">https://github.com/stricaud/faup/issues</a>
-</li>
-<li>
 <strong>Mailing List</strong>: <a href="https://groups.google.com/d/forum/libfaup">libfaup@googlegroups.com</a>
 </li>
-</ul><h2>
-<a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h2>
+<li>
+<strong>Documentation</strong>: [<a href="https://github.com/stricaud/faup/blob/master/doc/library.md">Library</a>] - [<a href="https://github.com/stricaud/faup/blob/master/doc/cli.md">Faup Tool</a>]
+</li>
+</ul>
 
-<ul>
-<li><a href="https://github.com/stricaud/faup/blob/master/doc/library.md">Library API documentation</a></li>
-<li><a href="https://github.com/stricaud/faup/blob/master/doc/library.md">Command Line Tool</a></li>
-</ul><h2>
-<a name="quick-start" class="anchor" href="#quick-start"><span class="octicon octicon-link"></span></a>Quick Start</h2>
+<h2><a name="what-can-faup-do" class="anchor" href="#what-can-faup-do-for-me"><span class="octicon octicon-link"></span></a>What can Faup do for me?</h2>
 
-<h2>
-<a name="what-is-provided" class="anchor" href="#what-is-provided"><span class="octicon octicon-link"></span></a>What is provided?</h2>
+<p>
+Extract various elements from an URL with no pain. The fields we get are: <strong>scheme</strong>, <strong>credential</strong>, <strong>subdomain</strong>, <strong>domain</strong>, <strong>host</strong>, <strong>tld</strong>, <strong>port</strong>, <strong>resource path</strong>, <strong>query string</strong> and <strong>fragment</strong> ('#'). Ever dreamed of giving urls to a command line tool doing it? Faup exists!
+</p>
 
-<ul>
-<li>A static library you can embed in your software (faup_static)</li>
-<li>A dynamic library you can get along with (faupl)</li>
-<li>A command line tool you can use to extract various parts of a url (faup)</li>
-</ul><h2>
-<a name="why-yet-another-url-extraction-library" class="anchor" href="#why-yet-another-url-extraction-library"><span class="octicon octicon-link"></span></a>Why Yet Another URL Extraction Library?</h2>
+<pre><code>$ faup -f domain www.github.com
+github.com
+</code></pre>
+
+<h2><a name="why-yet-another-url-extraction-library" class="anchor" href="#why-yet-another-url-extraction-library"><span class="octicon octicon-link"></span></a>Why Yet Another URL Extraction Library?</h2>
 
 <p>Because they all suck. Find a library that can extract, say, a TLD even if you have 
 an IP address, or http://localhost, or anything that may confuse your regex so much
 that you end up with an unmaintainable one.</p>
 
-<h2>
-<a name="architecture" class="anchor" href="#architecture"><span class="octicon octicon-link"></span></a>Architecture</h2>
+<p>You can see all those failures on the <a href="http://regexlib.com/Search.aspx?k=URL">regex library webpage here</a>.</p>
 
-<p>[ URL ] -&gt; [ Features discovery ] -&gt; [ Decoding ] -&gt; [ URL Fields ]</p>
+<p>Here's a buch of example with faup run on various urls to extract the TLD:
+<table>
+<tr>
+<th>URL</th>
+<th>Faup TLD extraction</th>
+<th>Comments</th>
+</tr>
+<tr>
+<td>www.example.co.uk</td>
+<td>co.uk</td>
+<td>TLD &gt; 1</td>
+</tr>
+<tr>
+<td>www.example.bl.uk</td>
+<td>uk</td>
+<td>bl is an exception in uk TLD extraction</td>
+</tr>
+<tr>
+<td>192.168.0.42</td>
+<td></td>
+<td>IPv4 address, no TLD</td>
+</tr>
+<tr>
+<td>www.tagada.42</td>
+<td>42</td>
+<td>This is not an IP address, 42 is right</td>
+</tr>
+<tr>
+<td>www.example.paris</td>
+<td>paris</td>
+<td>GTLD extracted smoothly</td>
+</tr>
+<tr>
+<td>حكومة.امارات</td>
+<td>حكومة</td>
+<td>United Arab Emirates IDN ccTLD</td>
+</tr>
+</table> 
+</p>
 
-<h2>
-<a name="command-line-usage" class="anchor" href="#command-line-usage"><span class="octicon octicon-link"></span></a>Command line usage</h2>
+<h2><a name="how-fast" class="anchor" href="#how-fast"><span class="octicon octicon-link"></span></a>How fast?</h2>
 
-<p>Simply pipe or give your url as a parameter:</p>
-
-<pre><code>$ echo "www.github.com" |faup -p
-scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment
-,,www,github.com,www.github.com,com,,,,
-
-$ faup www.github.com
-,,www,github.com,www.github.com,com,,,,
-</code></pre>
-
-<h2>
-<a name="extract-tld--1" class="anchor" href="#extract-tld--1"><span class="octicon octicon-link"></span></a>Extract TLD &gt; 1</h2>
-
-<p>We use the mozilla list that you can update like this:</p>
-
-<pre><code>  $ faup -u
-</code></pre>
-
-<p>Then the -t flag will search for TLDs against the mozilla list (and we output as json for clarity):</p>
-
-<pre><code> $ faup -o json -t http://www.google.co.uk
- {
-"scheme": "http",
-"credential": "",
-"subdomain": "www",
-"domain": "google.co.uk",
-"host": "www.google.co.uk",
-"tld": "co.uk",
-"port": "",
-"resource_path": "",
-"query_string": "",
-"fragment": "",
- }
-</code></pre>
-
-<h2>
-<a name="extract-only-the-tld-field" class="anchor" href="#extract-only-the-tld-field"><span class="octicon octicon-link"></span></a>Extract only the TLD field</h2>
-
-<pre><code>$ faup -f tld slashdot.org
-org
-
-$ faup -f tld www.bbc.co.uk
-uk
-
-$ faup -f tld -t www.bbc.co.uk
-co.uk
-</code></pre>
-
-<p>Of course, without the -t flag we are faster because we are not checking against a list.</p>
-
-<h2>
-<a name="python-bindings" class="anchor" href="#python-bindings"><span class="octicon octicon-link"></span></a>Python bindings</h2>
-
-<p>Here's what you can do:</p>
-
-<pre><code>   &gt;&gt;&gt; from pyfaup.faup import Faup
-   &gt;&gt;&gt; f = Faup()
-   &gt;&gt;&gt; f.decode("https://www.slashdot.org")
-   &gt;&gt;&gt; f.get()
-   {'credential': None, 'domain': 'slashdot.org', 'subdomain': 'www', 'fragment': None, 'host': 'www.slashdot.org', 'resource_path': None, 'tld': 'org', 'query_string': None, 'scheme': 'https', 'port': None}
-   &gt;&gt;&gt; 
-</code></pre>
-
-<h2>
-<a name="c-api" class="anchor" href="#c-api"><span class="octicon octicon-link"></span></a>C API</h2>
-
-<p>Again, things are basic:</p>
-
-<pre><code>   faup_handler_t *fh;
-
-   fh = faup_init();
-   faup_decode(fh, "https://wallinfire.net", strlen("https://wallinfire.net"));
-   tld_pos = faup_get_tld_pos(fh); /* will return 19 */       
-   tld_size = faup_get_tld_size(fh); /* will return 3 */       
-   faup_show(fh, ',', stdout);
-
-   faup_terminate(fh);
-</code></pre>
+<p>
+We did a bunch of tests with a few libraries, regex etc. The regex used was this one:
+<pre>^(http|https|ftp)\://([a-zA-Z0-9\.\-]+(\:[a-zA- Z0-9\.&amp;%\$\-]+)*@)*((25[0-5]|2[0-4][0-9]|[0-1]{1} [0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]| [0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]| 2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\. (25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}| [0-9])|localhost|([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9\-]+\. (com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro| aero|coop|museum|[a-zA-Z]{2}))(\:[0-9]+)*(/($|[a-zA- Z0-9\.\,\?\'\\\+&amp;%\$#\=~_\-]+))*$</pre>
+</p>
+<p>
+This is the result graph against 1 million URLs:
+</p>
+<p>
+<div align="center">
+<img src="images/faup-bench.png"/>
+</div>
+</p>
 
 <h2>
 <a name="building-faup" class="anchor" href="#building-faup"><span class="octicon octicon-link"></span></a>Building faup</h2>
@@ -169,6 +131,7 @@ cd faup
 mkdir build
 cd build
 cmake .. &amp;&amp; make
+sudo make install
 </code></pre>
         </section>
 
