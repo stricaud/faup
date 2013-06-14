@@ -160,7 +160,7 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 						tld_pos = (uint32_t) (((uintptr_t)tld)-((uintptr_t)host));
 						tld_len = url_features->host.size - tld_pos;
 
-						if (tld_len>1) {
+						if (tld_len>0) {
 							const char* domain;
 							/* We sometime have no resource_path after but a trailing slash ('www.honeynet.org/') */
 							if (tld[tld_len-1] == '/') {
