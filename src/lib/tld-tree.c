@@ -238,6 +238,10 @@ static bool faup_tld_tree_tld_exists(TLDNode *Tree, const char *tld, int tld_len
 	bool wildcard;
 	int lenght = 0;
 
+	if (!Tree) {
+		fprintf(stderr, "Error: Tree does not exists!\n");
+		return false;
+	}
 
 	p = tld + tld_len - 1;
 	while (tld_len--) {
@@ -255,11 +259,14 @@ static bool faup_tld_tree_tld_exists(TLDNode *Tree, const char *tld, int tld_len
 			if( wildcard ) {
 				while( tld_len-- ) {
 					if( tld_len && (*(--p) == '.') ) {
+						//printf("AAAA\n");
 						return false;
 					}
 				}
+				//printf("CCCC\n");
 				return true;
 			}
+			//printf("BBBB!\n");
 			return false;
 		}
 
@@ -267,9 +274,11 @@ static bool faup_tld_tree_tld_exists(TLDNode *Tree, const char *tld, int tld_len
 	}
 
 	if( pNode->EoT ) {
+		//printf("DDDD\n");
 		return true;
 	}
 
+	//printf("EEEE\n");
 	return false;
 }
 
@@ -344,20 +353,22 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 	// www.foo.siemens.om/tagada != www.foo.siemens.om
 	last_len_just_for_host = strlen(last) - (strlen(org_str) - (fh->faup.features.host.pos + fh->faup.features.host.size));
 
-	found = faup_tld_tree_tld_exists(tld_tree->sibling, last, last_len_just_for_host);
-	if( found )
-	{
-		// here we have the longest TLD
-		// but is that an exception ? (ex: !siemens.om vs *.om)
-		while (counter < tld_len) {
-			if (*last != '.') {
-				last++;
-				tld_exception_len++;
-			} else {
-				has_a_dot = true;
-				break;
+	if (tld_tree->sibling) {
+		found = faup_tld_tree_tld_exists(tld_tree->sibling, last, last_len_just_for_host);
+		if( found )
+		{	
+			// here we have the longest TLD
+			// but is that an exception ? (ex: !siemens.om vs *.om)
+			while (counter < tld_len) {
+				if (*last != '.') {
+					last++;
+					tld_exception_len++;
+				} else {
+					has_a_dot = true;
+					break;
+				}
+				counter++;
 			}
-			counter++;
 		}
 	}
 

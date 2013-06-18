@@ -286,5 +286,6 @@ void faup_tld_array_foreach(void (*cb_tld_array)(char *tld, void *user_data), vo
 void faup_tld_datadir_print(void) 
 {
 	printf("FAUP_DATA_DIR=%s\n", FAUP_DATA_DIR);
+	printf("TLD file being used:%s\n", faup_tld_get_file("mozilla.tlds"));
 }
 
