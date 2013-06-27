@@ -22,29 +22,31 @@
 
 void faup_features_init(faup_features_t* features)
 {
-	features->scheme.pos        = -1;
-	features->hierarchical.pos  = -1;
-	features->credential.pos    = -1;
-	features->host.pos          = -1;
-	features->subdomain.pos     = -1;
-	features->domain.pos        = -1;
-	features->port.pos          = -1;
-	features->resource_path.pos = -1;
-	features->query_string.pos  = -1;
-	features->fragment.pos      = -1;
-	features->tld.pos           = -1;
+	features->scheme.pos             = -1;
+	features->hierarchical.pos       = -1;
+	features->credential.pos         = -1;
+	features->host.pos               = -1;
+	features->subdomain.pos          = -1;
+	features->domain.pos             = -1;
+	features->domain_without_tld.pos = -1;
+	features->port.pos               = -1;
+	features->resource_path.pos      = -1;
+	features->query_string.pos       = -1;
+	features->fragment.pos           = -1;
+	features->tld.pos                = -1;
 
-	features->scheme.field        = FAUP_FEATURES_FIELD_SCHEME;
-	features->hierarchical.field  = FAUP_FEATURES_FIELD_HIERARCHICAL;
-	features->credential.field    = FAUP_FEATURES_FIELD_CREDENTIAL;
-	features->host.field          = FAUP_FEATURES_FIELD_HOST;
-	features->subdomain.field     = FAUP_FEATURES_FIELD_SUBDOMAIN;
-	features->domain.field        = FAUP_FEATURES_FIELD_DOMAIN;
-	features->port.field          = FAUP_FEATURES_FIELD_PORT;
-	features->resource_path.field = FAUP_FEATURES_FIELD_RESOURCE_PATH;
-	features->query_string.field  = FAUP_FEATURES_FIELD_QUERY_STRING;
-	features->fragment.field      = FAUP_FEATURES_FIELD_FRAGMENT;
-	features->tld.field           = FAUP_FEATURES_FIELD_TLD;
+	features->scheme.field             = FAUP_FEATURES_FIELD_SCHEME;
+	features->hierarchical.field       = FAUP_FEATURES_FIELD_HIERARCHICAL;
+	features->credential.field         = FAUP_FEATURES_FIELD_CREDENTIAL;
+	features->host.field               = FAUP_FEATURES_FIELD_HOST;
+	features->subdomain.field          = FAUP_FEATURES_FIELD_SUBDOMAIN;
+	features->domain.field             = FAUP_FEATURES_FIELD_DOMAIN;
+	features->domain_without_tld.field = FAUP_FEATURES_FIELD_DOMAIN_WITHOUT_TLD;
+	features->port.field               = FAUP_FEATURES_FIELD_PORT;
+	features->resource_path.field      = FAUP_FEATURES_FIELD_RESOURCE_PATH;
+	features->query_string.field       = FAUP_FEATURES_FIELD_QUERY_STRING;
+	features->fragment.field           = FAUP_FEATURES_FIELD_FRAGMENT;
+	features->tld.field                = FAUP_FEATURES_FIELD_TLD;
 }
 
 #ifdef WIN32
@@ -202,6 +204,7 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 		buffer_pos++;
 		current_pos++;
 	}
+
 }
 
 void faup_features_debug(const char *url, faup_features_t const* features)
@@ -212,6 +215,7 @@ void faup_features_debug(const char *url, faup_features_t const* features)
 	fprintf(stdout, "features->credential:%d,%u\n", features->credential.pos, features->credential.size);
 	fprintf(stdout, "features->host:%d,%u\n", features->host.pos, features->host.size);
 	fprintf(stdout, "features->domain:%d,%u\n", features->domain.pos, features->domain.size);
+	fprintf(stdout, "features->domain_without_tld:%d,%u\n", features->domain_without_tld.pos, features->domain_without_tld.size);
 	fprintf(stdout, "features->subdomain:%d,%u\n", features->subdomain.pos, features->subdomain.size);
 	fprintf(stdout, "features->tld:%d,%u\n", features->tld.pos, features->tld.size);
 	fprintf(stdout, "features->port:%d,%u\n", features->port.pos, features->port.size);

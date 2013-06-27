@@ -112,6 +112,7 @@ void faup_output_csv_header(faup_handler_t const* fh, faup_options_t *opts, FILE
 	_faup_output_csv_header_single(opts, out, FAUP_URL_FIELD_CREDENTIAL, "credential");
 	_faup_output_csv_header_single(opts, out, FAUP_URL_FIELD_SUBDOMAIN, "subdomain");
 	_faup_output_csv_header_single(opts, out, FAUP_URL_FIELD_DOMAIN, "domain");
+	_faup_output_csv_header_single(opts, out, FAUP_URL_FIELD_DOMAIN_WITHOUT_TLD, "domain_without_tld");
 	_faup_output_csv_header_single(opts, out, FAUP_URL_FIELD_HOST, "host");	
 	_faup_output_csv_header_single(opts, out, FAUP_URL_FIELD_TLD, "tld");
 	_faup_output_csv_header_single(opts, out, FAUP_URL_FIELD_PORT, "port");
@@ -127,6 +128,7 @@ void faup_output_csv(faup_handler_t const* fh, faup_options_t *opts, FILE* out)
 	_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_CREDENTIAL);
 	_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_SUBDOMAIN);
 	_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_DOMAIN);
+	_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_DOMAIN_WITHOUT_TLD);
 	_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_HOST);
 	_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_TLD);
 	_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_PORT);
@@ -167,6 +169,9 @@ void faup_output_json(faup_handler_t const* fh, faup_options_t *opts, FILE* out)
 	}
 	if (opts->fields & FAUP_URL_FIELD_DOMAIN) {
 		_faup_output_json_single(fh, opts, "domain", fh->faup.features.domain, out, FAUP_URL_FIELD_DOMAIN);
+	}
+	if (opts->fields & FAUP_URL_FIELD_DOMAIN_WITHOUT_TLD) {
+		_faup_output_json_single(fh, opts, "domain_without_tld", fh->faup.features.domain_without_tld, out, FAUP_URL_FIELD_DOMAIN_WITHOUT_TLD);
 	}
 	if (opts->fields & FAUP_URL_FIELD_HOST) {
 		_faup_output_json_single(fh, opts, "host", fh->faup.features.host, out, FAUP_URL_FIELD_HOST);

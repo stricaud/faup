@@ -77,6 +77,16 @@ uint32_t faup_get_domain_size(faup_handler_t *fh)
         return faup_get_size(fh, domain);
 }
 
+int32_t faup_get_domain_without_tld_pos(faup_handler_t *fh)
+{
+        return faup_get_pos(fh, domain_without_tld);
+}
+
+uint32_t faup_get_domain_without_tld_size(faup_handler_t *fh)
+{
+        return faup_get_size(fh, domain_without_tld);
+}
+
 int32_t faup_get_host_pos(faup_handler_t *fh)
 {
         return faup_get_pos(fh, host);
@@ -136,11 +146,4 @@ uint32_t faup_get_fragment_size(faup_handler_t *fh)
 {
         return faup_get_size(fh, fragment);
 }
-
-
-
-
-
-
-
 

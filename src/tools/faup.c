@@ -88,9 +88,32 @@ static int run_from_stream(faup_handler_t *fh, faup_options_t *options, FILE *st
 	return 0;
 }
 
+
+void print_help(char **argv)
+{
+	printf("\nUsage: %s [options] url|file\n\n", argv[0]);
+
+	printf("Options:\n");
+	printf("-a\tskip provided argument file open check\n");
+	printf("-d {delimiter}\n\twill separate the fields with the wanted delimiter\n");
+	printf("-e {browser_name}\n\temulate the browser name ('ie' for internet explorer)\n");
+	printf("-f {scheme|credential|subdomain|domain|domain_without_tld|host|tld|port|resource_path|query_string|fragment}\n\tfield to extract\n");
+	printf("-h\tprint the header\n");
+	printf("-l\tprefix with the line number (csv only)\n");
+	printf("-o {csv,json}\n\toutput csv or json at your convenience\n");
+	printf("-p\tprint the header\n");
+	printf("-t\tdo not extract TLD > 1 (eg. only get 'uk' instead of 'co.uk')\n");
+	printf("-u\tupdate the mozilla list\n");
+	printf("\n");
+}
+
+
+/*
 void print_help(char **argv) 
 {
-	printf("Usage: %s [-plu] [-e {ie}] [-d delimiter] [-o {csv|json}] [-f {scheme|credential|subdomain|domain|host|tld|port|resource_path|query_string|fragment}] url|file\n \
+	printf("Usage: %s [-plu] [-e {ie}] [-d delimiter] [-o {csv|json}] "\
+		"[-f {scheme|credential|subdomain|domain|domain_without_tld|host|tld|port|resource_path|query_string|fragment}] "\
+		"url|file\n \
 		Where:\n \
 		url is the url that you want to parse\n \
 		\t-a: skip provided argument file open check\n \
@@ -104,7 +127,7 @@ void print_help(char **argv)
 		\t-t: Do not extract TLD > 1 (eg. only get 'uk' instead of 'co.uk')\n \
 		\t-u: update the mozilla list\n", argv[0]);
 }
-
+*/
 int main(int argc, char **argv)
 {
 	faup_handler_t *fh;
@@ -160,6 +183,9 @@ int main(int argc, char **argv)
 	  	}
 	  	if (!strcmp("domain", optarg)) {
 	  		faup_opts->fields = FAUP_URL_FIELD_DOMAIN;
+	  	}
+	  	if (!strcmp("domain_without_tld", optarg)) {
+	  		faup_opts->fields = FAUP_URL_FIELD_DOMAIN_WITHOUT_TLD;
 	  	}
 	  	if (!strcmp("host", optarg)) {
 	  		faup_opts->fields = FAUP_URL_FIELD_HOST;
