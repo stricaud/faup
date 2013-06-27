@@ -107,27 +107,6 @@ void print_help(char **argv)
 	printf("\n");
 }
 
-
-/*
-void print_help(char **argv) 
-{
-	printf("Usage: %s [-plu] [-e {ie}] [-d delimiter] [-o {csv|json}] "\
-		"[-f {scheme|credential|subdomain|domain|domain_without_tld|host|tld|port|resource_path|query_string|fragment}] "\
-		"url|file\n \
-		Where:\n \
-		url is the url that you want to parse\n \
-		\t-a: skip provided argument file open check\n \
-		\t-d delimiter: will separate the fields with the wanted delimiter\n \
-		\t-e browser_name: Emulate the browser name ('ie' for internet explorer)\n \
-		\t-f: field to extract\n \
-		\t-h: print the header\n \
-		\t-l: prefix with the line number\n \
-		\t-o: output csv or json at your convenience\n \
-		\t-p: print the header\n \
-		\t-t: Do not extract TLD > 1 (eg. only get 'uk' instead of 'co.uk')\n \
-		\t-u: update the mozilla list\n", argv[0]);
-}
-*/
 int main(int argc, char **argv)
 {
 	faup_handler_t *fh;
