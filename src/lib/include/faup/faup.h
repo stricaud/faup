@@ -94,6 +94,8 @@ int32_t faup_get_subdomain_pos(faup_handler_t *fh);
 uint32_t faup_get_subdomain_size(faup_handler_t *fh);
 int32_t faup_get_domain_pos(faup_handler_t *fh);
 uint32_t faup_get_domain_size(faup_handler_t *fh);
+int32_t faup_get_domain_without_tld_pos(faup_handler_t *fh);
+uint32_t faup_get_domain_without_tld_size(faup_handler_t *fh);
 int32_t faup_get_host_pos(faup_handler_t *fh);
 uint32_t faup_get_host_size(faup_handler_t *fh);
 int32_t faup_get_tld_pos(faup_handler_t *fh);

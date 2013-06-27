@@ -31,20 +31,20 @@ enum _faup_output_t {
 	FAUP_OUTPUT_JSON,
 };
 typedef enum _faup_output_t faup_output_t;
-
 enum _faup_url_field_t {
-	FAUP_URL_FIELD_NONE          = (1 << 0),
-	FAUP_URL_FIELD_LINE          = (1 << 1),
-	FAUP_URL_FIELD_SCHEME        = (1 << 2),
-	FAUP_URL_FIELD_CREDENTIAL    = (1 << 3),
-	FAUP_URL_FIELD_SUBDOMAIN     = (1 << 4),
-	FAUP_URL_FIELD_DOMAIN        = (1 << 5),
-	FAUP_URL_FIELD_HOST          = (1 << 6),
-	FAUP_URL_FIELD_TLD           = (1 << 7),
-	FAUP_URL_FIELD_PORT          = (1 << 8),
-	FAUP_URL_FIELD_RESOURCE_PATH = (1 << 9),
-	FAUP_URL_FIELD_QUERY_STRING  = (1 << 10),
-	FAUP_URL_FIELD_FRAGMENT      = (1 << 11),
+	FAUP_URL_FIELD_NONE               = (1 << 0),
+	FAUP_URL_FIELD_LINE               = (1 << 1),
+	FAUP_URL_FIELD_SCHEME             = (1 << 2),
+	FAUP_URL_FIELD_CREDENTIAL         = (1 << 3),
+	FAUP_URL_FIELD_SUBDOMAIN          = (1 << 4),
+	FAUP_URL_FIELD_DOMAIN             = (1 << 5),
+	FAUP_URL_FIELD_DOMAIN_WITHOUT_TLD = (1 << 6),
+	FAUP_URL_FIELD_HOST               = (1 << 7),
+	FAUP_URL_FIELD_TLD                = (1 << 8),
+	FAUP_URL_FIELD_PORT               = (1 << 9),
+	FAUP_URL_FIELD_RESOURCE_PATH      = (1 << 10),
+	FAUP_URL_FIELD_QUERY_STRING       = (1 << 11),
+	FAUP_URL_FIELD_FRAGMENT           = (1 << 12),
 };
 typedef enum _faup_url_field_t faup_url_field_t;
 

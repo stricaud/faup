@@ -34,6 +34,7 @@ enum _faup_features_field_t {
 	FAUP_FEATURES_FIELD_CREDENTIAL,
 	FAUP_FEATURES_FIELD_SUBDOMAIN,
 	FAUP_FEATURES_FIELD_DOMAIN,
+	FAUP_FEATURES_FIELD_DOMAIN_WITHOUT_TLD,
 	FAUP_FEATURES_FIELD_HOST,
 	FAUP_FEATURES_FIELD_TLD,
 	FAUP_FEATURES_FIELD_PORT,
@@ -60,6 +61,7 @@ struct _faup_features_t {
 	faup_feature_t credential;
 	faup_feature_t host;
 	faup_feature_t domain;
+	faup_feature_t domain_without_tld;
 	faup_feature_t subdomain;
 	faup_feature_t tld;
 	faup_feature_t port;

@@ -51,7 +51,7 @@ void faup_options_defaults(faup_options_t *opts)
 
 	faup_options_enable_tld_above_one(opts);
 
-	opts->fields = FAUP_URL_FIELD_SCHEME | FAUP_URL_FIELD_CREDENTIAL | FAUP_URL_FIELD_SUBDOMAIN | FAUP_URL_FIELD_DOMAIN | FAUP_URL_FIELD_HOST | FAUP_URL_FIELD_TLD | FAUP_URL_FIELD_PORT | FAUP_URL_FIELD_RESOURCE_PATH | FAUP_URL_FIELD_QUERY_STRING | FAUP_URL_FIELD_FRAGMENT;
+	opts->fields = FAUP_URL_FIELD_SCHEME | FAUP_URL_FIELD_CREDENTIAL | FAUP_URL_FIELD_SUBDOMAIN | FAUP_URL_FIELD_DOMAIN | FAUP_URL_FIELD_DOMAIN_WITHOUT_TLD | FAUP_URL_FIELD_HOST | FAUP_URL_FIELD_TLD | FAUP_URL_FIELD_PORT | FAUP_URL_FIELD_RESOURCE_PATH | FAUP_URL_FIELD_QUERY_STRING | FAUP_URL_FIELD_FRAGMENT;
 
 	opts->emulation = FAUP_BROWSER_EMULATION_NONE;
 }
@@ -102,6 +102,9 @@ faup_feature_t faup_options_field_get_feature(faup_handler_t const *fh, faup_url
 	}
 	if (field & FAUP_URL_FIELD_DOMAIN) {
 		return fh->faup.features.domain;
+	}
+	if (field & FAUP_URL_FIELD_DOMAIN_WITHOUT_TLD) {
+		return fh->faup.features.domain_without_tld;
 	}
 	if (field & FAUP_URL_FIELD_HOST) {
 		return fh->faup.features.host;
