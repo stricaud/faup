@@ -115,6 +115,7 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 	faup_features_find(fh, url, url_len);
 	url_features = &fh->faup.features;
 
+	//FIXME: faup_features_errors_lookup _always_ return 0 => ?! This if statement is useless !
 	if (!faup_features_errors_lookup(url_features)) {
 		if ((faup_features_exist(url_features->scheme)) && (faup_features_exist(url_features->hierarchical))) { 
 			total_size = url_features->hierarchical.pos - url_features->scheme.pos; 
@@ -277,9 +278,21 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 			url_features->domain.size = url_features->host.size;
 		}
 
+		// URL has been analyzed so we can determine 'domain_without_tld' 
+		if( faup_features_exist(url_features->domain) ) { 
+			url_features->domain_without_tld.pos  = url_features->domain.pos;
+			url_features->domain_without_tld.size = url_features->domain.size;
+
+			if( faup_features_exist(url_features->tld) ) {
+				url_features->domain_without_tld.size -= (url_features->tld.size +1); //+1 for the dot before the tld
+			}
+		}
 		//faup_features_debug(url, url_features);
 		return 0;
 	}
+
+	// FIXME: we never go here because of the 'return 0' just here and in error_lookup() !
+
 
 	/* FIXME: Such a message should not belong to the library */
 	fprintf(stderr, "Cannot parse the url: '%s'\n", url);
