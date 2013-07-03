@@ -65,6 +65,56 @@ function test_vanilla
     test_generic "" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla"
 }
 
+function test_vanilla_scheme
+{
+    test_generic "-f scheme" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla.scheme"
+}
+
+function test_vanilla_credential
+{
+    test_generic "-f credential" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla.credential"
+}
+
+function test_vanilla_subdomain
+{
+    test_generic "-f subdomain" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla.subdomain"
+}
+
+function test_vanilla_domain
+{
+    test_generic "-f domain" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla.domain"
+}
+
+function test_vanilla_host
+{
+    test_generic "-f host" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla.host"
+}
+
+function test_vanilla_tld
+{
+    test_generic "-f tld" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla.tld"
+}
+
+function test_vanilla_port
+{
+    test_generic "-f port" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla.port"
+}
+
+function test_vanilla_resource_path
+{
+    test_generic "-f resource_path" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla.resource_path"
+}
+
+function test_vanilla_query_string
+{
+    test_generic "-f query_string" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla.query_string"
+}
+
+function test_vanilla_fragment
+{
+    test_generic "-f fragment" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla.fragment"
+}
+
 function test_tld_one_only
 {
     test_generic "-t" "$SRC_TEST_DIR/ref-files/urls.txt.tld_one_only"
@@ -118,6 +168,16 @@ fi
 
 case $1 in
     vanilla) test_vanilla;;
+    vanilla_scheme) test_vanilla_scheme;;
+    vanilla_credential) test_vanilla_credential;;
+    vanilla_subdomain) test_vanilla_subdomain;;
+    vanilla_domain) test_vanilla_domain;;
+    vanilla_host) test_vanilla_host;;
+    vanilla_tld) test_vanilla_tld;;
+    vanilla_port) test_vanilla_port;;
+    vanilla_resource_path) test_vanilla_resource_path;;
+    vanilla_query_string) test_vanilla_query_string;;
+    vanilla_fragment) test_vanilla_fragment;;
     tld_one_only) test_tld_one_only;;
     json) test_json;;
     json_tld_one_only) test_json_tld_one_only;;
