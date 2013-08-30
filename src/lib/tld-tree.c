@@ -77,6 +77,8 @@ static int _faup_tld_tree_add_node(TLDNode **Tree, char *tld, int tld_len)
 	TLDNode *pNode  = *Tree;
 	int counter = 0;
 
+	//printf("Adding the TLD:[%s]\n", tld);
+
 	// Add the TLD to the Trie in reverse order
 	p = tld + tld_len -1;
 	while( (*p) && (counter < tld_len - 1) )
@@ -282,6 +284,11 @@ static bool faup_tld_tree_tld_exists(TLDNode *Tree, const char *tld, int tld_len
 	return false;
 }
 
+void faup_tld_tree_debug(TLDNode *tld_tree) 
+{
+
+}
+
 /*
  * Return the starting position of the tld in host or -1 if not found
  * Require a TLD Tree.
@@ -308,6 +315,11 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 
 	tld_extracted.pos = -1;
 	tld_extracted.size = 0;
+
+	if (!tld_tree) {
+		fprintf(stderr, "(Error) No TLD Tree given!\n");
+		return tld_extracted;
+	}
 
 	if (!tld_tree->kid) {
 		fprintf(stderr, "(Warning) Cannot extract TLD > 1. Mozilla list does not exists. Please download it (faup -u)\n");

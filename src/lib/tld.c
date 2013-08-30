@@ -217,6 +217,7 @@ void faup_tld_array_populate(void)
 
 	FILE *fp;
 	char *tld_file = faup_tld_get_file("mozilla.tlds");
+	bool begin_icann_domains = 0;
 
 	if (_tlds) {
 		fprintf(stderr, "The tld array has already been populated!\n");
@@ -234,22 +235,30 @@ void faup_tld_array_populate(void)
 			size_t line_len = strlen(line);
 			char *allocated_line = NULL;
 
-			switch(line[0]) {
-				case '/':
-				case '\n':
-				case '\r':
-				case '0':
-				case ' ':
-					break;
-				default:
-					if (!isupper(line[0])) { // Last check: Apache banners starts with upper case, not TLDs
+			if (line_len > 0) {
+				line[line_len - 1] = '\0';
+				allocated_line = strdup((const char *)line);
+
+				switch(line[0]) {
+					case '/':
+						if (!strncmp("// ===BEGIN ICANN DOMAINS===", allocated_line, 28)) {
+							begin_icann_domains = 1;
+						}
+						break;
+					case '\n':
+					case '\r':
+					case '0':
+					case ' ':
+					case '\0':
+						break;
+					default:
 						if (line_len > 0) {
-							line[line_len - 1] = '\0';
-							allocated_line = strdup((const char *)line);
-							utarray_push_back(_tlds, &allocated_line);
-						}						
-					}
-			}
+							if (begin_icann_domains) {
+								utarray_push_back(_tlds, &allocated_line);
+							}
+						} // if (line_len > 0) {			
+				} // switch(line[0]) {
+			} // if (line_len > 0) {
 		}
 		fclose(fp);
 	}
