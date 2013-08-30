@@ -25,6 +25,7 @@ add_test(File_Argument     ${TEST_FAUP_SCRIPT} file_arg)
 # Cover all the issues that we had (if applicable)
 add_test(Issue24           ${TEST_FAUP_SCRIPT} issue 24)
 add_test(Issue27           ${TEST_FAUP_SCRIPT} issue 27)
+add_test(Issue28           ${TEST_FAUP_SCRIPT} issue 28)
 
 # Test Browser Emulation
 add_test(Emulation_IE ${TEST_FAUP_SCRIPT} ie)

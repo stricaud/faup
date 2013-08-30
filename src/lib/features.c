@@ -89,6 +89,7 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 	ssize_t whatever_len = 0;
 
 	faup_last_slash_t last_slash_meaning = FAUP_LAST_SLASH_NOTFOUND;
+	char host_is_ipv6 = 0;
 
 	ssize_t current_pos = 0;
 	ssize_t buffer_pos = 0;
@@ -104,6 +105,11 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 		}
 
 		/* printf("reading %c, bufferpos=%d\n", c, buffer_pos); */
+
+		if (host_is_ipv6 && c != ']') {
+			current_pos++;
+		        continue;
+		}
 
 		switch(c) {
 			case '/':
@@ -132,7 +138,7 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 						} else {
 							if (faup_features_exist(url_features->host)) {
 								last_slash_meaning = FAUP_LAST_SLASH_AFTER_DOMAIN;
-								url_features->resource_path.pos = current_pos;		
+								url_features->resource_path.pos = current_pos;
 							}
 						}
 					}
@@ -184,6 +190,15 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 
 				buffer_pos=-1;
 				break;
+		        case '[': /* This can be an IPv6 URL, see RFC 2732*/
+				if (url_features->host.pos < 0) {
+				  url_features->host.pos = current_pos;
+				  host_is_ipv6 = 1;
+				}
+			        break;
+		        case ']':
+			        host_is_ipv6 = 0; /* We stop handle the special IPv6 case*/
+			        break;
 			default:
 				//fh->allocated_buf[buffer_pos] = c;
 				if (current_pos == 0) {

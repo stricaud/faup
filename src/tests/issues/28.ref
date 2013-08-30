@@ -1,0 +1,91 @@
+{
+	"scheme": "http",
+	"credential": "",
+	"subdomain": "",
+	"domain": "[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]",
+	"domain_without_tld": "[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]",
+	"host": "[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]",
+	"tld": "",
+	"port": "80",
+	"resource_path": "/index.html",
+	"query_string": "",
+	"fragment": ""
+}
+{
+	"scheme": "http",
+	"credential": "",
+	"subdomain": "",
+	"domain": "[1080:0:0:0:8:800:200C:417A]",
+	"domain_without_tld": "[1080:0:0:0:8:800:200C:417A]",
+	"host": "[1080:0:0:0:8:800:200C:417A]",
+	"tld": "",
+	"port": "",
+	"resource_path": "/index.html",
+	"query_string": "",
+	"fragment": ""
+}
+{
+	"scheme": "http",
+	"credential": "",
+	"subdomain": "",
+	"domain": "[3ffe:2a00:100:7031::1]",
+	"domain_without_tld": "[3ffe:2a00:100:7031::1]",
+	"host": "[3ffe:2a00:100:7031::1]",
+	"tld": "",
+	"port": "",
+	"resource_path": "",
+	"query_string": "",
+	"fragment": ""
+}
+{
+	"scheme": "http",
+	"credential": "",
+	"subdomain": "",
+	"domain": "[1080::8:800:200C:417A]",
+	"domain_without_tld": "[1080::8:800:200C:417A]",
+	"host": "[1080::8:800:200C:417A]",
+	"tld": "",
+	"port": "",
+	"resource_path": "/foo",
+	"query_string": "",
+	"fragment": ""
+}
+{
+	"scheme": "http",
+	"credential": "",
+	"subdomain": "",
+	"domain": "[::192.9.5.5]",
+	"domain_without_tld": "[::192.9.5.5]",
+	"host": "[::192.9.5.5]",
+	"tld": "",
+	"port": "",
+	"resource_path": "/ipng",
+	"query_string": "",
+	"fragment": ""
+}
+{
+	"scheme": "http",
+	"credential": "",
+	"subdomain": "",
+	"domain": "[::FFFF:129.144.52.38]",
+	"domain_without_tld": "[::FFFF:129.144.52.38]",
+	"host": "[::FFFF:129.144.52.38]",
+	"tld": "",
+	"port": "80",
+	"resource_path": "/index.html",
+	"query_string": "",
+	"fragment": ""
+}
+{
+	"scheme": "http",
+	"credential": "",
+	"subdomain": "",
+	"domain": "[2010:836B:4179::836B:4179]",
+	"domain_without_tld": "[2010:836B:4179::836B:4179]",
+	"host": "[2010:836B:4179::836B:4179]",
+	"tld": "",
+	"port": "",
+	"resource_path": "",
+	"query_string": "",
+	"fragment": ""
+}

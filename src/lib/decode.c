@@ -99,6 +99,19 @@ bool is_ipv4(const char* str, const size_t n)
 	return ndots == 3;
 }
 
+bool is_ipv6(const char* str, const size_t n)
+{
+        if (n < 3) {
+                return false;
+	}
+
+	if ((str[0] == '[') && (str[n-1] == ']')) {
+                return true;
+	}
+
+	return false;
+}
+
 int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_options_t *options)
 {
 	uint32_t total_size = 0;
@@ -145,12 +158,14 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 			if (next_valid_token_pos > url_features->host.pos) {
 				const char *host;
 
-
 				total_size = next_valid_token_pos - url_features->host.pos;
 				url_features->host.size = total_size;
 				/* Check if we are dealing with an IPv(4|6) */
 				host = url + url_features->host.pos;
-				if (!is_ipv4(host, total_size)) {
+
+				bool ipv4_host = is_ipv4(host, total_size);
+				bool ipv6_host = is_ipv6(host, total_size);
+				if (!ipv4_host && !ipv6_host) {
 					uint32_t tld_pos;
 					uintptr_t tld_len;
 					 /* Extract the TLD now */

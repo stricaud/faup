@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 
 project(faup-project)
 
+message("CMake system name: ${CMAKE_SYSTEM_NAME}")
+
 if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
 message(FATAL_ERROR "CMake generation is not allowed within the source directory!
 Remove the CMakeCache.txt file and try again from another folder, e.g.:
