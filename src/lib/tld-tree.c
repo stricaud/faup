@@ -399,6 +399,7 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 
 	if (has_a_dot) {
 		tld_extracted.pos += 1;
+		tld_extracted.size -= 1;
 	}
 
 //	printf("tld_extracted.size=%zd;tld_extracted.pos=%zd\n", tld_extracted.size, tld_extracted.pos);
