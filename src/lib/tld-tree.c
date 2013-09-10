@@ -28,6 +28,21 @@
 
 static UT_array *_tlds;
 
+void faup_tld_tree_debug(TLDNode *tld_tree, int pos, char *type)
+{
+ 	printf("[%d] type: '%s'\n", pos, type);
+ 	printf("[%d] c   : '%c'\n", pos, tld_tree->c);
+ 	printf("[%d] EoT : %d\n", pos, tld_tree->EoT);
+ 	if (tld_tree->sibling) {
+		faup_tld_tree_debug(tld_tree->sibling, pos+1, "sibling");
+	}
+
+	if (tld_tree->kid) {
+		faup_tld_tree_debug(tld_tree->kid, pos+1, "kid");
+	}
+}
+
+
 static int _faup_tld_tree_allocate_kid(TLDNode **Node, char c, bool EoT, bool move_cursor)
 {
 	if( (*Node)->kid != NULL )
@@ -261,14 +276,11 @@ static bool faup_tld_tree_tld_exists(TLDNode *Tree, const char *tld, int tld_len
 			if( wildcard ) {
 				while( tld_len-- ) {
 					if( tld_len && (*(--p) == '.') ) {
-						//printf("AAAA\n");
 						return false;
 					}
 				}
-				//printf("CCCC\n");
 				return true;
 			}
-			//printf("BBBB!\n");
 			return false;
 		}
 
@@ -276,11 +288,9 @@ static bool faup_tld_tree_tld_exists(TLDNode *Tree, const char *tld, int tld_len
 	}
 
 	if( pNode->EoT ) {
-		//printf("DDDD\n");
 		return true;
 	}
 
-	//printf("EEEE\n");
 	return false;
 }
 
