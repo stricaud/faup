@@ -294,11 +294,6 @@ static bool faup_tld_tree_tld_exists(TLDNode *Tree, const char *tld, int tld_len
 	return false;
 }
 
-void faup_tld_tree_debug(TLDNode *tld_tree) 
-{
-
-}
-
 /*
  * Return the starting position of the tld in host or -1 if not found
  * Require a TLD Tree.
@@ -401,6 +396,10 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 
 	//printf("fh->faup.features.host.pos(%zd), fh->faup.features.host.size(%zd), tld_extracted.size(%zd), counter(%zd)\n", fh->faup.features.host.pos, fh->faup.features.host.size, tld_extracted.size, counter);
 	tld_extracted.pos = fh->faup.features.host.pos + fh->faup.features.host.size - tld_extracted.size;
+
+	if (has_a_dot) {
+		tld_extracted.pos += 1;
+	}
 
 //	printf("tld_extracted.size=%zd;tld_extracted.pos=%zd\n", tld_extracted.size, tld_extracted.pos);
 
