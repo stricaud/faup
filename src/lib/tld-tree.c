@@ -81,9 +81,9 @@ static int _faup_tld_tree_add_node(TLDNode **Tree, char *tld, int tld_len)
 
 	// Add the TLD to the Trie in reverse order
 	p = tld + tld_len -1;
-	while( (*p) && (counter < tld_len - 1) )
+	while( (*p) && (counter < tld_len) )
 	{
-		lastChar        =  *(p-1)         ? false : true;
+		lastChar        = (counter+1 == tld_len) ? true : false;
 		nextIsDot       = (*(p-1) == '.') ? true  : false;
 		nextIsException = (*(p-1) == '!') ? true  : false;
 
