@@ -41,6 +41,14 @@ include(CheckLibraryExists)
 
 include(FindPkgConfig)
 
+# Find LUA
+# If we don't have lua, then we have no modules, it still works, but is less cool :)
+#find_package(LUA51)
+if(${LUA51_FOUND})
+  add_definitions(-DFAUP_LUA_MODULES=1)
+  message("Lua 5.1 found. Faup will build with modules.")
+endif()
+
 # Manage the version
 file(STRINGS VERSION VERSION)
 set(FAUP_VERSION ${VERSION})
@@ -65,6 +73,7 @@ if(APPLE)
 	set(FAUP_LIBRARY "${faup-project_BINARY_DIR}/src/lib/libfaupl.dylib")
 endif(APPLE)
 
+# Set our env variables
 set(FAUP_DATA_DIR "${CMAKE_INSTALL_PREFIX}/share/faup/")
 add_definitions(-DFAUP_DATA_DIR="${FAUP_DATA_DIR}")
 

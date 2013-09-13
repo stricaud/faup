@@ -20,6 +20,10 @@
 #include <faup/features.h>
 #include <faup/tld-tree.h>
 
+#ifdef FAUP_LUA_MODULES
+#include <faup/modules.h>
+#endif
+
 #ifdef WIN32
 #include <faup/compat.h>
 #endif
@@ -118,14 +122,34 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 
 	int next_valid_token_pos = 0;
 
+#ifdef FAUP_LUA_MODULES
+	const char *url_transformed_by_modules;
+	faup_modules_t *modules;
+#endif
+
 	faup_features_t *url_features = NULL;
 
 	if (!url) {
 		return FAUP_URL_EMPTY;
 	}
 
+#ifdef FAUP_LUA_MODULES
+	modules = faup_modules_new();
+	url_transformed_by_modules = faup_modules_exec_url_in(modules, "../src/lib/modules/sample_uppercase.lua", url);
+	faup_modules_terminate(modules);
+
+	if (url_transformed_by_modules) {
+		fh->faup.org_str = url_transformed_by_modules;
+		faup_features_find(fh, url_transformed_by_modules, url_len);
+	} else {
+		fh->faup.org_str = url;
+		faup_features_find(fh, url, url_len);
+	}
+#else
 	fh->faup.org_str = url;
 	faup_features_find(fh, url, url_len);
+#endif // FAUP_LUA_MODULES
+
 	url_features = &fh->faup.features;
 
 	//FIXME: faup_features_errors_lookup _always_ return 0 => ?! This if statement is useless !

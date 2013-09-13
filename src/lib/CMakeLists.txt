@@ -1,5 +1,6 @@
 include_directories(AFTER "include/" ${FAUP_INCLUDE_DIRS})
 
+
 if(WIN32)
 set(WIN32_PORTABLE
 compat/bsd-asprintf.c
@@ -11,8 +12,24 @@ else()
 set(WIN32_PORTABLE)
 endif(WIN32)
 
+
+if(${LUA51_FOUND})
+
+set(LUA_MODULES_SRC_FILES
+modules.c
+)
+set(LUA_MODULES_HDR_FILES
+include/faup/modules.h
+)
+
+include_directories(AFTER ${LUA_INCLUDE_DIR})
+
+endif()
+
 set(FAUP_LIB_SRC_FILES
 ${WIN32_PORTABLE}
+${LUA_MODULES_SRC_FILES}
+datadir.c
 decode.c
 emulation.c
 features.c
@@ -26,10 +43,12 @@ tld-tree.c
 
 set(FAUP_LIB_HDR_FILES
 include/faup/compat.h
+include/faup/datadir.h
 include/faup/decode.h
 include/faup/emulation.h
 include/faup/features.h
 include/faup/faup.h
+${LUA_MODULES_HDR_FILES}
 include/faup/options.h
 include/faup/output.h
 include/faup/portable.h
@@ -38,6 +57,7 @@ include/faup/tld-tree.h
 )
 
 set(FAUP_LINK_LIBRARIES
+${LUA_LIBRARIES}
 )
 
 # Our static library

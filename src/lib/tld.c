@@ -35,6 +35,7 @@
 #endif // WIN32
 
 #include <faup/faup.h>
+#include <faup/datadir.h>
 #include <faup/tld.h>
 #include <faup/compat.h>
 
@@ -110,98 +111,11 @@ int faup_tld_download_mozilla_list(char *store_to_file)
 	return 0;
 }
 
-char *faup_tld_home_file_exists(char *append)
-{
-#ifndef WIN32
-	int retval;
-	char *retbuf;
-	struct passwd *pw = getpwuid(getuid());
-	const char *homedir = pw->pw_dir;
-	FILE *fp;
-
-	retval = asprintf(&retbuf, "%s%s.faup%s%s", homedir, FAUP_OS_DIRSEP, FAUP_OS_DIRSEP, append);
-	fp = fopen(retbuf, "r");
-	if (fp) {
-		return retbuf;
-	}
-
-	free(retbuf);
-#endif // WIN32
-	return NULL;
-}
-
-char *faup_tld_get_file_from_home(char *append)
-{
-#ifndef WIN32
-	int retval;
-	char *retbuf;
-	struct passwd *pw = getpwuid(getuid());
-	const char *homedir = pw->pw_dir;
-	FILE *fp;
-
-	retval = asprintf(&retbuf, "%s%s.faup", homedir, FAUP_OS_DIRSEP);
-	retval = mkdir(retbuf, 0700);
-	free(retbuf);
-
-	retval = asprintf(&retbuf, "%s%s.faup%s%s", homedir, FAUP_OS_DIRSEP, FAUP_OS_DIRSEP, append);
-	fp = fopen(retbuf, "w");
-	if (fp) {
-		return retbuf;
-	}
-#endif
-	return NULL;
-}
-
-char *faup_tld_get_file(char *append)
-{
-	char *dataenv_dir;
-	char *retbuf;
-	int retval;
-
-	dataenv_dir = getenv("FAUP_DATA_DIR");
-	if (!dataenv_dir) {
-
-		retbuf = faup_tld_home_file_exists(append);
-		if (retbuf) {
-			return retbuf;
-		}
-
-		retval = asprintf(&retbuf, "%s%s", FAUP_DATA_DIR, append);
-		return retbuf;
-	}
-
-	if (strlen(dataenv_dir) > FAUP_MAXPATHLEN) {
-		return NULL; /* Invalid path! */
-	}
-	retval = asprintf(&retbuf, "%s%s%s", dataenv_dir, FAUP_OS_DIRSEP, append);
-
-	return retbuf;
-}
-
-char *faup_tld_file_to_write(void) 
-{
-	char *tld_file = NULL;
-	tld_file = faup_tld_get_file("mozilla.tlds");
-	if (tld_file) {
-		FILE *fp;
-		fp = fopen(tld_file, "w");
-		if (!fp) {
-		    free(tld_file);
-			return faup_tld_get_file_from_home("mozilla.tlds");
-		} else {
-			return tld_file;
-			fclose(fp);
-		}
-	}
-
-	return faup_tld_get_file_from_home("mozilla.tlds");
-}
-
 int faup_tld_update(void)
 {
 	char *tld_file;
 
-	tld_file = faup_tld_file_to_write();
+	tld_file = faup_datadir_file_to_write("mozilla.tlds");
 	if (tld_file) {
 		faup_tld_download_mozilla_list(tld_file);
 		free(tld_file);
@@ -216,7 +130,7 @@ void faup_tld_array_populate(void)
 {
 
 	FILE *fp;
-	char *tld_file = faup_tld_get_file("mozilla.tlds");
+	char *tld_file = faup_datadir_get_file("mozilla.tlds");
 	bool begin_icann_domains = 0;
 
 	if (_tlds) {
@@ -295,6 +209,6 @@ void faup_tld_array_foreach(void (*cb_tld_array)(char *tld, void *user_data), vo
 void faup_tld_datadir_print(void) 
 {
 	printf("FAUP_DATA_DIR=%s\n", FAUP_DATA_DIR);
-	printf("TLD file being used:%s\n", faup_tld_get_file("mozilla.tlds"));
+	printf("TLD file being used:%s\n", faup_datadir_get_file("mozilla.tlds"));
 }
 
