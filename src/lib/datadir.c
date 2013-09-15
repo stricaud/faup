@@ -26,18 +26,27 @@
 #include <faup/faup.h>
 #include <faup/datadir.h>
 
-char *faup_datadir_home_file_exists(char *append)
+char *faup_datadir_home_file_or_dir_exists(char *append)
 {
 #ifndef WIN32
 	int retval;
 	char *retbuf;
 	struct passwd *pw = getpwuid(getuid());
 	const char *homedir = pw->pw_dir;
-	FILE *fp;
+	struct stat append_stat;
 
 	retval = asprintf(&retbuf, "%s%s.faup%s%s", homedir, FAUP_OS_DIRSEP, FAUP_OS_DIRSEP, append);
-	fp = fopen(retbuf, "r");
-	if (fp) {
+	if (retval < 0) {
+		fprintf(stderr, "Cannot allocate in %s with parameter '%s'\n", __FUNCTION__, append);
+		return NULL;
+	}
+
+	retval = stat(retbuf, &append_stat);
+	if (retval < 0) {
+		// The file or dir is not found
+		free(retbuf);
+		return NULL;
+	} else {
 		return retbuf;
 	}
 
@@ -77,7 +86,7 @@ char *faup_datadir_get_file(char *append)
 	dataenv_dir = getenv("FAUP_DATA_DIR");
 	if (!dataenv_dir) {
 
-		retbuf = faup_datadir_home_file_exists(append);
+		retbuf = faup_datadir_home_file_or_dir_exists(append);
 		if (retbuf) {
 			return retbuf;
 		}
@@ -87,6 +96,7 @@ char *faup_datadir_get_file(char *append)
 	}
 
 	if (strlen(dataenv_dir) > FAUP_MAXPATHLEN) {
+		fprintf(stderr, "Invalid path!\n");
 		return NULL; /* Invalid path! */
 	}
 	retval = asprintf(&retbuf, "%s%s%s", dataenv_dir, FAUP_OS_DIRSEP, append);

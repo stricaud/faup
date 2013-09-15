@@ -20,6 +20,7 @@ include(CMakeOptions.txt)
 set(CMAKE_BUILD_TYPE "Release")
 
 if (DEBUG_MODE)
+add_definitions(-DFAUP_DEBUG=1)
 set(CMAKE_BUILD_TYPE "Debug")
         if(NOT WIN32)
                 add_definitions(-g)
@@ -43,7 +44,7 @@ include(FindPkgConfig)
 
 # Find LUA
 # If we don't have lua, then we have no modules, it still works, but is less cool :)
-#find_package(LUA51)
+find_package(LUA51)
 if(${LUA51_FOUND})
   add_definitions(-DFAUP_LUA_MODULES=1)
   message("Lua 5.1 found. Faup will build with modules.")

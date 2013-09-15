@@ -123,7 +123,7 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 	int next_valid_token_pos = 0;
 
 #ifdef FAUP_LUA_MODULES
-	const char *url_transformed_by_modules;
+	const char *url_transformed_by_modules = NULL;
 	faup_modules_t *modules;
 #endif
 
@@ -135,7 +135,7 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 
 #ifdef FAUP_LUA_MODULES
 	modules = faup_modules_new();
-	url_transformed_by_modules = faup_modules_exec_url_in(modules, "../src/lib/modules/sample_uppercase.lua", url);
+	//url_transformed_by_modules = faup_modules_exec_url_in_by_module_name(modules, "sample_uppercase.lua", url);
 	faup_modules_terminate(modules);
 
 	if (url_transformed_by_modules) {
