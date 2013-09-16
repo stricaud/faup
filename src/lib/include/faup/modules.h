@@ -50,9 +50,10 @@ struct _faup_modules_transformed_url_t {
 	size_t url_len;
 };
 
-faup_modules_t *faup_modules_new(void);
+faup_modules_t *faup_modules_new(bool register_datadir);
 void faup_modules_terminate(faup_modules_t *modules);
-void _faup_module_register(faup_modules_t *modules, char *modules_dir, char *module, void *user_data, int count);
+faup_modules_t *faup_modules_load_from_datadir(void);
+void faup_module_register(faup_modules_t *modules, char *modules_dir, char *module, void *user_data, int count);
 const char *faup_modules_exec_url_in_by_module_name(faup_modules_t *modules, char *module, const char *url);
 
 // Returns the number of modules

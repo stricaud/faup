@@ -100,6 +100,7 @@ void print_help(char **argv)
 	printf("-f {scheme|credential|subdomain|domain|domain_without_tld|host|tld|port|resource_path|query_string|fragment}\n\tfield to extract\n");
 	printf("-h\tprint the header\n");
 	printf("-l\tprefix with the line number (csv only)\n");
+	printf("-m\t{module1 module2 module3}\n\tLoad the modules in the given order.\n\tIf empty, load no modules. If this option is not provided, modules in the shared data in modules_enabled will be loaded by default\n");
 	printf("-o {csv,json}\n\toutput csv or json at your convenience\n");
 	printf("-p\tprint the header\n");
 	printf("-t\tdo not extract TLD > 1 (eg. only get 'uk' instead of 'co.uk')\n");
@@ -120,6 +121,9 @@ int main(int argc, char **argv)
 
 	int tld_pos;
 
+  	bool has_module = false;
+
+
 	faup_opts = faup_options_new();
 	if (!faup_opts) {
 	  fprintf(stderr, "Error: cannot allocate faup options!\n" );
@@ -128,7 +132,7 @@ int main(int argc, char **argv)
 
 	fh = faup_init();
 
-	while ((opt = getopt(argc, argv, "ape:ld:vo:utf:")) != -1) {
+	while ((opt = getopt(argc, argv, "ape:ld:vo:utf:m:")) != -1) {
 	  switch(opt) {
 	  case 'a':
 	  	skip_file_check = 1;
@@ -150,6 +154,36 @@ int main(int argc, char **argv)
 	  	faup_opts->fields |= FAUP_URL_FIELD_LINE;
 	    faup_opts->print_line = 1;
 	    break;
+	  case 'm':	  	
+	  	for (optind--;optind < argc - 1;) {
+	  		// In case we parse the next option, we shall stop!
+	  		if (argv[optind][0] == '-') {
+	  			break;
+	  		} 
+
+	  		optind++;
+
+	  		if (!has_module) {
+	  			// This is our first argument
+	  			// we push our first arg: 'optarg'
+	  			//printf("optarg:%s\n", optarg);
+	  		}
+	  		has_module = 1;
+
+	  		// In case we parse the next option, we shall stop!
+	  		if (argv[optind][0] == '-') {
+	  			break;
+	  		} 
+	  		// we push our next arg: argv[optind]
+	  		//printf("argv[optin]:%s\n", argv[optind]);
+	  	}
+
+	  	if (has_module) {
+  			faup_opts->exec_modules = FAUP_MODULES_EXECARG;
+  		} else {
+  			faup_opts->exec_modules = FAUP_MODULES_NOEXEC;
+  		}
+	  	break;
 	  case 'f':
 	  	if (!strcmp("scheme", optarg)) {
 	  		faup_opts->fields = FAUP_URL_FIELD_SCHEME;
@@ -216,6 +250,10 @@ int main(int argc, char **argv)
 	    exit(1);
 	  }
 	}
+
+
+//	printf("Lart arg:'%s'\n", argv[optind+1]);
+
 
 	if (isatty(fileno(stdin))) {
 		faup_opts->input_source = FAUP_INPUT_SOURCE_ARGUMENT;

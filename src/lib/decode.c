@@ -133,7 +133,7 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 	}
 
 #ifdef FAUP_LUA_MODULES
-	if (options->exec_modules) {
+	if (options->exec_modules != FAUP_MODULES_NOEXEC) {
 		url_transformed_by_modules = faup_modules_decode_url_start(options, url, url_len);
 		if (url_transformed_by_modules) {
 			fh->faup.org_str = url_transformed_by_modules->url; // FIXME: Change to 'url' when the output has changed to reflect new way of doing with lua stuff

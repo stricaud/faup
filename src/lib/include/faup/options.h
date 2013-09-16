@@ -64,6 +64,13 @@ enum _faup_browser_emulation_t {
 };
 typedef enum _faup_browser_emulation_t faup_browser_emulation_t;
 
+enum _faup_modules_exec_t {
+	FAUP_MODULES_NOEXEC,
+	FAUP_MODULES_EXECPATH, // Exec from what we have in our datadir
+	FAUP_MODULES_EXECARG,  // Exec from the command line given
+};
+typedef enum _faup_modules_exec_t faup_modules_exec_t;
+
 struct _faup_options_t {
   int print_header;
   int print_line;
@@ -75,7 +82,7 @@ struct _faup_options_t {
   int tld_greater_extraction;
   faup_url_field_t fields;
   faup_browser_emulation_t emulation;
-  bool exec_modules;
+  faup_modules_exec_t exec_modules;
 };
 typedef struct _faup_options_t faup_options_t;
 

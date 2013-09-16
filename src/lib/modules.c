@@ -22,26 +22,26 @@
 #include <faup/datadir.h>
 #include <faup/modules.h>
 
-faup_modules_t *faup_modules_new(void)
+faup_modules_t *faup_modules_new(bool register_datadir)
 {
-	faup_modules_t *modules;
-	intptr_t count = 0;
+	if (register_datadir) {
+		return faup_modules_load_from_datadir();
+	}
 
-	modules = malloc(sizeof(faup_modules_t));
-	modules->nb_modules = faup_modules_foreach_filelist(NULL, NULL, NULL);
-	modules->module = malloc(sizeof(faup_module_t) * modules->nb_modules);
-
-	faup_modules_foreach_filelist(modules, _faup_module_register, (intptr_t *)count);
-
-	return modules;
+	return NULL;
 }
-
 
 void faup_modules_terminate(faup_modules_t *modules)
 {
+	if (!modules) {
+		return;
+	}
+
 	int	count = 0;
 	while (count < modules->nb_modules) {
-		lua_close(modules->module[count].lua_state);
+		if (modules->module[count].lua_state) {
+			lua_close(modules->module[count].lua_state);
+		}
 		free(modules->module[count].module_path);
 		free(modules->module[count].module_name);
 		count++;
@@ -50,8 +50,21 @@ void faup_modules_terminate(faup_modules_t *modules)
 	free(modules);
 }
 
+faup_modules_t *faup_modules_load_from_datadir(void)
+{
+	faup_modules_t *modules = NULL;
+	int count = 0;
 
-void _faup_module_register(faup_modules_t *modules, char *modules_dir, char *module, void *user_data, int count)
+	modules = malloc(sizeof(faup_modules_t));
+	modules->nb_modules = faup_modules_foreach_filelist(NULL, NULL, NULL);
+	modules->module = malloc(sizeof(faup_module_t) * modules->nb_modules);
+	//memset(modules, 0, sizeof(faup_module_t) * modules->nb_modules);
+	faup_modules_foreach_filelist(modules, faup_module_register, (int *)count);
+
+	return modules;
+}
+
+void faup_module_register(faup_modules_t *modules, char *modules_dir, char *module, void *user_data, int count)
 {
 	int retval;
 
@@ -126,8 +139,13 @@ void faup_modules_list(faup_modules_t *modules, char *modules_dir, char *module,
 const char *faup_modules_exec_url_in_by_module_name(faup_modules_t *modules, char *module, const char *url)
 {
 	int retval;
-
 	int	count = 0;
+
+	if (!modules) {
+		fprintf(stderr, "%s was given no modules struct!\n", __FUNCTION__);
+		return NULL;
+	}
+
 	while (count < modules->nb_modules) {
 		if (!strcmp(module, modules->module[count].module_name)) {
 			lua_getglobal(modules->module[count].lua_state, "faup_url_in");
@@ -159,7 +177,7 @@ int faup_modules_exec_extracted_fields(int module_id, lua_State *lua_state)
 faup_modules_transformed_url_t *faup_modules_decode_url_start(faup_options_t *options, const char *url, size_t url_len)
 {
 	faup_modules_transformed_url_t *transformed_url = NULL;
-	faup_modules_t *modules;
+	faup_modules_t *modules = NULL;
 	const char *new_url;
 
 	transformed_url = malloc(sizeof(faup_modules_transformed_url_t));
@@ -168,8 +186,20 @@ faup_modules_transformed_url_t *faup_modules_decode_url_start(faup_options_t *op
 		return NULL;
 	}
 
-	modules = faup_modules_new();
-	new_url = faup_modules_exec_url_in_by_module_name(modules, "sample_uppercase.lua", url);
+	switch(options->exec_modules) {
+		case FAUP_MODULES_EXECPATH:
+			modules = faup_modules_new(true);
+			if (!modules) {
+				printf("NO MODULES AT ALL\n");
+			}
+			new_url = faup_modules_exec_url_in_by_module_name(modules, "sample_uppercase.lua", url);
+			break;
+		case FAUP_MODULES_EXECARG:
+			modules = faup_modules_new(false);
+			break;
+		default:
+			fprintf(stderr, "*** Huh? We should never be there (%s)!\n", __FUNCTION__);
+	}
 	faup_modules_terminate(modules);
 
 	if (new_url) {

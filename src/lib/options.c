@@ -48,7 +48,7 @@ void faup_options_defaults(faup_options_t *opts)
 	opts->input_source = FAUP_INPUT_SOURCE_ARGUMENT;
 	opts->current_line = 1;
 	opts->output = FAUP_OUTPUT_CSV;
-	opts->exec_modules = 1;
+	opts->exec_modules = FAUP_MODULES_EXECPATH;
 
 	faup_options_enable_tld_above_one(opts);
 
