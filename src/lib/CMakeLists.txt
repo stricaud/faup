@@ -74,3 +74,5 @@ install(TARGETS faupl LIBRARY DESTINATION lib COMPONENT Libraries)
 
 install(FILES ${FAUP_LIB_HDR_FILES} DESTINATION include/faup COMPONENT Headers)
 
+add_subdirectory(modules)
+
