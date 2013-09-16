@@ -21,6 +21,8 @@
 #include <lauxlib.h>
 #include <lualib.h>
 
+#include <faup/options.h>
+
 #define FAUP_MODULE_NAME_MAXLEN 128
 
 #ifdef __cplusplus
@@ -29,6 +31,7 @@ extern "C" {
 
 typedef struct _faup_modules_t faup_modules_t;
 typedef struct _faup_module_t faup_module_t;
+typedef struct _faup_modules_transformed_url_t faup_modules_transformed_url_t;
 
 struct _faup_module_t {
 	char *module_path;
@@ -42,6 +45,11 @@ struct _faup_modules_t {
 	faup_module_t *module;
 };
 
+struct _faup_modules_transformed_url_t {
+	const char *url;
+	size_t url_len;
+};
+
 faup_modules_t *faup_modules_new(void);
 void faup_modules_terminate(faup_modules_t *modules);
 void _faup_module_register(faup_modules_t *modules, char *modules_dir, char *module, void *user_data, int count);
@@ -50,6 +58,9 @@ const char *faup_modules_exec_url_in_by_module_name(faup_modules_t *modules, cha
 // Returns the number of modules
 int faup_modules_foreach_filelist(faup_modules_t *modules, void (*cb_modules_foreach)(faup_modules_t *modules, char *modules_dir, char *module, void *user_data, int count), void *user_data);
 void faup_modules_list(faup_modules_t *modules, char *modules_dir, char *module, void *user_data, int count);
+
+faup_modules_transformed_url_t *faup_modules_decode_url_start(faup_options_t *options, const char *url, size_t url_len);
+void faup_modules_transformed_url_free(faup_modules_transformed_url_t *transformed_url);
 
 
 #ifdef __cplusplus

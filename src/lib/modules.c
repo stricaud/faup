@@ -156,4 +156,35 @@ int faup_modules_exec_extracted_fields(int module_id, lua_State *lua_state)
   return 0;
 }
 
+faup_modules_transformed_url_t *faup_modules_decode_url_start(faup_options_t *options, const char *url, size_t url_len)
+{
+	faup_modules_transformed_url_t *transformed_url = NULL;
+	faup_modules_t *modules;
+	const char *new_url;
 
+	transformed_url = malloc(sizeof(faup_modules_transformed_url_t));
+	if (!transformed_url) {
+		fprintf(stderr, "Cannot allocate URL for transformed url by modules!\n");
+		return NULL;
+	}
+
+	modules = faup_modules_new();
+	new_url = faup_modules_exec_url_in_by_module_name(modules, "sample_uppercase.lua", url);
+	faup_modules_terminate(modules);
+
+	if (new_url) {
+		transformed_url->url = new_url;
+		transformed_url->url_len = strlen(new_url);
+	} else {
+		transformed_url->url = url;
+		transformed_url->url_len = url_len;
+	}
+
+	return transformed_url;
+}
+
+void faup_modules_transformed_url_free(faup_modules_transformed_url_t *transformed_url)
+{
+	//free((void *)transformed_url->url);
+	free(transformed_url);
+}

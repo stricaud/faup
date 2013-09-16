@@ -123,8 +123,7 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 	int next_valid_token_pos = 0;
 
 #ifdef FAUP_LUA_MODULES
-	const char *url_transformed_by_modules = NULL;
-	faup_modules_t *modules;
+	faup_modules_transformed_url_t *url_transformed_by_modules = NULL;
 #endif
 
 	faup_features_t *url_features = NULL;
@@ -134,21 +133,20 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 	}
 
 #ifdef FAUP_LUA_MODULES
-	modules = faup_modules_new();
-	url_transformed_by_modules = faup_modules_exec_url_in_by_module_name(modules, "sample_uppercase.lua", url);
-	faup_modules_terminate(modules);
-
-	if (url_transformed_by_modules) {
-		fh->faup.org_str = url_transformed_by_modules;
-		faup_features_find(fh, url_transformed_by_modules, url_len);
-	} else {
-		fh->faup.org_str = url;
-		faup_features_find(fh, url, url_len);
+	if (options->exec_modules) {
+		url_transformed_by_modules = faup_modules_decode_url_start(options, url, url_len);
+		if (url_transformed_by_modules) {
+			fh->faup.org_str = url_transformed_by_modules->url; // FIXME: Change to 'url' when the output has changed to reflect new way of doing with lua stuff
+			faup_features_find(fh, url_transformed_by_modules->url, url_transformed_by_modules->url_len);
+		}
 	}
-#else
-	fh->faup.org_str = url;
-	faup_features_find(fh, url, url_len);
 #endif // FAUP_LUA_MODULES
+
+	// Nothing has been transformed, so we simply use our original url
+	if (!url_transformed_by_modules) {
+		fh->faup.org_str = url;
+		faup_features_find(fh, url, url_len);		
+	}
 
 	url_features = &fh->faup.features;
 

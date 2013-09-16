@@ -75,6 +75,7 @@ struct _faup_options_t {
   int tld_greater_extraction;
   faup_url_field_t fields;
   faup_browser_emulation_t emulation;
+  bool exec_modules;
 };
 typedef struct _faup_options_t faup_options_t;
 
