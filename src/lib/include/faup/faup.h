@@ -20,6 +20,7 @@
 #include <faup/errors.h>
 #include <faup/features.h>
 #include <faup/handler.h>
+#include <faup/options.h>
 #include <faup/portable.h>
 #include <faup/tld.h>
 #include <faup/version.h>
@@ -71,6 +72,10 @@ struct _faup_t {
 
 struct _faup_handler_t {
 	faup_t faup;
+	faup_options_t *options;
+#ifdef FAUP_LUA_MODULES
+	void *modules;	// faup_modules_t
+#endif
 };
 
 enum _faup_last_slash_t {
@@ -82,7 +87,7 @@ enum _faup_last_slash_t {
 #define faup_get_pos(fh, name) (fh)->faup.features.name.pos
 #define faup_get_size(fh, name) (fh)->faup.features.name.size
 
-faup_handler_t *faup_init(void);
+faup_handler_t *faup_init(faup_options_t *options);
 char *faup_get_version(void);
 void faup_terminate(faup_handler_t *fh);
 

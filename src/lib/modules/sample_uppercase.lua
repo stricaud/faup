@@ -5,13 +5,15 @@ function faup_url_in(url)
 	 return new_url
 end
 
-function faup_extracted_fields(url, url_fields)
-	 local tab_out = {numfields=1}
-	 for k,v in pairs(tab_in) do
-	     tab_out.numfields = tab_out.numfields + 1
-	     tab_out[tostring(k)] = string.upper(tostring(v))
-	 end
-         tab_out.numfields = tostring(tab_out.numfields)
+-- function faup_output(orig_url, positions_and_sizes)
+--
+--	local new_positions_and_sizes = {numfields=1}
+--
+--	for k,v in pairs(positions_and_sizes) do
+--		--io.write("k:",k, " v:", v, "\n")
+--		new_positions_and_sizes.numfields = new_positions_and_sizes.numfields + 1
+--		new_positions_and_sizes[tostring(k)] = v
+--	end
 
-	 return tab_out
-end
+--	return orig_url, new_positions_and_sizes
+--end

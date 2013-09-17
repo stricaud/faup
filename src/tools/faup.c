@@ -62,7 +62,7 @@ static char *readline(FILE *fp)
 	return str;
 }
 
-static int run_from_stream(faup_handler_t *fh, faup_options_t *options, FILE *stream) 
+static int run_from_stream(faup_handler_t *fh, FILE *stream) 
 {
 		char *strbuf=NULL;
 
@@ -77,13 +77,13 @@ static int run_from_stream(faup_handler_t *fh, faup_options_t *options, FILE *st
 				continue;
 			}
 
-			faup_decode(fh, strbuf, strlen(strbuf), options);
+			faup_decode(fh, strbuf, strlen(strbuf));
 
-			faup_output(fh, options, stdout);
+			faup_output(fh, stdout);
 
-			options->print_header = 0; // We don't need to output the header anymore!
+			fh->options->print_header = 0; // We don't need to output the header anymore!
 			free(strbuf);
-			options->current_line++;
+			fh->options->current_line++;
 		}
 	return 0;
 }
@@ -130,8 +130,6 @@ int main(int argc, char **argv)
 	  return -1;
 	}
 
-	fh = faup_init();
-
 	while ((opt = getopt(argc, argv, "ape:ld:vo:utf:m:")) != -1) {
 	  switch(opt) {
 	  case 'a':
@@ -154,7 +152,7 @@ int main(int argc, char **argv)
 	  	faup_opts->fields |= FAUP_URL_FIELD_LINE;
 	    faup_opts->print_line = 1;
 	    break;
-	  case 'm':	  	
+	  case 'm':
 	  	for (optind--;optind < argc - 1;) {
 	  		// In case we parse the next option, we shall stop!
 	  		if (argv[optind][0] == '-') {
@@ -251,6 +249,7 @@ int main(int argc, char **argv)
 	  }
 	}
 
+	fh = faup_init(faup_opts);
 
 //	printf("Lart arg:'%s'\n", argv[optind+1]);
 
@@ -274,19 +273,19 @@ int main(int argc, char **argv)
 				FILE *fp = fopen(argv[optind], "r");
 				if (fp) {
 					faup_opts->input_source = FAUP_INPUT_SOURCE_FILE;
-					ret = run_from_stream(fh, faup_opts, fp);
+					ret = run_from_stream(fh, fp);
 					fclose(fp);
 					goto terminate;
 				}
 			}
 		}
 
-		faup_decode(fh, argv[optind], strlen(argv[optind]), faup_opts);
+		faup_decode(fh, argv[optind], strlen(argv[optind]));
 
-		faup_output(fh, faup_opts, stdout);
+		faup_output(fh, stdout);
 	} else {       	/* We read from stdin */
 		faup_opts->input_source = FAUP_INPUT_SOURCE_PIPE;
-		run_from_stream(fh, faup_opts, stdin);
+		run_from_stream(fh, stdin);
 	}
 
 terminate:

@@ -116,7 +116,7 @@ bool is_ipv6(const char* str, const size_t n)
 	return false;
 }
 
-int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_options_t *options)
+int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len)
 {
 	uint32_t total_size = 0;
 
@@ -133,20 +133,22 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 	}
 
 #ifdef FAUP_LUA_MODULES
-	if (options->exec_modules != FAUP_MODULES_NOEXEC) {
-		url_transformed_by_modules = faup_modules_decode_url_start(options, url, url_len);
+	if (fh->options->exec_modules != FAUP_MODULES_NOEXEC) {
+		url_transformed_by_modules = faup_modules_decode_url_start(fh, url, url_len);
 		if (url_transformed_by_modules) {
 			fh->faup.org_str = url_transformed_by_modules->url; // FIXME: Change to 'url' when the output has changed to reflect new way of doing with lua stuff
 			faup_features_find(fh, url_transformed_by_modules->url, url_transformed_by_modules->url_len);
 		}
 	}
-#endif // FAUP_LUA_MODULES
-
-	// Nothing has been transformed, so we simply use our original url
 	if (!url_transformed_by_modules) {
 		fh->faup.org_str = url;
 		faup_features_find(fh, url, url_len);		
 	}
+#else
+	// Nothing has been transformed, so we simply use our original url
+	fh->faup.org_str = url;
+	faup_features_find(fh, url, url_len);		
+#endif // FAUP_LUA_MODULES
 
 	url_features = &fh->faup.features;
 
@@ -206,8 +208,8 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len, faup_
 							}
 
 							// All the features are detected, we can do some extra operations now
-							if (options->tld_greater_extraction) {
-								faup_tld_tree_extracted_t tld_extracted = faup_tld_tree_extract(fh, options->tld_tree, fh->faup.org_str);
+							if (fh->options->tld_greater_extraction) {
+								faup_tld_tree_extracted_t tld_extracted = faup_tld_tree_extract(fh, fh->options->tld_tree, fh->faup.org_str);
 								url_features->tld.pos = tld_extracted.pos;
 								url_features->tld.size = tld_extracted.size;
 

@@ -15,14 +15,23 @@
  */
 
 #include <faup/faup.h>
+#ifdef FAUP_LUA_MODULES
+#include <faup/modules.h>
+#endif
+
 
 #include <stdlib.h>
 
-faup_handler_t *faup_init(void)
+faup_handler_t *faup_init(faup_options_t *options)
 {
 	faup_handler_t *fh;
+    int retval;
 
 	fh = malloc(sizeof(faup_handler_t));
+    fh->options = options;
+#ifdef FAUP_LUA_MODULES
+    retval = faup_modules_new(fh);
+#endif
 
 	return fh;
 }

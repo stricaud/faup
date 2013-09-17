@@ -21,6 +21,10 @@
 #include <faup/output.h>
 #include <faup/emulation.h>
 
+#ifdef FAUP_LUA_MODULES
+#include <faup/modules.h>
+#endif
+
 void faup_output_show(faup_handler_t const* fh, faup_options_t *opts, const faup_feature_t feature, FILE* out, int escape_dquotes)
 {
 
@@ -79,8 +83,6 @@ void faup_output_show(faup_handler_t const* fh, faup_options_t *opts, const faup
 
 void _faup_output_csv_single(faup_handler_t const* fh, faup_options_t *opts, FILE *out, faup_url_field_t field)
 {
-
-
 		if (opts->fields & field) {
 			faup_output_show(fh, opts, faup_options_field_get_feature(fh, field), out, 0);
 			if (faup_options_url_field_has_greater_than(opts, field)) {
@@ -196,29 +198,35 @@ void faup_output_json(faup_handler_t const* fh, faup_options_t *opts, FILE* out)
 	fwrite(&"\n}\n", 3, 1, out);
 }
 
-void faup_output(faup_handler_t const* fh, faup_options_t *opts, FILE* out)
+void faup_output(faup_handler_t *fh, FILE* out)
 {
-	switch(opts->output) {
-		case FAUP_OUTPUT_CSV:
-			faup_output_csv_header(fh, opts, out);
+#ifdef FAUP_LUA_MODULES
+	bool module_executed;
 
-			if (opts->print_line) {
-					switch(opts->input_source) {
+	module_executed = faup_modules_url_output(fh, out);
+#endif
+
+	switch(fh->options->output) {
+		case FAUP_OUTPUT_CSV:
+			faup_output_csv_header(fh, fh->options, out);
+
+			if (fh->options->print_line) {
+					switch(fh->options->input_source) {
 						case FAUP_INPUT_SOURCE_ARGUMENT:
-							printf("0%c", opts->sep_char);
+							printf("0%c", fh->options->sep_char);
 							break;
 						case FAUP_INPUT_SOURCE_PIPE:
 						case FAUP_INPUT_SOURCE_FILE:
-							printf("%ld%c", opts->current_line, opts->sep_char);
+							printf("%ld%c", fh->options->current_line, fh->options->sep_char);
 							break;
 					}
 			}
-			faup_output_csv(fh, opts, out);
+			faup_output_csv(fh, fh->options, out);
 			break;
 		case FAUP_OUTPUT_JSON:
-			faup_output_json(fh, opts, out);
+			faup_output_json(fh, fh->options, out);
 			break;
 		default:
-			fprintf(stderr, "Error: unknown output option %d\n", opts->output);
+			fprintf(stderr, "Error: unknown output option %d\n", fh->options->output);
 	}
 }

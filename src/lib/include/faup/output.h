@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-void faup_output(faup_handler_t const* fh, faup_options_t *opts, FILE* out);
+void faup_output(faup_handler_t *fh, FILE* out);
 
 #ifdef __cplusplus
 }

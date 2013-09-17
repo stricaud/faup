@@ -22,6 +22,7 @@
 #include <faup/tld-tree.h>
 #include <faup/features.h>
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -83,6 +84,8 @@ struct _faup_options_t {
   faup_url_field_t fields;
   faup_browser_emulation_t emulation;
   faup_modules_exec_t exec_modules;
+  char **modules_argv;
+  int modules_argc;
 };
 typedef struct _faup_options_t faup_options_t;
 
