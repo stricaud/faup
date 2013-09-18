@@ -30,6 +30,8 @@ extern "C" {
 enum _faup_output_t {
 	FAUP_OUTPUT_CSV,
 	FAUP_OUTPUT_JSON,
+	FAUP_OUTPUT_MODULE,
+
 };
 typedef enum _faup_output_t faup_output_t;
 enum _faup_url_field_t {

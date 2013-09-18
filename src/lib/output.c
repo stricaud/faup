@@ -226,6 +226,9 @@ void faup_output(faup_handler_t *fh, FILE* out)
 		case FAUP_OUTPUT_JSON:
 			faup_output_json(fh, fh->options, out);
 			break;
+		case FAUP_OUTPUT_MODULE:
+			// We don't do a thing since our modules did 
+			break;
 		default:
 			fprintf(stderr, "Error: unknown output option %d\n", fh->options->output);
 	}

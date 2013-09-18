@@ -43,6 +43,9 @@ char *faup_get_version(void)
 
 void faup_terminate(faup_handler_t *fh)
 {
+#ifdef FAUP_LUA_MODULES
+    faup_modules_terminate(fh->modules);
+#endif
 	free(fh);
 }
 

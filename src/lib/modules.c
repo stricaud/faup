@@ -49,7 +49,6 @@ int faup_modules_new(faup_handler_t *fh)
 
 void faup_modules_terminate(faup_modules_t *modules)
 {
-	#if 0
 	if (!modules) {
 		return;
 	}
@@ -65,7 +64,6 @@ void faup_modules_terminate(faup_modules_t *modules)
 	}
 	free(modules->module);
 	free(modules);
-	#endif
 }
 
 faup_modules_t *faup_modules_load_from_datadir(void)
