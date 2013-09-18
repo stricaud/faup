@@ -80,8 +80,14 @@ faup_modules_t *faup_modules_load_from_datadir(void)
 	return modules;
 }
 
-faup_modules_t *faup_modules_load_from_arg(char **argc, int argv)
+faup_modules_t *faup_modules_load_from_arg(char **argv, int argc)
 {
+	int count;
+
+	for (count = 0; count < argc; count++) {
+		printf("arg:%s\n", argv[count]);
+	}
+
 	return NULL;
 }
 

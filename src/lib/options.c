@@ -35,9 +35,16 @@ faup_options_t *faup_options_new(void)
 
 void faup_options_free(faup_options_t *opts)
 {
+	int i;
 	if (opts) {
 		faup_options_disable_tld_above_one(opts);		
 	}
+
+	// Clear modules arguments
+	for (i = 0; i < opts->modules_argc; i++) {
+		free(opts->modules_argv[i]);
+	}
+
 	free(opts);
 }
 void faup_options_defaults(faup_options_t *opts)
@@ -49,6 +56,8 @@ void faup_options_defaults(faup_options_t *opts)
 	opts->current_line = 1;
 	opts->output = FAUP_OUTPUT_CSV;
 	opts->exec_modules = FAUP_MODULES_EXECPATH;
+	opts->modules_argv = NULL;
+	opts->modules_argc = 0;
 
 	faup_options_enable_tld_above_one(opts);
 
