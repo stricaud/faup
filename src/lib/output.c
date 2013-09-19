@@ -173,6 +173,8 @@ void faup_output(faup_handler_t *fh, FILE* out)
 	module_executed = faup_modules_url_output(fh, out);
 #endif
 
+	//faup_features_debug("", &fh->faup.features);
+
 	switch(fh->options->output) {
 		case FAUP_OUTPUT_CSV:
 			faup_output_csv_header(fh, fh->options, out);

@@ -26,6 +26,7 @@
 SRC_TEST_DIR="${faup-project_SOURCE_DIR}/src/tests"
 BIN_TEST_DIR="${faup-project_BINARY_DIR}/src/tests"
 FAUP_DATA_DIR="${faup-project_SOURCE_DIR}/src/data"
+FAUP_MODULES_DIR="${faup-project_SOURCE_DIR}/src/lib/modules"
 FAUP_TOOL="${faup-project_BINARY_DIR}/src/tools/faup"
 
 URLS="$SRC_TEST_DIR/urls.txt"
@@ -150,6 +151,25 @@ function test_issue
     exit $RET
 }
 
+function test_module
+{
+    MODULE_NAME=$1
+
+    FAUP_OPTIONS=$(cat $SRC_TEST_DIR/modules/$1.options)
+    REF_FILE="$SRC_TEST_DIR/modules/$1.ref"
+    URLS_FILE="$SRC_TEST_DIR/modules/$1"
+
+    CMD="$FAUP_TOOL -m $MODULE_NAME $FAUP_OPTIONS"
+
+    # Execute faup on issues/ticket-id and compare to the reference output
+    $CMD < "$URLS_FILE" > "$URLS_CMP" ||exit $1
+    diff -u "$URLS_CMP" "$REF_FILE" >/dev/null
+    RET=$?
+    if [ $RET -eq 0 ]; then rm "$URLS_CMP"; fi
+
+    exit $RET
+}
+
 #
 # Main
 #
@@ -179,6 +199,7 @@ case $1 in
     issue) test_issue $2;;
     url_arg) test_argument "http://foo:bar@www3.altavista.digital.com:8080/index.php1?tada=da&fremo=genial#anchor1234" "$SRC_TEST_DIR/ref-files/argument.txt";;
     file_arg) test_argument $URLS "$SRC_TEST_DIR/ref-files/urls.txt.vanilla";;
+    module) test_module $2;;
     *) echo "Unknown option '$1'"
     exit 42
     ;;

@@ -116,7 +116,7 @@ bool is_ipv6(const char* str, const size_t n)
 	return false;
 }
 
-int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len)
+int faup_decode(faup_handler_t *fh, const char *url, size_t url_len)
 {
 	uint32_t total_size = 0;
 
@@ -138,6 +138,7 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len)
 		if (url_transformed_by_modules) {
 			fh->faup.org_str = url_transformed_by_modules->url; // FIXME: Change to 'url' when the output has changed to reflect new way of doing with lua stuff
 			faup_features_find(fh, url_transformed_by_modules->url, url_transformed_by_modules->url_len);
+			url_len = url_transformed_by_modules->url_len;
 		}
 	}
 	if (!url_transformed_by_modules) {
@@ -237,7 +238,7 @@ int faup_decode(faup_handler_t *fh, const char *url, const size_t url_len)
 									// Grab the TLD with us
 									url_features->domain.size = next_valid_token_pos - domain_pos;
 
-									// subdomaing is what remains of the host
+									// subdomaing is what remains from the host
 									if (url_features->domain.pos > 1) {
 										url_features->subdomain.pos = url_features->host.pos;
 										url_features->subdomain.size = url_features->domain.pos - url_features->host.pos - 1;

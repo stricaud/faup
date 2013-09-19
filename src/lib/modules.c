@@ -283,6 +283,7 @@ faup_modules_transformed_url_t *faup_modules_decode_url_start(faup_handler_t con
 	}
 
 	if (new_url) {
+		//printf("new url=%s, size=%zd\n", new_url, strlen(new_url));
 		transformed_url->url = new_url;
 		transformed_url->url_len = strlen(new_url);
 	} else {

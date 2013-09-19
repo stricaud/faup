@@ -168,8 +168,9 @@ int main(int argc, char **argv)
 	  			faup_opts->modules_argv[faup_opts->modules_argc] = strdup(optarg);
 
 	  			faup_opts->modules_argc++;
+	  			has_module = 1;
 	  		}
-	  		has_module = 1;
+	  		
 
 	  		// In case we parse the next option, we shall stop!
 	  		// In case the next argument is the last, that means this is the url, not the module
