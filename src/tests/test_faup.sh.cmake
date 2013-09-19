@@ -131,11 +131,6 @@ function test_json_tld_one_only
     test_generic "-o json -t" "$SRC_TEST_DIR/ref-files/urls.txt.json_tld_one_only"
 }
 
-function test_emulation_ie
-{
-    test_generic "-e ie" "$SRC_TEST_DIR/ref-files/urls.txt.emulation_ie"
-}
-
 function test_issue
 {
     ISSUE_NB=$1
@@ -184,7 +179,6 @@ case $1 in
     issue) test_issue $2;;
     url_arg) test_argument "http://foo:bar@www3.altavista.digital.com:8080/index.php1?tada=da&fremo=genial#anchor1234" "$SRC_TEST_DIR/ref-files/argument.txt";;
     file_arg) test_argument $URLS "$SRC_TEST_DIR/ref-files/urls.txt.vanilla";;
-    ie) test_emulation_ie;;
     *) echo "Unknown option '$1'"
     exit 42
     ;;
