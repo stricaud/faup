@@ -33,9 +33,7 @@ int faup_modules_new(faup_handler_t *fh)
 		break;
 		case FAUP_MODULES_EXECPATH:
 			fh->modules = faup_modules_load_from_datadir();
-//			if (fh->modules) {
-//				new_url = faup_modules_exec_url_in_by_module_name(fh->modules, "sample_uppercase.lua", url);
-//			}
+
 		break;
 		case FAUP_MODULES_EXECARG:
 			fh->modules = faup_modules_load_from_arg(fh->options->modules_argv, fh->options->modules_argc);
@@ -72,8 +70,17 @@ faup_modules_t *faup_modules_load_from_datadir(void)
 	int count = 0;
 
 	modules = malloc(sizeof(faup_modules_t));
+	if (!modules) {
+		fprintf(stderr, "Cannot allocate modules!\n");
+		return NULL;
+	}
 	modules->nb_modules = faup_modules_foreach_filelist(NULL, NULL, NULL);
 	modules->module = malloc(sizeof(faup_module_t) * modules->nb_modules);
+	if (!modules->module) {
+		fprintf(stderr, "Cannot allocate modules->module!\n");
+		free(modules);
+		return NULL;
+	}
 	//memset(modules, 0, sizeof(faup_module_t) * modules->nb_modules);
 	faup_modules_foreach_filelist(modules, faup_module_register, (int *)count);
 
@@ -82,24 +89,87 @@ faup_modules_t *faup_modules_load_from_datadir(void)
 
 faup_modules_t *faup_modules_load_from_arg(char **argv, int argc)
 {
+	faup_modules_t *modules = NULL;
+	FILE *fp;
 	int count;
+	int modules_that_do_not_count = 0;
+	int retval;
 
+
+	bool a_module_was_registered;
+
+	modules = malloc(sizeof(faup_modules_t));
+	if (!modules) {
+		fprintf(stderr, "Cannot allocate modules in %s\n", __FUNCTION__);
+		return NULL;
+	}
+	modules->module = malloc(sizeof(faup_module_t) * argc);
+	modules->nb_modules = 0;
+	if (!modules->module) {
+		fprintf(stderr, "Cannot allocate modules->module in %s\n", __FUNCTION__);
+		free(modules);
+		return NULL;
+	}
 	for (count = 0; count < argc; count++) {
-		printf("arg:%s\n", argv[count]);
+		a_module_was_registered = false;
+		// We try first to open a local file
+		fp = fopen(argv[count], "r");
+		if (fp) { // Found
+			fclose(fp);
+
+			retval = faup_module_register(modules, NULL, argv[count], NULL, count - modules_that_do_not_count);
+			if (retval == 0) {
+				modules->nb_modules++;
+				a_module_was_registered = true;
+			}
+		} else {
+			// The module was not discovered localy, so we get it from "modules_available"
+			char *load_path;
+			char *available_module;
+
+			retval = asprintf(&load_path, "modules_available%s%s", FAUP_OS_DIRSEP, argv[count]);
+			available_module = faup_datadir_get_file(load_path);
+			free(load_path);
+
+			fp = fopen(available_module, "r");
+			if (fp) {
+				retval = faup_module_register(modules, NULL, available_module, NULL, count - modules_that_do_not_count);
+				if (retval == 0) {
+					modules->nb_modules++;
+					a_module_was_registered = true;
+
+				}
+				fclose(fp);
+			} else {
+				fprintf(stderr, "Cannot register the module '%s': Not found in modules_available nor local path!\n", argv[count]);
+			}
+
+		}
+
+		if (!a_module_was_registered) {
+			modules_that_do_not_count++;
+		}
+
 	}
 
-	return NULL;
+	return modules;
 }
 
 
-void faup_module_register(faup_modules_t *modules, char *modules_dir, char *module, void *user_data, int count)
+int faup_module_register(faup_modules_t *modules, char *modules_dir, char *module, void *user_data, int count)
 {
 	int retval;
 
-	retval = asprintf(&modules->module[count].module_path, "%s%s%s", modules_dir, FAUP_OS_DIRSEP, module);
-	if (retval < 0) {
-		fprintf(stderr, "Cannot allocate in %s with parameter '%s%s%s'\n", __FUNCTION__, modules_dir, FAUP_OS_DIRSEP, module);
-		return;
+//	printf("Register module with module %s and count %d\n", module, count);
+
+	if (modules_dir) {
+		retval = asprintf(&modules->module[count].module_path, "%s%s%s", modules_dir, FAUP_OS_DIRSEP, module);
+		if (retval < 0) {
+			fprintf(stderr, "Cannot allocate in %s with parameter '%s%s%s'\n", __FUNCTION__, modules_dir, FAUP_OS_DIRSEP, module);
+			return -1;
+		}
+	} else {
+		modules->module[count].module_path = strdup(module);
 	}
 
 	modules->module[count].module_name = strdup(module);
@@ -118,14 +188,15 @@ void faup_module_register(faup_modules_t *modules, char *modules_dir, char *modu
 	retval = lua_pcall(modules->module[count].lua_state, 0, 0, 0);
 	if (retval) goto err;
 
-	return;
+	return 0;
 
 err:
-	fprintf(stderr, "*** Error: %s\n", lua_tostring(modules->module[count].lua_state, -1));
+	fprintf(stderr, "*** Error(%s): %s\n", __FUNCTION__, lua_tostring(modules->module[count].lua_state, -1));
+	return -1;
 }
 
 
-int faup_modules_foreach_filelist(faup_modules_t *modules, void (*cb_modules_foreach)(faup_modules_t *modules, char *modules_dir, char *module, void *user_data, int count), void *user_data)
+int faup_modules_foreach_filelist(faup_modules_t *modules, int (*cb_modules_foreach)(faup_modules_t *modules, char *modules_dir, char *module, void *user_data, int count), void *user_data)
 {
 	char *modules_dir;
 	DIR  *modules_dir_fp;
@@ -142,7 +213,7 @@ int faup_modules_foreach_filelist(faup_modules_t *modules, void (*cb_modules_for
 		if (modules_dir_file->d_name[0] != '.') {
 			size_t filelen = strlen(modules_dir_file->d_name);
 			if (filelen > FAUP_MODULE_NAME_MAXLEN) {
-				fprintf(stderr, "*** Error: Module file name too long (>128). Won't execute!\n");
+				fprintf(stderr, "*** Error(%s): Module file name too long (>128). Won't execute!\n", __FUNCTION__);
 				count++;
 				continue;
 			}
@@ -161,45 +232,6 @@ int faup_modules_foreach_filelist(faup_modules_t *modules, void (*cb_modules_for
 void faup_modules_list(faup_modules_t *modules, char *modules_dir, char *module, void *user_data, int count)
 {
 	printf("%s\n", module);
-}
-
-
-const char *faup_modules_exec_url_in_by_module_name(faup_modules_t *modules, char *module, const char *url)
-{
-	int retval;
-	int	count = 0;
-
-	if (!modules) {
-		fprintf(stderr, "%s was given no modules struct!\n", __FUNCTION__);
-		return NULL;
-	}
-
-	while (count < modules->nb_modules) {
-		if (!strcmp(module, modules->module[count].module_name)) {
-			lua_getglobal(modules->module[count].lua_state, "faup_url_in");
-			lua_pushstring(modules->module[count].lua_state, url);
-
-			retval = lua_pcall(modules->module[count].lua_state, 1, 1, 0);
-			if (retval) goto err;
-
-			return lua_tostring(modules->module[count].lua_state, -1);
-		}
-
-		count++;
-	}
-
-	// We have not executed any module
-	return NULL;
-
-err:
-	fprintf(stderr, "*** Error: %s\n", lua_tostring(modules->module[count].lua_state, -1));
-	return NULL;
-}
-
-int faup_modules_exec_extracted_fields(int module_id, lua_State *lua_state)
-{
-
-  return 0;
 }
 
 faup_modules_transformed_url_t *faup_modules_decode_url_start(faup_handler_t const* fh, const char *url, size_t url_len)
@@ -231,7 +263,7 @@ faup_modules_transformed_url_t *faup_modules_decode_url_start(faup_handler_t con
 			}
 			retval = lua_pcall(modules->module[count].lua_state, 1, 1, 0);
 			if (retval) {
-				fprintf(stderr, "*** Error: %s\n", lua_tostring(modules->module[count].lua_state, -1));
+				fprintf(stderr, "*** Error(%s): %s\n", __FUNCTION__, lua_tostring(modules->module[count].lua_state, -1));
 				return NULL;
 			}
 

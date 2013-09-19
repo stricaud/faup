@@ -1,4 +1,4 @@
-#define _POSIX_SOURCE
+//#define _POSIX_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -164,15 +164,10 @@ int main(int argc, char **argv)
 	  		if (!has_module) {
 	  			// This is our first argument
 	  			// we push our first arg: 'optarg'
-
-#if 0
 	  			faup_opts->modules_argv = realloc(faup_opts->modules_argv, faup_opts->modules_argc + 1);
-	  			faup_opts->modules_argv[faup_opts->modules_argc] = malloc(strlen(optarg));
-	  			//strcpy(optarg, faup_opts->modules_argv[faup_opts->modules_argc]);
-	  			faup_opts->modules_argv[faup_opts->modules_argc] = "first";
+	  			faup_opts->modules_argv[faup_opts->modules_argc] = strdup(optarg);
 
 	  			faup_opts->modules_argc++;
-#endif
 	  		}
 	  		has_module = 1;
 
@@ -181,15 +176,10 @@ int main(int argc, char **argv)
 	  		if ((argv[optind][0] == '-') | (optind == argc - 1)) {
 	  			break;
 	  		}
-#if 0
-	  		// we push our next arg: argv[optind]
-	  		//printf("argv[optin]:%s\n", argv[optind]);
+
 	  		faup_opts->modules_argv = realloc(faup_opts->modules_argv, faup_opts->modules_argc + 1);
-	  		faup_opts->modules_argv[faup_opts->modules_argc] = malloc(strlen(argv[optind]));
-	  		//strcpy(argv[optind], faup_opts->modules_argv[faup_opts->modules_argc]);
-	  		faup_opts->modules_argv[faup_opts->modules_argc] = "second";
-	 		faup_opts->modules_argc++;
-#endif
+	  		faup_opts->modules_argv[faup_opts->modules_argc] = strdup(argv[optind]);
+	  		faup_opts->modules_argc++;
 	  	}
 
 	  	if (has_module) {

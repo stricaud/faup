@@ -55,11 +55,11 @@ int faup_modules_new(faup_handler_t *fh);
 void faup_modules_terminate(faup_modules_t *modules);
 faup_modules_t *faup_modules_load_from_datadir(void);
 faup_modules_t *faup_modules_load_from_arg(char **argc, int argv);
-void faup_module_register(faup_modules_t *modules, char *modules_dir, char *module, void *user_data, int count);
+int faup_module_register(faup_modules_t *modules, char *modules_dir, char *module, void *user_data, int count);
 const char *faup_modules_exec_url_in_by_module_name(faup_modules_t *modules, char *module, const char *url);
 
 // Returns the number of modules
-int faup_modules_foreach_filelist(faup_modules_t *modules, void (*cb_modules_foreach)(faup_modules_t *modules, char *modules_dir, char *module, void *user_data, int count), void *user_data);
+int faup_modules_foreach_filelist(faup_modules_t *modules, int (*cb_modules_foreach)(faup_modules_t *modules, char *modules_dir, char *module, void *user_data, int count), void *user_data);
 void faup_modules_list(faup_modules_t *modules, char *modules_dir, char *module, void *user_data, int count);
 
 faup_modules_transformed_url_t *faup_modules_decode_url_start(faup_handler_t const* fh, const char *url, size_t url_len);
