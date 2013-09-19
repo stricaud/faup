@@ -215,8 +215,11 @@ int faup_modules_foreach_filelist(faup_modules_t *modules, int (*cb_modules_fore
 	modules_dir = faup_datadir_get_file("modules_enabled");
 	modules_dir_fp = opendir(modules_dir);
 	if (!modules_dir_fp) {
+		free(modules_dir);
 		return -1;
 	}
+	free(modules_dir);
+
 	modules_dir_file = readdir(modules_dir_fp);
 	while (modules_dir_file) {
 		if (modules_dir_file->d_name[0] != '.') {
