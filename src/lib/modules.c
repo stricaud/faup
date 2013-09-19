@@ -75,6 +75,11 @@ faup_modules_t *faup_modules_load_from_datadir(void)
 		return NULL;
 	}
 	modules->nb_modules = faup_modules_foreach_filelist(NULL, NULL, NULL);
+	if (modules->nb_modules <= 0) {
+		// We have no modules enabled
+		free(modules);
+		return NULL;
+	}
 	modules->module = malloc(sizeof(faup_module_t) * modules->nb_modules);
 	if (!modules->module) {
 		fprintf(stderr, "Cannot allocate modules->module!\n");
@@ -249,7 +254,7 @@ faup_modules_transformed_url_t *faup_modules_decode_url_start(faup_handler_t con
 
 	transformed_url = malloc(sizeof(faup_modules_transformed_url_t));
 	if (!transformed_url) {
-		fprintf(stderr, "Cannot allocate URL for transformed url by modules!\n");
+		fprintf(stderr, "(%s) Cannot allocate URL for transformed url by modules!\n", __FUNCTION__);
 		return NULL;
 	}
 
