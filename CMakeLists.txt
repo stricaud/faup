@@ -15,6 +15,8 @@ Remove the CMakeCache.txt file and try again from another folder, e.g.:
 ")
 endif()
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${faup-project_SOURCE_DIR}/cmake)
+
 include(CMakeOptions.txt)
 
 set(CMAKE_BUILD_TYPE "Release")
