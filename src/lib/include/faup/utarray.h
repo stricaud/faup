@@ -34,6 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _UNUSED_ 
 #endif
 
+#ifdef LINUX
+#define __USE_BSD
+#endif
+
 #include <stddef.h>  /* size_t */
 #include <string.h>  /* memset, etc */
 #include <stdlib.h>  /* exit */

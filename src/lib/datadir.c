@@ -14,6 +14,11 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
+#ifdef LINUX
+#define _GNU_SOURCE
+#endif
+
+#include <stdio.h>
 #include <stdlib.h>
 
 #ifndef WIN32

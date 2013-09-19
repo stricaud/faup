@@ -14,10 +14,15 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
+#ifdef LINUX
+#define _GNU_SOURCE
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
 #include <string.h>
+#include <stdint.h>
 
 #include <faup/faup.h>
 #include <faup/datadir.h>
@@ -86,7 +91,7 @@ faup_modules_t *faup_modules_load_from_datadir(void)
 		free(modules);
 		return NULL;
 	}
-	faup_modules_foreach_filelist(modules, faup_module_register, (void *)(int)count);
+	faup_modules_foreach_filelist(modules, faup_module_register, (void *)(intptr_t)count);
 
 	return modules;
 }

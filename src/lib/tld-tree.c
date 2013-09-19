@@ -20,6 +20,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef LINUX
+#define __USE_BSD
+#endif
+
+
 #include <faup/faup.h>
 #include <faup/tld.h>
 #include <faup/tld-tree.h>

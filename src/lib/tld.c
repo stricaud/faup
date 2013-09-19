@@ -24,6 +24,10 @@
 	#include <sys/stat.h>
 #endif
 
+#ifdef LINUX
+#define __USE_BSD
+#endif
+
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
