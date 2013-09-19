@@ -31,7 +31,6 @@ ${WIN32_PORTABLE}
 ${LUA_MODULES_SRC_FILES}
 datadir.c
 decode.c
-emulation.c
 features.c
 faup.c
 options.c
@@ -45,7 +44,6 @@ set(FAUP_LIB_HDR_FILES
 include/faup/compat.h
 include/faup/datadir.h
 include/faup/decode.h
-include/faup/emulation.h
 include/faup/features.h
 include/faup/faup.h
 ${LUA_MODULES_HDR_FILES}

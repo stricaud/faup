@@ -1,0 +1,31 @@
+ * Implements the browser emulation of uri handling in some particular cases.
+ * Naturally, this kind of url will be handled by faup this way:
+ * $ faup -f tld http://www.example.com?foo:bar
+ * com?foo
+ *
+ * While we all recognized this is not a problem in faup, it is still a problem
+ * since browsers such as Firefox will replace www.example.com?foo:bar with
+ * www.example.com/?foo:bar
+ * 
+ * It can be processed by faup to retrieve the TLD properly:
+ * $ faup -f tld http://www.example.com/?foo:bar
+ * com
+ *
+ * Faup is here to remove the hassle from getting a TLD, since browsers behave that
+ * way, faup can emulate their behavior.
+ * For the moment, only firefox is implemented. The user tool must provide a flag
+ * that can take two strings: firefox or any.
+ * To emulate firefox, simply type faup -b firefox
+ * To emulate any kind of browser, simply type faup -b any
+ * 'any' will summarize the best of the different behaviors among the different browsers
+ * 
+ * A funny thing would be to be able to recognize the browser of our client is using just
+ * by looking at DNS requests :)
+ *
+ * Resources:
+ * http://mxr.mozilla.org/mozilla-central/source/netwerk/base/public/nsIURI.idl 
+ * http://blogs.msdn.com/b/ie/archive/2005/08/15/452006.aspx
+ *
+ * Security issues to consider:
+ * http://archive.cert.uni-stuttgart.de/bugtraq/2005/02/msg00123.html
+ 
