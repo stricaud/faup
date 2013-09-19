@@ -1,8 +1,14 @@
-//#define _POSIX_SOURCE
+
+#ifdef LINUX
+#define _POSIX_SOURCE
+#define _BSD_SOURCE
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <unistd.h>
 
 #ifdef WIN32
 	#include "win32-getopt.h"

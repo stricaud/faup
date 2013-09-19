@@ -57,6 +57,8 @@ file(STRINGS VERSION VERSION)
 set(FAUP_VERSION ${VERSION})
 configure_file("src/lib/include/faup/version.h.cmake" "src/lib/include/faup/version.h")
 
+
+message("CMake system: ${CMAKE_SYSTEM_NAME}")
 # Mac OS Specifics
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   add_definitions(-DMACOS=1)
@@ -64,6 +66,10 @@ endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "WIN32")
   add_definitions(-DWIN32=1)
+endif()
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  add_definitions(-DLINUX=1)
 endif()
 
 set(FAUP_INCLUDE_DIRS "${faup-project_SOURCE_DIR}/src/lib/include/" "${faup-project_BINARY_DIR}/src/lib/include")
