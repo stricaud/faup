@@ -58,15 +58,6 @@ enum _faup_input_source_t {
 };
 typedef enum _faup_input_source_t faup_input_source_t;
 
-enum _faup_browser_emulation_t {
-	FAUP_BROWSER_EMULATION_NONE,
-	FAUP_BROWSER_EMULATION_ALL,		
-	FAUP_BROWSER_EMULATION_IE,
-	FAUP_BROWSER_EMULATION_SAFARI,
-	FAUP_BROWSER_EMULATION_FIREFOX,
-};
-typedef enum _faup_browser_emulation_t faup_browser_emulation_t;
-
 enum _faup_modules_exec_t {
 	FAUP_MODULES_NOEXEC,
 	FAUP_MODULES_EXECPATH, // Exec from what we have in our datadir
@@ -84,7 +75,6 @@ struct _faup_options_t {
   void *tld_tree; /* TLDNode */
   int tld_greater_extraction;
   faup_url_field_t fields;
-  faup_browser_emulation_t emulation;
   faup_modules_exec_t exec_modules;
   char **modules_argv;
   int modules_argc;

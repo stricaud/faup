@@ -96,7 +96,6 @@ void print_help(char **argv)
 	printf("Options:\n");
 	printf("-a\tskip provided argument file open check\n");
 	printf("-d {delimiter}\n\twill separate the fields with the wanted delimiter\n");
-	printf("-e {browser_name}\n\temulate the browser name ('ie' for internet explorer)\n");
 	printf("-f {scheme|credential|subdomain|domain|domain_without_tld|host|tld|port|resource_path|query_string|fragment}\n\tfield to extract\n");
 	printf("-h\tprint the header\n");
 	printf("-l\tprefix with the line number (csv only)\n");
@@ -140,11 +139,6 @@ int main(int argc, char **argv)
 	    	faup_opts->sep_char = optarg[0];
 	    }
 	    break;	 
-	  case 'e':
-	  	if (!strcmp("ie", optarg)) {
-	  		faup_opts->emulation = FAUP_BROWSER_EMULATION_IE;
-	  	}
-	  	break;
 	  case 'p':
 	    faup_opts->print_header = 1;
 	    break;

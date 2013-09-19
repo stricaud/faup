@@ -19,7 +19,6 @@
 
 #include <faup/faup.h>
 #include <faup/output.h>
-#include <faup/emulation.h>
 
 #ifdef FAUP_LUA_MODULES
 #include <faup/modules.h>
@@ -29,40 +28,9 @@ void faup_output_show(faup_handler_t const* fh, faup_options_t *opts, const faup
 {
 
 	if (faup_features_exist(feature)) {
-		char *emulation_str = NULL;
 		uint32_t counter = 0;
 		const char *tmpbuf = NULL;
 		tmpbuf = &fh->faup.org_str[feature.pos];
-
-		switch (opts->emulation) {
-			case FAUP_BROWSER_EMULATION_IE:
-				emulation_str = faup_emulation_internet_explorer(fh, feature);
-				if (emulation_str) {
-					fprintf(out, "%s", emulation_str);
-					free(emulation_str);
-					return;
-				} 
-			break;
-			case FAUP_BROWSER_EMULATION_SAFARI:
-				emulation_str = faup_emulation_safari(fh, feature);
-				if (emulation_str) {
-					fprintf(out, "%s", emulation_str);
-					free(emulation_str);
-					return;
-				} 
-			break;
-			case FAUP_BROWSER_EMULATION_FIREFOX:
-				emulation_str = faup_emulation_firefox(fh, feature);
-				if (emulation_str) {
-					fprintf(out, "%s", emulation_str);
-					free(emulation_str);
-					return;
-				} 
-			break;
-			case FAUP_BROWSER_EMULATION_NONE:
-			default:
-				break;
-		}
 
 		while (counter < feature.size) {
 
@@ -76,7 +44,6 @@ void faup_output_show(faup_handler_t const* fh, faup_options_t *opts, const faup
 			counter++;
 
 		}
-
 
 	}
 }

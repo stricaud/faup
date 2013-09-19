@@ -62,8 +62,6 @@ void faup_options_defaults(faup_options_t *opts)
 	faup_options_enable_tld_above_one(opts);
 
 	opts->fields = FAUP_URL_FIELD_SCHEME | FAUP_URL_FIELD_CREDENTIAL | FAUP_URL_FIELD_SUBDOMAIN | FAUP_URL_FIELD_DOMAIN | FAUP_URL_FIELD_DOMAIN_WITHOUT_TLD | FAUP_URL_FIELD_HOST | FAUP_URL_FIELD_TLD | FAUP_URL_FIELD_PORT | FAUP_URL_FIELD_RESOURCE_PATH | FAUP_URL_FIELD_QUERY_STRING | FAUP_URL_FIELD_FRAGMENT;
-
-	opts->emulation = FAUP_BROWSER_EMULATION_NONE;
 }
 
 void faup_options_enable_tld_above_one(faup_options_t *opts)
