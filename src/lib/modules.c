@@ -86,8 +86,7 @@ faup_modules_t *faup_modules_load_from_datadir(void)
 		free(modules);
 		return NULL;
 	}
-	//memset(modules, 0, sizeof(faup_module_t) * modules->nb_modules);
-	faup_modules_foreach_filelist(modules, faup_module_register, (int *)count);
+	faup_modules_foreach_filelist(modules, faup_module_register, (void *)(int)count);
 
 	return modules;
 }
