@@ -45,16 +45,16 @@ Simply pipe or give your url as a parameter:
 
 If that url is a file, multiple values will be unpacked:
 
-   $ cat urls.txt 
-   https://foo:bar@example.com
-   localhost
-   www.mozilla.org:80/index.php
+   	$ cat urls.txt 
+   	https://foo:bar@example.com
+   	localhost
+   	www.mozilla.org:80/index.php
 
-   $ faup -p urls.txt 
-   scheme,credential,subdomain,domain,domain_without_tld,host,tld,port,resource_path,query_string,fragment
-   https,foo:bar,,example.com,example,example.com,com,,,,
-   ,,,localhost,localhost,localhost,,,,,
-   ,,www,mozilla.org,mozilla,www.mozilla.org,org,80,/index.php,,
+   	$ faup -p urls.txt 
+   	scheme,credential,subdomain,domain,domain_without_tld,host,tld,port,resource_path,query_string,fragment
+   	https,foo:bar,,example.com,example,example.com,com,,,,
+   	,,,localhost,localhost,localhost,,,,,
+   	,,www,mozilla.org,mozilla,www.mozilla.org,org,80,/index.php,,
 
 Extract only the TLD field
 --------------------------
