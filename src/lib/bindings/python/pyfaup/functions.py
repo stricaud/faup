@@ -5,7 +5,7 @@ from ctypes import *
 from .bind import *
 
 faup_get_version = bind("faup_get_version", c_char_p)
-faup_init = bind("faup_init", c_void_p)
+faup_init = bind("faup_init", c_void_p, c_void_p)
 faup_decode = bind("faup_decode", None, c_void_p, c_char_p, c_size_t, c_void_p)
 faup_terminate = bind("faup_terminate", None, c_void_p)
 

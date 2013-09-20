@@ -32,6 +32,11 @@ int faup_modules_new(faup_handler_t *fh)
 {
 	int count;
 
+	if (!fh->options) {
+		fprintf(stderr, "Options have not been initialized! Make sure they are set before calling %s\n", __FUNCTION__);
+		return -1;
+	}
+
 	switch(fh->options->exec_modules) {
 		case FAUP_MODULES_NOEXEC:
 			fh->modules = NULL;

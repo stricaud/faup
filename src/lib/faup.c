@@ -28,7 +28,12 @@ faup_handler_t *faup_init(faup_options_t *options)
     int retval;
 
 	fh = malloc(sizeof(faup_handler_t));
-    fh->options = options;
+
+    if (options) {
+        fh->options = options;
+    } else {
+        fh->options = faup_options_new();
+    }
 #ifdef FAUP_LUA_MODULES
     retval = faup_modules_new(fh);
 #endif
