@@ -10,8 +10,8 @@ class Faup(object):
     Faup Python Library 
     """
     def __init__(self):
-        self.fh = faup_init(None)
         self.options = faup_options_new()
+        self.fh = faup_init(self.options)
         self.decoded = False
         self.retval = {}
 
