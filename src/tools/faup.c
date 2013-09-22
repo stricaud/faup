@@ -269,6 +269,7 @@ int main(int argc, char **argv)
 		if (argc < 2) {
 			print_help(argv);
 			faup_options_free(faup_opts);
+			faup_terminate(fh);
 			exit(1);
 		}
 
