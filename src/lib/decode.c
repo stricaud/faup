@@ -116,11 +116,11 @@ bool is_ipv6(const char* str, const size_t n)
 	return false;
 }
 
-int faup_decode(faup_handler_t *fh, const char *url, size_t url_len)
+const char *faup_decode(faup_handler_t *fh, const char *url, size_t url_len)
 {
 	uint32_t total_size = 0;
-
 	int next_valid_token_pos = 0;
+	const char *retval_url = url;
 
 #ifdef FAUP_LUA_MODULES
 	faup_modules_transformed_url_t *url_transformed_by_modules = NULL;
@@ -129,7 +129,7 @@ int faup_decode(faup_handler_t *fh, const char *url, size_t url_len)
 	faup_features_t *url_features = NULL;
 
 	if (!url) {
-		return FAUP_URL_EMPTY;
+		return NULL;
 	}
 
 #ifdef FAUP_LUA_MODULES
@@ -139,6 +139,7 @@ int faup_decode(faup_handler_t *fh, const char *url, size_t url_len)
 			fh->faup.org_str = url_transformed_by_modules->url; // FIXME: Change to 'url' when the output has changed to reflect new way of doing with lua stuff
 			faup_features_find(fh, url_transformed_by_modules->url, url_transformed_by_modules->url_len);
 			url_len = url_transformed_by_modules->url_len;
+			retval_url = url_transformed_by_modules->url;
 		}
 	}
 	if (!url_transformed_by_modules) {
@@ -328,7 +329,7 @@ int faup_decode(faup_handler_t *fh, const char *url, size_t url_len)
 			}
 		}
 		//faup_features_debug(url, url_features);
-		return 0;
+		return retval_url;
 	}
 
 	// FIXME: we never go here because of the 'return 0' just here and in error_lookup() !
@@ -336,5 +337,5 @@ int faup_decode(faup_handler_t *fh, const char *url, size_t url_len)
 
 	/* FIXME: Such a message should not belong to the library */
 	fprintf(stderr, "Cannot parse the url: '%s'\n", url);
-	return FAUP_URL_PARSER_ERROR;
+	return NULL;
 }

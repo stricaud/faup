@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-int faup_decode(faup_handler_t *fh, const char *url, size_t url_size);
+const char *faup_decode(faup_handler_t *fh, const char *url, size_t url_size);
 
 #ifdef __cplusplus
 }

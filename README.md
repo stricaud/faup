@@ -12,8 +12,8 @@
 
 ## Documentation
 
-* [Library API documentation][libdoc]
 * [Command Line Tool][clidoc]
+* [Library API documentation][libdoc]
 
 ## Quick Start
 
@@ -43,9 +43,23 @@ Simply pipe or give your url as a parameter:
 	$ faup www.github.com
 	,,www,github.com,www.github.com,com,,,,
 
+If that url is a file, multiple values will be unpacked:
+
+   	$ cat urls.txt 
+   	https://foo:bar@example.com
+   	localhost
+   	www.mozilla.org:80/index.php
+
+   	$ faup -p urls.txt 
+   	scheme,credential,subdomain,domain,domain_without_tld,host,tld,port,resource_path,query_string,fragment
+   	https,foo:bar,,example.com,example,example.com,com,,,,
+   	,,,localhost,localhost,localhost,,,,,
+   	,,www,mozilla.org,mozilla,www.mozilla.org,org,80,/index.php,,
 
 Extract only the TLD field
 --------------------------
+
+Faup uses the [Mozilla list](http://mxr.mozilla.org/mozilla-central/source/netwerk/dns/effective_tld_names.dat?raw=1) to extract TLDs of level greater than one. Can handle exceptions, etc.
 
 	$ faup -f tld slashdot.org
 	org
@@ -53,8 +67,25 @@ Extract only the TLD field
 	$ faup -f tld www.bbc.co.uk
 	co.uk
 
-	$ faup -f tld -t www.bbc.co.uk
-	uk
+Json output, high level TLDs
+----------------------------
+
+The Json output can be called like this:
+
+	$ faup -o json www.takatoukiter.foobar.yokohama.jp
+	{
+		"scheme": "",
+		"credential": "",
+		"subdomain": "www",
+		"domain": "takatoukiter.foobar.yokohama.jp",
+		"domain_without_tld": "takatoukiter",
+		"host": "www.takatoukiter.foobar.yokohama.jp",
+		"tld": "foobar.yokohama.jp",
+		"port": "",
+		"resource_path": "",
+		"query_string": "",
+		"fragment": ""
+	}
 
 
 Building faup

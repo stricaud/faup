@@ -10,8 +10,8 @@ class Faup(object):
     Faup Python Library 
     """
     def __init__(self):
-        self.fh = faup_init(None)
         self.options = faup_options_new()
+        self.fh = faup_init(self.options)
         self.decoded = False
         self.retval = {}
 
@@ -33,7 +33,7 @@ class Faup(object):
         if sys.version.split('.')[0].split('.')[0]=='2':
             self.url = bytes(url)
 
-        faup_decode(self.fh, self.url, len(url), self.options)
+        self.url = faup_decode(self.fh, self.url, len(url))
         self.decoded = True
         self.retval = {}
         
