@@ -1,6 +1,6 @@
 ## Faup Library API
 
-The Faup library is designed to be embeded with no pain. The library is lightweight and the license is very permissive, so you can do whatever you want to. We just wanted to fix the url normalization problem and make that available for the general public, whatever you want to do with it. Of course, if you make a lot of money with it, sending over a truck full of beers to me will be much appreciated.
+The Faup library is designed to be embeded with no pain. The library is lightweight and the license is very permissive, so you can do whatever you want to. We just wanted to fix the url normalization problem and make that available for the general public, whatever you want to do with it.
 
 A great way to see how the C library can be used is to look at the [faup][fauptoolsrc] command line tool source code. It is a minimalistic program, first class citizen of the library. Every feature the library has can be activated for the command line.
 
@@ -14,7 +14,7 @@ Of course, speed is what we had in mind all the time. The mozilla.tlds file is l
 
 ### Python API
 
-[Click here][python-api.md] to access the documentation on the Python API.
+[Click here][pythonapi] to access the documentation on the Python API.
 
 ### C API
 
@@ -75,4 +75,4 @@ The output can also by controled in the same script if the function exists. For 
 
 
 [fauptoolsrc]: http://github.com/stricaud/faup/blob/master/src/tools/faup.c
-
+[pythonapi]: python-api.md
