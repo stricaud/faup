@@ -329,6 +329,11 @@ const char *faup_decode(faup_handler_t *fh, const char *url, size_t url_len)
 			}
 		}
 		//faup_features_debug(url, url_features);
+#ifdef FAUP_LUA_MODULES
+		if (url_transformed_by_modules) {
+		  free(url_transformed_by_modules);
+		}
+#endif // FAUP_LUA_MODULES
 		return retval_url;
 	}
 

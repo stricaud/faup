@@ -52,6 +52,8 @@ static int _faup_tld_tree_allocate_kid(TLDNode **Node, char c, bool EoT, bool mo
 {
 	if( (*Node)->kid != NULL )
 		return -1;
+
+	//	printf("kid\n");
 	
 	(*Node)->kid = calloc(1, sizeof(TLDNode));
 	if( (*Node)->kid == NULL )
@@ -70,6 +72,8 @@ static int _faup_tld_tree_allocate_sibling(TLDNode **Node, char c, bool EoT, boo
 {
 	if( (*Node)->sibling != NULL )
 		return -1;
+
+	//	printf("sibling\n");
 	
 	(*Node)->sibling = calloc(1, sizeof(TLDNode));
 	if( (*Node)->sibling== NULL ) {
@@ -247,9 +251,18 @@ TLDNode *faup_tld_tree_new(void)
 }
 
 
-void faup_tld_tree_free(TLDNode *Tree)
+void faup_tld_tree_free(TLDNode *tld_tree, TLDNode *last_tld_tree, int pos)
 {
-	free(Tree);
+  if (!tld_tree) return;
+
+  if (tld_tree->kid) {
+    faup_tld_tree_free(tld_tree->kid, tld_tree, pos+1);
+  }
+  if (tld_tree->sibling) {
+    faup_tld_tree_free(tld_tree->sibling, tld_tree, pos+1);
+  }
+
+  free(tld_tree);
 }
 
 /*

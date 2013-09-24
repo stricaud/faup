@@ -66,11 +66,14 @@ void faup_modules_terminate(faup_modules_t *modules)
 		if (modules->module[count].lua_state) {
 			lua_close(modules->module[count].lua_state);
 		}
-		free(modules->module[count].module_path);
+		if (modules->module[count].module_path) {
+		  free(modules->module[count].module_path);
+		}
 		free(modules->module[count].module_name);
 		count++;
 	}
-	free(modules->module);
+
+       	free(modules->module);
 	free(modules);
 }
 
@@ -141,6 +144,7 @@ faup_modules_t *faup_modules_load_from_arg(char **argv, int argc)
 			char *load_path;
 			char *available_module;
 
+			load_path = malloc(17 /* modules_available */ + 1 /* FAUP_OS_DIRSEP */ + strlen(argv[count]));
 			retval = asprintf(&load_path, "modules_available%s%s", FAUP_OS_DIRSEP, argv[count]);
 			available_module = faup_datadir_get_file(load_path);
 			free(load_path);
@@ -206,6 +210,7 @@ int faup_module_register(faup_modules_t *modules, char *modules_dir, char *modul
 
 err:
 	fprintf(stderr, "*** Error(%s): %s\n", __FUNCTION__, lua_tostring(modules->module[count].lua_state, -1));
+	free(modules->module[count].module_path);
 	return -1;
 }
 
@@ -223,7 +228,6 @@ int faup_modules_foreach_filelist(faup_modules_t *modules, int (*cb_modules_fore
 		free(modules_dir);
 		return -1;
 	}
-	free(modules_dir);
 
 	modules_dir_file = readdir(modules_dir_fp);
 	while (modules_dir_file) {
@@ -241,6 +245,8 @@ int faup_modules_foreach_filelist(faup_modules_t *modules, int (*cb_modules_fore
 		modules_dir_file = readdir(modules_dir_fp);
 	}
 	closedir(modules_dir_fp);
+
+	free(modules_dir);
 
 	return count;
 }

@@ -176,6 +176,7 @@ void faup_tld_array_populate(void)
 							}
 						} // if (line_len > 0) {			
 				} // switch(line[0]) {
+				free(allocated_line);
 			} // if (line_len > 0) {
 		}
 		fclose(fp);
