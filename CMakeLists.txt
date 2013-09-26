@@ -71,6 +71,7 @@ endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   add_definitions(-DLINUX=1)
+  message("Discovered distribution type: ${LINUX_DIST}");
 endif()
 
 set(FAUP_INCLUDE_DIRS "${faup-project_SOURCE_DIR}/src/lib/include/" "${faup-project_BINARY_DIR}/src/lib/include")
