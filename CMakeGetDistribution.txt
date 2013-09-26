@@ -1,0 +1,15 @@
+# Get Linux Distribution
+# This module defines
+# LINUX_DIST
+# where its value is one of the supported Linux distribution:
+# debian, redhat, slackware
+
+if(EXISTS "/etc/debian_version")
+	  set(LINUX_DIST "debian")
+endif()
+if(EXISTS "/etc/redhat-release")
+	  set(LINUX_DIST "redhat")
+endif()
+if(EXISTS "/etc/slackware-version")
+	  set(LINUX_DIST "slackware")
+endif()
