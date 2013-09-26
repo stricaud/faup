@@ -22,17 +22,6 @@
 #include <faup/output.h>
 
 
-/* IPv6 tests:
-
-      http://[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]:80/index.html
-      http://[1080:0:0:0:8:800:200C:417A]/index.html
-      http://[3ffe:2a00:100:7031::1]
-      http://[1080::8:800:200C:417A]/foo
-      http://[::192.9.5.5]/ipng
-      http://[::FFFF:129.144.52.38]:80/index.html
-      http://[2010:836B:4179::836B:4179]
- */
-
 /* readline() - read a line from the file handle.
  * Return an allocated string */
 static char *readline(FILE *fp)
@@ -133,6 +122,11 @@ int main(int argc, char **argv)
 	if (!faup_opts) {
 	  fprintf(stderr, "Error: cannot allocate faup options!\n" );
 	  return -1;
+	}
+
+	if ((argc > 1) && (!strcmp(argv[1],"$"))) {
+	  // Handle some specific shell operations
+	  return faup_handle_shell(argc, argv);
 	}
 
 	while ((opt = getopt(argc, argv, "ape:ld:vo:utf:m:")) != -1) {
