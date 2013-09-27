@@ -47,7 +47,10 @@ include(FindPkgConfig)
 
 # Find LUA
 # If we don't have lua, then we have no modules, it still works, but is less cool :)
-find_package(Lua51)
+if (NOT FAUP_NOLUA)
+   find_package(Lua51)
+endif()
+
 if(${LUA51_FOUND})
   add_definitions(-DFAUP_LUA_MODULES=1)
   message("Lua 5.1 found. Faup will build with modules.")
@@ -71,7 +74,7 @@ endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   add_definitions(-DLINUX=1)
-  message("Discovered distribution type: ${LINUX_DIST}");
+  message("Discovered distribution type: ${LINUX_DIST}")
 endif()
 
 set(FAUP_INCLUDE_DIRS "${faup-project_SOURCE_DIR}/src/lib/include/" "${faup-project_BINARY_DIR}/src/lib/include")

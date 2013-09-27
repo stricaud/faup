@@ -6,3 +6,7 @@ else()
         message(STATUS "Compile mode: Release")
         set(CMAKE_BUILD_TYPE "Release")
 endif()
+
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/cmake-options/nolua)
+	set(FAUP_NOLUA 1)
+endif()
