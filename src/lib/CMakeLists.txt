@@ -24,6 +24,11 @@ include/faup/modules.h
 
 include_directories(AFTER ${LUA_INCLUDE_DIR})
 
+set(FAUP_LINK_LIBRARIES
+${FAUP_LINK_LIBRARIES}
+${LUA_LIBRARIES}
+)
+
 endif()
 
 set(FAUP_LIB_SRC_FILES
@@ -52,10 +57,6 @@ include/faup/output.h
 include/faup/portable.h
 include/faup/tld.h
 include/faup/tld-tree.h
-)
-
-set(FAUP_LINK_LIBRARIES
-${LUA_LIBRARIES}
 )
 
 # Our static library
