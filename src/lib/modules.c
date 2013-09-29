@@ -286,8 +286,10 @@ faup_modules_transformed_url_t *faup_modules_decode_url_start(faup_handler_t con
 			}
 			retval = lua_pcall(modules->module[count].lua_state, 1, 1, 0);
 			if (retval) {
-				fprintf(stderr, "*** Error(%s): %s\n", __FUNCTION__, lua_tostring(modules->module[count].lua_state, -1));
-				return NULL;
+				// This module has no faup_url_in function. Nothing wrong here, we can continue
+				continue;
+				//fprintf(stderr, "*** Error(%s): %s\n", __FUNCTION__, lua_tostring(modules->module[count].lua_state, -1));
+				//return NULL;
 			}
 
 			new_url = lua_tostring(modules->module[count].lua_state, -1);	
@@ -319,6 +321,17 @@ void _faup_add_keyval_dict(faup_modules_t *modules, int count, char *key, int va
 
 }
 
+void _faup_add_feature(faup_modules_t *modules, int count, faup_feature_t feature, char *pos_key, char *size_key)
+{
+		if (faup_features_exist(feature)) {
+			_faup_add_keyval_dict(modules, count, pos_key, feature.pos);
+			_faup_add_keyval_dict(modules, count, size_key, feature.size);
+		} else {
+			_faup_add_keyval_dict(modules, count, pos_key, -1);
+			_faup_add_keyval_dict(modules, count, size_key, 0);			
+		}
+}
+
 bool faup_modules_url_output(faup_handler_t *fh, FILE* out)
 {
 	int retval;
@@ -339,30 +352,19 @@ bool faup_modules_url_output(faup_handler_t *fh, FILE* out)
 
 		// Table for positions
 		lua_newtable(modules->module[count].lua_state); // -1
-		_faup_add_keyval_dict(modules, count, "scheme.pos", fh->faup.features.scheme.pos);
-		_faup_add_keyval_dict(modules, count, "scheme.size", fh->faup.features.scheme.size);
-		_faup_add_keyval_dict(modules, count, "hierarchical.pos", fh->faup.features.hierarchical.pos);
-		_faup_add_keyval_dict(modules, count, "hierarchical.size", fh->faup.features.hierarchical.size);
-		_faup_add_keyval_dict(modules, count, "credential.pos", fh->faup.features.credential.pos);
-		_faup_add_keyval_dict(modules, count, "credential.size", fh->faup.features.credential.size);
-		_faup_add_keyval_dict(modules, count, "host.pos", fh->faup.features.host.pos);
-		_faup_add_keyval_dict(modules, count, "host.size", fh->faup.features.host.size);
-		_faup_add_keyval_dict(modules, count, "subdomain.pos", fh->faup.features.subdomain.pos);
-		_faup_add_keyval_dict(modules, count, "subdomain.size", fh->faup.features.subdomain.size);
-		_faup_add_keyval_dict(modules, count, "domain.pos", fh->faup.features.domain.pos);
-		_faup_add_keyval_dict(modules, count, "domain.size", fh->faup.features.domain.size);
-		_faup_add_keyval_dict(modules, count, "domain_without_tld.pos", fh->faup.features.domain_without_tld.pos);
-		_faup_add_keyval_dict(modules, count, "domain_without_tld.size", fh->faup.features.domain_without_tld.size);
-		_faup_add_keyval_dict(modules, count, "tld.pos", fh->faup.features.tld.pos);
-		_faup_add_keyval_dict(modules, count, "tld.size", fh->faup.features.tld.size);
-		_faup_add_keyval_dict(modules, count, "port.pos", fh->faup.features.port.pos);
-		_faup_add_keyval_dict(modules, count, "port.size", fh->faup.features.port.size);
-		_faup_add_keyval_dict(modules, count, "resource_path.pos", fh->faup.features.resource_path.pos);
-		_faup_add_keyval_dict(modules, count, "resource_path.size", fh->faup.features.resource_path.size);
-		_faup_add_keyval_dict(modules, count, "query_string.pos", fh->faup.features.query_string.pos);
-		_faup_add_keyval_dict(modules, count, "query_string.size", fh->faup.features.query_string.size);
-		_faup_add_keyval_dict(modules, count, "fragment.pos", fh->faup.features.fragment.pos);
-		_faup_add_keyval_dict(modules, count, "fragment.size", fh->faup.features.fragment.size);
+
+		_faup_add_feature(modules, count, fh->faup.features.scheme, "scheme.pos", "scheme.size");
+		_faup_add_feature(modules, count, fh->faup.features.hierarchical, "hierarchical.pos", "hierarchical.size");
+		_faup_add_feature(modules, count, fh->faup.features.credential, "credential.pos", "credential.size");
+		_faup_add_feature(modules, count, fh->faup.features.host, "host.pos", "host.size");
+		_faup_add_feature(modules, count, fh->faup.features.subdomain, "subdomain.pos", "subdomain.size");
+		_faup_add_feature(modules, count, fh->faup.features.domain, "domain.pos", "domain.size");
+		_faup_add_feature(modules, count, fh->faup.features.domain_without_tld, "domain_without_tld.pos", "domain_without_tld.size");
+		_faup_add_feature(modules, count, fh->faup.features.tld, "tld.pos", "tld.size");
+		_faup_add_feature(modules, count, fh->faup.features.port, "port.pos", "port.size");
+		_faup_add_feature(modules, count, fh->faup.features.resource_path, "resource_path.pos", "resource_path.size");
+		_faup_add_feature(modules, count, fh->faup.features.query_string, "query_string.pos", "query_string.size");
+		_faup_add_feature(modules, count, fh->faup.features.fragment, "fragment.pos", "fragment.size");
 
 		// If the function does not exists, we just ignore it
 		retval = lua_pcall(modules->module[count].lua_state, 2, 2, 0);
