@@ -34,3 +34,4 @@ function faup_url_in(url)
 
 	return string.lower(new_url)
 end
+

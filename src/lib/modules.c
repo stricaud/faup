@@ -347,6 +347,11 @@ bool faup_modules_url_output(faup_handler_t *fh, FILE* out)
 	
 	for (count = 0; count < modules->nb_modules; count++) {
 		lua_getglobal(modules->module[count].lua_state, "faup_output");
+		if(!lua_isfunction(modules->module[count].lua_state, -1)) {
+			//printf("No such function: 'faup_output'\n");
+			// Since that function does not exists in the module, we skip it!
+			continue;
+		}
 
 		lua_pushstring(modules->module[count].lua_state, fh->faup.org_str);
 
@@ -366,6 +371,7 @@ bool faup_modules_url_output(faup_handler_t *fh, FILE* out)
 		_faup_add_feature(modules, count, fh->faup.features.query_string, "query_string.pos", "query_string.size");
 		_faup_add_feature(modules, count, fh->faup.features.fragment, "fragment.pos", "fragment.size");
 
+
 		// If the function does not exists, we just ignore it
 		retval = lua_pcall(modules->module[count].lua_state, 2, 2, 0);
 		if (retval == 0) {
@@ -378,6 +384,7 @@ bool faup_modules_url_output(faup_handler_t *fh, FILE* out)
     		lua_pushnil(modules->module[count].lua_state);
     		const char *k;
     		int v;
+
    			while (lua_next(modules->module[count].lua_state, -2)) { // The table is is -2 in the stack
         		v = lua_tointeger(modules->module[count].lua_state, -1);
         		lua_pop(modules->module[count].lua_state, 1);
@@ -468,8 +475,8 @@ bool faup_modules_url_output(faup_handler_t *fh, FILE* out)
 
         		}
    			}
-
-
+		} else { // if (retval == 0) {
+			fprintf(stderr, "*** Error(%s)[in script:%s]: %s\n", __FUNCTION__, modules->module[count].module_name, lua_tostring(modules->module[count].lua_state, -1));
 		}
 	}
 
