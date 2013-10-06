@@ -21,6 +21,7 @@
 #include <faup/options.h>
 #include <faup/output.h>
 
+#include "shell.h"
 
 /* readline() - read a line from the file handle.
  * Return an allocated string */
