@@ -175,3 +175,18 @@ faup_url_field_t faup_options_get_field_from_name(char *name)
 
   	return FAUP_URL_FIELD_NONE;
 }
+
+faup_output_t faup_options_get_output_from_name(char *name)
+{
+	if (!strcmp("csv", name)) {
+		return FAUP_OUTPUT_CSV;
+	}
+	if (!strcmp("json", name)) {
+		return FAUP_OUTPUT_JSON;
+	}
+	if (!strcmp("module", name)) {
+		return FAUP_OUTPUT_MODULE;
+	}
+
+	return FAUP_OUTPUT_NONE;
+}

@@ -188,17 +188,14 @@ int main(int argc, char **argv)
 	  	faup_opts->fields = faup_options_get_field_from_name(optarg);
 	  	break;
 	  case 'o':
-	  	if (!strcmp("csv", optarg)) {
-	  		faup_opts->output = FAUP_OUTPUT_CSV;
-	  	} else if (!strcmp("json", optarg)) {
-	  		faup_opts->output = FAUP_OUTPUT_JSON;
-	  	} else if (!strcmp("module", optarg)) {
-	  		faup_opts->output = FAUP_OUTPUT_MODULE;
-	  	} else {
+	  	faup_opts->output = faup_options_get_output_from_name(optarg);
+
+	  	if (faup_opts->output == FAUP_OUTPUT_NONE) {
 	  		fprintf(stderr, "invalid output option '%s'!\n", optarg);
 			faup_options_free(faup_opts);
 	  		exit(1);
 	  	}
+	  	
 	  	break;
 	  case 't':
 	  	faup_options_disable_tld_above_one(faup_opts);
