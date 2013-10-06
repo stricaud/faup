@@ -93,6 +93,7 @@ int faup_options_url_field_has_greater_than(faup_options_t *opts, faup_url_field
 	return retval;
 }
 
+
 faup_feature_t faup_options_field_get_feature(faup_handler_t const *fh, faup_url_field_t field)
 {
 	faup_feature_t error;
@@ -134,4 +135,43 @@ faup_feature_t faup_options_field_get_feature(faup_handler_t const *fh, faup_url
 	}
 
 	return error;
+}
+
+faup_url_field_t faup_options_get_field_from_name(char *name)
+{
+  	if (!strcmp("scheme", name)) {
+  		return FAUP_URL_FIELD_SCHEME;
+  	}
+  	if (!strcmp("credential", name)) {
+  		return FAUP_URL_FIELD_CREDENTIAL;
+  	}
+  	if (!strcmp("subdomain", name)) {
+  		return FAUP_URL_FIELD_SUBDOMAIN;
+  	}
+  	if (!strcmp("domain", name)) {
+  		return FAUP_URL_FIELD_DOMAIN;
+  	}
+  	if (!strcmp("domain_without_tld", name)) {
+  		return FAUP_URL_FIELD_DOMAIN_WITHOUT_TLD;
+  	}
+  	if (!strcmp("host", name)) {
+  		return FAUP_URL_FIELD_HOST;
+  	}
+  	if (!strcmp("tld", name)) {
+  		return FAUP_URL_FIELD_TLD;
+  	}
+  	if (!strcmp("port", name)) {
+  		return FAUP_URL_FIELD_PORT;
+  	}
+  	if (!strcmp("resource_path", name)) {
+  		return FAUP_URL_FIELD_RESOURCE_PATH;
+  	}
+  	if (!strcmp("query_string", name)) {
+  		return FAUP_URL_FIELD_QUERY_STRING;
+  	}
+  	if (!strcmp("fragment", name)) {
+  		return FAUP_URL_FIELD_FRAGMENT;
+  	}
+
+  	return FAUP_URL_FIELD_NONE;
 }

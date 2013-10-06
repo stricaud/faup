@@ -89,6 +89,7 @@ void faup_options_disable_tld_above_one(faup_options_t *opts);
 void faup_options_debug(faup_options_t *opts);
 int faup_options_url_field_has_greater_than(faup_options_t *opts, faup_url_field_t field);
 faup_feature_t faup_options_field_get_feature(faup_handler_t const *fh, faup_url_field_t field);
+faup_url_field_t faup_options_get_field_from_name(char *name);
 
 #ifdef __cplusplus
 }

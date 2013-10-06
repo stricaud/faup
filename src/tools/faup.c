@@ -184,39 +184,7 @@ int main(int argc, char **argv)
   		}
 	  	break;
 	  case 'f':
-	  	if (!strcmp("scheme", optarg)) {
-	  		faup_opts->fields = FAUP_URL_FIELD_SCHEME;
-	  	}
-	  	if (!strcmp("credential", optarg)) {
-	  		faup_opts->fields = FAUP_URL_FIELD_CREDENTIAL;
-	  	}
-	  	if (!strcmp("subdomain", optarg)) {
-	  		faup_opts->fields = FAUP_URL_FIELD_SUBDOMAIN;
-	  	}
-	  	if (!strcmp("domain", optarg)) {
-	  		faup_opts->fields = FAUP_URL_FIELD_DOMAIN;
-	  	}
-	  	if (!strcmp("domain_without_tld", optarg)) {
-	  		faup_opts->fields = FAUP_URL_FIELD_DOMAIN_WITHOUT_TLD;
-	  	}
-	  	if (!strcmp("host", optarg)) {
-	  		faup_opts->fields = FAUP_URL_FIELD_HOST;
-	  	}
-	  	if (!strcmp("tld", optarg)) {
-	  		faup_opts->fields = FAUP_URL_FIELD_TLD;
-	  	}
-	  	if (!strcmp("port", optarg)) {
-	  		faup_opts->fields = FAUP_URL_FIELD_PORT;
-	  	}
-	  	if (!strcmp("resource_path", optarg)) {
-	  		faup_opts->fields = FAUP_URL_FIELD_RESOURCE_PATH;
-	  	}
-	  	if (!strcmp("query_string", optarg)) {
-	  		faup_opts->fields = FAUP_URL_FIELD_QUERY_STRING;
-	  	}
-	  	if (!strcmp("fragment", optarg)) {
-	  		faup_opts->fields = FAUP_URL_FIELD_FRAGMENT;
-	  	}
+	  	faup_opts->fields = faup_options_get_field_from_name(optarg);
 	  	break;
 	  case 'o':
 	  	if (!strcmp("csv", optarg)) {
