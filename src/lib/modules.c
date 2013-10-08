@@ -87,7 +87,7 @@ faup_modules_t *faup_modules_load_from_datadir(void)
 		fprintf(stderr, "Cannot allocate modules!\n");
 		return NULL;
 	}
-	modules->nb_modules = faup_modules_foreach_filelist(NULL, NULL, NULL);
+	modules->nb_modules = faup_modules_foreach_filelist(NULL, NULL, NULL, NULL);
 	if (modules->nb_modules <= 0) {
 		// We have no modules enabled
 		free(modules);
@@ -99,7 +99,7 @@ faup_modules_t *faup_modules_load_from_datadir(void)
 		free(modules);
 		return NULL;
 	}
-	faup_modules_foreach_filelist(modules, faup_module_register, (void *)(intptr_t)count);
+	faup_modules_foreach_filelist(modules, NULL, faup_module_register, (void *)(intptr_t)count);
 
 	return modules;
 }
@@ -215,14 +215,18 @@ err:
 }
 
 
-int faup_modules_foreach_filelist(faup_modules_t *modules, int (*cb_modules_foreach)(faup_modules_t *modules, char *modules_dir, char *module, void *user_data, int count), void *user_data)
+int faup_modules_foreach_filelist(faup_modules_t *modules, char *force_path, int (*cb_modules_foreach)(faup_modules_t *modules, char *modules_dir, char *module, void *user_data, int count), void *user_data)
 {
 	char *modules_dir;
 	DIR  *modules_dir_fp;
 	struct dirent *modules_dir_file;
 	int count = 0;
 
-	modules_dir = faup_datadir_get_file("modules_enabled");
+	if (!force_path) {
+		modules_dir = faup_datadir_get_file("modules_enabled");
+	} else {
+		modules_dir = force_path;
+	}
 	modules_dir_fp = opendir(modules_dir);
 	if (!modules_dir_fp) {
 		free(modules_dir);
@@ -246,7 +250,9 @@ int faup_modules_foreach_filelist(faup_modules_t *modules, int (*cb_modules_fore
 	}
 	closedir(modules_dir_fp);
 
-	free(modules_dir);
+	if (!force_path) {
+		free(modules_dir);
+	}
 
 	return count;
 }

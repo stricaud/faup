@@ -96,8 +96,7 @@ char *faup_datadir_get_file(char *append)
 			return retbuf;
 		}
 
-		retval = asprintf(&retbuf, "%s%s", FAUP_DATA_DIR, append);
-		return retbuf;
+		return faup_datadir_get_global_file(append);
 	}
 
 	if (strlen(dataenv_dir) > FAUP_MAXPATHLEN) {
@@ -106,6 +105,15 @@ char *faup_datadir_get_file(char *append)
 	}
 	retval = asprintf(&retbuf, "%s%s%s", dataenv_dir, FAUP_OS_DIRSEP, append);
 
+	return retbuf;
+}
+
+char *faup_datadir_get_global_file(char *append)
+{
+	char *retbuf;
+	int retval;
+
+	retval = asprintf(&retbuf, "%s%s", FAUP_DATA_DIR, append);
 	return retbuf;
 }
 
