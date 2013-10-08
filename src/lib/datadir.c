@@ -60,7 +60,7 @@ char *faup_datadir_home_file_or_dir_exists(char *append)
 	return NULL;
 }
 
-char *faup_datadir_get_file_from_home(char *append)
+char *faup_datadir_get_file_from_home(char *append, bool to_symlink)
 {
 #ifndef WIN32
 	int retval;
@@ -76,13 +76,17 @@ char *faup_datadir_get_file_from_home(char *append)
 	retval = asprintf(&retbuf, "%s%s.faup%s%s", homedir, FAUP_OS_DIRSEP, FAUP_OS_DIRSEP, append);
 	fp = fopen(retbuf, "w");
 	if (fp) {
+		if (to_symlink) {
+			unlink(retbuf);
+		}
+		fclose(fp);
 		return retbuf;
 	}
 #endif
 	return NULL;
 }
 
-char *faup_datadir_get_file(char *append)
+char *faup_datadir_get_file(char *append, bool to_symlink)
 {
 	char *dataenv_dir;
 	char *retbuf;
@@ -91,9 +95,11 @@ char *faup_datadir_get_file(char *append)
 	dataenv_dir = getenv("FAUP_DATA_DIR");
 	if (!dataenv_dir) {
 
-		retbuf = faup_datadir_home_file_or_dir_exists(append);
-		if (retbuf) {
-			return retbuf;
+		if (!to_symlink) {
+			retbuf = faup_datadir_home_file_or_dir_exists(append);
+			if (retbuf) {
+				return retbuf;
+			}
 		}
 
 		return faup_datadir_get_global_file(append);
@@ -117,23 +123,23 @@ char *faup_datadir_get_global_file(char *append)
 	return retbuf;
 }
 
-char *faup_datadir_file_to_write(char *file) 
+char *faup_datadir_file_to_write(char *file, bool to_symlink) 
 {
 	char *datadir_file = NULL;
-	datadir_file = faup_datadir_get_file(file);
+	datadir_file = faup_datadir_get_file(file, to_symlink);
 	if (datadir_file) {
 		FILE *fp;
 		fp = fopen(datadir_file, "w");
 		if (!fp) {
 		    free(datadir_file);
-			return faup_datadir_get_file_from_home(file);
+			return faup_datadir_get_file_from_home(file, to_symlink);
 		} else {
 			return datadir_file;
 			fclose(fp);
 		}
 	}
 
-	return faup_datadir_get_file_from_home(file);
+	return faup_datadir_get_file_from_home(file, to_symlink);
 }
 
 

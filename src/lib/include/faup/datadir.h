@@ -17,16 +17,18 @@
 #ifndef _FAUP_DATADIR_H_
 #define _FAUP_DATADIR_H_
 
+#include <faup/faup.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
 char *faup_datadir_home_file_or_dir_exists(char *append);
-char *faup_datadir_get_file_from_home(char *append);
-char *faup_datadir_get_file(char *append);
+char *faup_datadir_get_file_from_home(char *append, bool to_symlink);
+char *faup_datadir_get_file(char *append, bool to_symlink);
 char *faup_datadir_get_global_file(char *append);
-char *faup_datadir_file_to_write(char *file);
+char *faup_datadir_file_to_write(char *file, bool to_symlink);
 
 
 #ifdef __cplusplus

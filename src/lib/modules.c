@@ -146,7 +146,7 @@ faup_modules_t *faup_modules_load_from_arg(char **argv, int argc)
 
 			load_path = malloc(17 /* modules_available */ + 1 /* FAUP_OS_DIRSEP */ + strlen(argv[count]));
 			retval = asprintf(&load_path, "modules_available%s%s", FAUP_OS_DIRSEP, argv[count]);
-			available_module = faup_datadir_get_file(load_path);
+			available_module = faup_datadir_get_file(load_path, false);
 			free(load_path);
 
 			fp = fopen(available_module, "r");
@@ -223,7 +223,7 @@ int faup_modules_foreach_filelist(faup_modules_t *modules, char *force_path, int
 	int count = 0;
 
 	if (!force_path) {
-		modules_dir = faup_datadir_get_file("modules_enabled");
+		modules_dir = faup_datadir_get_file("modules_enabled", false);
 	} else {
 		modules_dir = force_path;
 	}
