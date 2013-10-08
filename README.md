@@ -100,6 +100,7 @@ to build the binary in the source directory, you have to create a build director
     cd build
     cmake .. && make
     sudo make install
+    sudo ldconfig
 
 
 [github]: https://github.com/stricaud/faup
