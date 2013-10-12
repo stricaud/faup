@@ -15,6 +15,9 @@
 * [Command Line Tool][clidoc]
 * [Library API documentation][libdoc]
 
+* [Frequently Asked Questions][faq]
+
+
 ## Quick Start
 
 What is provided?
@@ -106,3 +109,4 @@ to build the binary in the source directory, you have to create a build director
 [issues]: https://github.com/stricaud/faup/issues
 [libdoc]: doc/library.md
 [clidoc]: doc/cli.md
+[faq]: doc/faq.md
