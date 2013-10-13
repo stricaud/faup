@@ -15,7 +15,7 @@
     /opt/splunk/etc/apps/faup/opt/../opt/linux-x86_64/bin/faup: /lib64/libc.so.6: version `GLIBC_2.11' not found (required by /opt/splunk/etc/apps/faup/opt/../opt/linux-x86_64/lib/liblua-5.1.so)
     /opt/splunk/etc/apps/faup/opt/../opt/linux-x86_64/bin/faup: /lib64/libc.so.6: version `GLIBC_2.7' not found (required by /opt/splunk/etc/apps/faup/opt/../opt/linux-x86_64/lib/liblua-5.1.so)
  
-#### Q: Install Faup from git, then edit etc/apps/faup/bin/faup.py and replace:
+#### A: Install Faup from git, then edit etc/apps/faup/bin/faup.py and replace:
 
     def where_is_faup():
         if platform.system() == "Darwin":
