@@ -80,3 +80,55 @@ Some options are just for the CSV output, such as printing headers ('-p') or cha
 	http;;www;slashdot.org;www.slashdot.org;org;8080;;;
 	http;;www;github.com;www.github.com;com;;/stricaud/faup;;
 
+Modules
+-------
+
+Modules can be enabled or available. This can be global, local or customized with the FAUP_DATA_DIR variable. They can be enabled, disabled, listed using the shell. The faup shell is simply using the '$' token to type some commands, to get commands that can be typed, simply run:
+
+	$ faup $
+	Usage: faup $ shell_command [parameters]
+
+	Available shell comands: modules
+
+In our case, only the modules shell command is available, all parameters are:
+
+       $ faup $ modules
+       Usage: faup $ modules action
+
+       Where action can be:
+       list all      : List all modules
+       list enabled  : List enabled modules
+       list available: List available modules
+
+       enable module_name : Enable the module 'module_name'
+       disable module_name: Disable the module 'module_name'
+
+
+Let's start with listing all the modules:
+
+      $ faup $ modules list all
+      Modules enabled:
+      [0] /Users/stricaud/.faup/modules_enabled/emulation_ie.lua
+      [1] /Users/stricaud/.faup/modules_enabled/writeall.lua
+
+      Modules available:
+      [0] /usr/local/share/faup/modules_available/emulation_ie.lua
+      [1] /usr/local/share/faup/modules_available/uppercase.lua
+      [2] /usr/local/share/faup/modules_available/writeall.lua
+
+The number is brackets displays the execution order. The modules available will never be executed. In our case, the modules 'emulation_ie.lua' and 'writeall.lua' will be executed.
+
+To disable the 'writeall.lua' module, simply run:
+
+   	   $ faup $ modules disable writeall.lua
+	   Module 'writeall.lua' disabled with success!
+
+	   $ faup $ modules list enabled
+
+	   [0] /Users/stricaud/.faup/modules_enabled/emulation_ie.lua
+
+And to enable it, run the enable command:
+
+       $ faup $ modules enable writeall.lua
+       Module 'writeall.lua' enabled with success!
+
