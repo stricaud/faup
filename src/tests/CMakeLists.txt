@@ -33,5 +33,5 @@ add_test(Issue30           ${TEST_FAUP_SCRIPT} issue 30)
 include_directories(AFTER ${FAUP_INCLUDE_DIRS})
 
 add_executable(multithreads multithreads.c)
-target_link_libraries(multithreads ${FAUP_LIBRARY})
+target_link_libraries(multithreads ${FAUP_LIBRARY} "pthread" )
 add_test(MultiThreads ${TEST_FAUP_SCRIPT} multithreads)
