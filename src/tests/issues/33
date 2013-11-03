@@ -1,0 +1,3 @@
+http://test:?test@example.com
+http://test:/test@example.com
+http://test:#test@example.com
