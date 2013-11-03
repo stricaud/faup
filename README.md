@@ -103,7 +103,39 @@ to build the binary in the source directory, you have to create a build director
     cd build
     cmake .. && make
     sudo make install
+    
+FAQ
+---
 
+### Why do I receive the error “libfaupl.so.1: cannot open shared object file” when trying to run faup?
+
+If you get a shared library loading error similar to the following when trying to run faup, its probably due to your platform doesn't include the `/usr/local/lib` shared library directory by default  (ex: [Ubuntu](http://developer.ubuntu.com/packaging/html/libraries.html)/[Debian](http://www.debian.org/doc/debian-policy/ch-sharedlibs.html#s-ldconfig))  or the directory where faup has its shared library installed:
+
+```
+$ faup
+faup: error while loading shared libraries: libfaupl.so.1: cannot open shared object file: No such file or director
+```
+
+A good way to see which shared libraries are loaded by faup is by using the `ldd` command:
+```
+$ ldd /usr/local/bin/faup 
+	linux-vdso.so.1 =>  (0x00007fff89735000)
+	libfaupl.so.1 => not found
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f55a6082000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f55a641a000)
+
+```
+To update the faup shared library path, you can use the `ldconfig` command. For example if faup libraries are installed in `/usr/local/lib`, you can add the path as follows:
+```
+$ echo '/usr/local/lib' | sudo tee -a /etc/ld.so.conf.d/faup.conf
+$ ldconfig
+$ ldd /usr/local/bin/faup 
+	linux-vdso.so.1 =>  (0x00007fff550d5000)
+	libfaupl.so.1 => /usr/local/lib/libfaupl.so.1 (0x00007f41f9102000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f41f8d78000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f41f9317000)
+
+```
 
 [github]: https://github.com/stricaud/faup
 [issues]: https://github.com/stricaud/faup/issues
