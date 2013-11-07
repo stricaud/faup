@@ -1,0 +1,81 @@
+from: http://support.microsoft.com/kb/969869
+
+Certain special characters are not allowed in the URL entered into the address bar of Internet Explorer
+
+RAPID PUBLISHING
+RAPID PUBLISHING ARTICLES PROVIDE INFORMATION DIRECTLY FROM WITHIN THE MICROSOFT SUPPORT ORGANIZATION. THE INFORMATION CONTAINED HEREIN IS CREATED IN RESPONSE TO EMERGING OR UNIQUE TOPICS, OR IS INTENDED SUPPLEMENT OTHER KNOWLEDGE BASE INFORMATION.
+
+Symptom
+
+
+When you use the address bar of Internet Explorer 6.0 or later to enter a username and password to access an FTP site, and the format of the URL you enter is ftp://username:password@domain, the following error message is displayed:
+
+    Windows cannot find ' ftp://username:password@domain'. Check the spelling and try again.
+
+Cause
+
+
+Either the username or the password contains any one of the characters:
+
+    : # ? / \ %
+
+This behavior is by design.
+
+Resolution
+
+
+If the username or password needs to contain any one of the characters listed in the Cause section, you will need to encode the special characters in the following way:
+
+# -> %23
+
+/ -> %2F
+
+: -> %3A
+
+? -> %3F
+
+\ -> %5C
+
+% -> %25
+
+More Information
+
+
+Consider the following example.
+
+A user with the username "jdoe" and a password of "Sure?" who wants to access an FTP site on a server called "ftpserver".
+
+When the user tries to access the site using Internet Explorer and enters ftp://jdoe:Sure?@ftpserver into the address bar, the access will fail and the error message described above will be displayed.
+
+However, when the user enters ftp://jdoe:Sure%3F@ftpserver in the address bar, he or she will successfully access the FTP server.
+
+DISCLAIMER
+MICROSOFT AND/OR ITS SUPPLIERS MAKE NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY, RELIABILITY OR ACCURACY OF THE INFORMATION CONTAINED IN THE DOCUMENTS AND RELATED GRAPHICS PUBLISHED ON THIS WEBSITE (THE “MATERIALS”) FOR ANY PURPOSE. THE MATERIALS MAY INCLUDE TECHNICAL INACCURACIES OR TYPOGRAPHICAL ERRORS AND MAY BE REVISED AT ANY TIME WITHOUT NOTICE.
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, MICROSOFT AND/OR ITS SUPPLIERS DISCLAIM AND EXCLUDE ALL REPRESENTATIONS, WARRANTIES, AND CONDITIONS WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO REPRESENTATIONS, WARRANTIES, OR CONDITIONS OF TITLE, NON INFRINGEMENT, SATISFACTORY CONDITION OR QUALITY, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, WITH RESPECT TO THE MATERIALS.
+
+Note This is a "FAST PUBLISH" article created directly from within the Microsoft support organization. The information contained herein is provided as-is in response to emerging issues. As a result of the speed in making it available, the materials may include typographical errors and may be revised at any time without notice. See Terms of Use for other considerations.
+
+Properties
+Article ID: 969869 - Last Review: August 19, 2011 - Revision: 2.1
+
+APPLIES TO
+
+    Windows Internet Explorer 9
+    Windows 7 Enterprise
+    Windows 7 Enterprise N
+    Windows 7 Home Basic
+    Windows 7 Home Premium
+    Windows 7 Home Premium N
+    Windows 7 Professional
+    Windows 7 Professional N
+    Windows 7 Starter
+    Windows 7 Starter N
+    Windows 7 Ultimate
+    Windows 7 Ultimate N
+    Windows Internet Explorer 8
+    Windows Internet Explorer 7
+    Microsoft Internet Explorer 6.0
+
+
+
