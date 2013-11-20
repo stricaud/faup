@@ -93,7 +93,6 @@ void print_help(char **argv)
 	printf("-a\tskip provided argument file open check\n");
 	printf("-d {delimiter}\n\twill separate the fields with the wanted delimiter\n");
 	printf("-f {scheme|credential|subdomain|domain|domain_without_tld|host|tld|port|resource_path|query_string|fragment}\n\tfield to extract\n");
-	printf("-h\tprint the header\n");
 	printf("-l\tprefix with the line number (csv only)\n");
 	printf("-m\t{module1 module2 module3}\n\tLoad the modules in the given order.\n\tIf empty, load no modules. If this option is not provided, modules in the shared data in modules_enabled will be loaded by default\n");
 	printf("-o {csv,json,module}\n\toutput csv or json at your convenience. You can also just let the modules handle it.\n");
