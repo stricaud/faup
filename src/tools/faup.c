@@ -129,7 +129,7 @@ int main(int argc, char **argv)
 	  return faup_handle_shell(argc, argv);
 	}
 
-	while ((opt = getopt(argc, argv, "ape:ld:vo:utf:m:")) != -1) {
+	while ((opt = getopt(argc, argv, "apld:vo:utf:m:")) != -1) {
 	  switch(opt) {
 	  case 'a':
 	  	skip_file_check = 1;
