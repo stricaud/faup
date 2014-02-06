@@ -49,7 +49,7 @@ Still, the behavior of extracting only TLD of level 1 only can be asked by using
 	co.uk
 
 	$ faup -f tld -t http://www.github.com
-	uk
+	com
 
 To have co.uk extracted, we match against a list, this is list maintained by Mozilla dudes. So a *big* thank you Mozilla!
 
