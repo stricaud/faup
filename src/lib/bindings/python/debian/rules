@@ -1,0 +1,30 @@
+#!/usr/bin/make -f
+# Inspired from libleeloo (http://github.com/quarkslab/libleeloo) !
+
+export DH_VERBOSE=1
+
+PY3VERS = $(shell py3versions -rv)
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/buildflags.mk
+
+
+%:
+	dh $@ --with python2,python3
+
+override_dh_auto_build:
+	dh_auto_build
+	set -e && for pyv in $(PY3VERS); do \
+	  python$$pyv setup.py build ; \
+	done
+
+override_dh_install:
+	dh_install "debian/tmp/usr/lib/python2.*" -p python-pyfaup
+
+	# Install python3 files
+	set -e && for pyv in $(PY3VERS); do \
+	  python$$pyv setup.py install --install-layout=deb \
+		--force --no-compile -O0 --root=$(CURDIR)/debian/python3-pyfaup; \
+	done
+
+	# Continue with regular dh_install
+	dh_install

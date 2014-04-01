@@ -1,0 +1,20 @@
+Source: pyfaup
+Maintainer: Adrien Guinet <aguinet@quarkslab.com>
+Section: python
+Priority: optional
+Build-Depends: python-all-dev (>= 2.6.6-3), python3-all-dev, debhelper (>= 7), faup, libboost-python-dev
+X-Python-Version: >= 2.7
+X-Python3-Version: >= 3.1
+Standards-Version: 3.9.1
+
+Package: python-pyfaup
+Architecture: all
+Depends: ${misc:Depends}, ${python:Depends}, faup
+Description: Python bindings for faup
+ Python bindings for faup
+
+Package: python3-pyfaup
+Architecture: all
+Depends: ${misc:Depends}, ${python3:Depends}, faup
+Description: Python bindings for faup
+ Python3 bindings for faup
