@@ -17,9 +17,11 @@
 #ifndef _FAUP_MODULES_H_
 #define _FAUP_MODULES_H_
 
+#ifdef FAUP_LUA_MODULES
 #include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>
+#endif
 
 #include <faup/faup.h>
 #include <faup/options.h>
@@ -37,11 +39,15 @@ typedef struct _faup_modules_transformed_url_t faup_modules_transformed_url_t;
 struct _faup_module_t {
 	char *module_path;
 	char *module_name;
+#ifdef FAUP_LUA_MODULES
 	lua_State *lua_state;
+#endif
 };
 
 struct _faup_modules_t {
+#ifdef FAUP_LUA_MODULES
 	lua_State *lua_state;
+#endif
 	int nb_modules;
 	faup_module_t *module;
 };

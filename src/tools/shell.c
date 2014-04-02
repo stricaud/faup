@@ -22,6 +22,7 @@ int shell_modules_list_cb(faup_modules_t *modules, char *modules_dir, char *modu
 int faup_handle_shell_modules(int argc, char **argv)
 {
 
+#ifdef FAUP_LUA_MODULES
   if (argc < 5) {
     printf("Usage: %s $ modules action\n", argv[0]);
     printf("\nWhere action can be:\n");
@@ -102,6 +103,8 @@ int faup_handle_shell_modules(int argc, char **argv)
       }
       free(symlink_file);
   }
+
+#endif // FAUP_LUA_MODULES
 
   return 0;
 }
