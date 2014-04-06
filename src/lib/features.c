@@ -232,16 +232,16 @@ void faup_features_debug_print(char *string, int32_t pos, uint32_t size)
 void faup_features_debug(const char *url, faup_features_t const* features)
 {
 	fprintf(stdout, "url:%s\n", url);
-	faup_features_debug_print("features->scheme:%d,%u\n", features->scheme.pos, features->scheme.size);
-	faup_features_debug_print("features->hierarchical:%d,%u\n", features->hierarchical.pos, features->hierarchical.size);
-	faup_features_debug_print("features->credential:%d,%u\n", features->credential.pos, features->credential.size);
-	faup_features_debug_print("features->host:%d,%u\n", features->host.pos, features->host.size);
-	faup_features_debug_print("features->domain:%d,%u\n", features->domain.pos, features->domain.size);
-	faup_features_debug_print("features->domain_without_tld:%d,%u\n", features->domain_without_tld.pos, features->domain_without_tld.size);
-	faup_features_debug_print("features->subdomain:%d,%u\n", features->subdomain.pos, features->subdomain.size);
-	faup_features_debug_print("features->tld:%d,%u\n", features->tld.pos, features->tld.size);
-	faup_features_debug_print("features->port:%d,%u\n", features->port.pos, features->port.size);
-	faup_features_debug_print("features->resource_path:%d,%u\n", features->resource_path.pos, features->resource_path.size);
-	faup_features_debug_print("features->query_string:%d,%u\n", features->query_string.pos, features->query_string.size);
-	faup_features_debug_print("features->fragment:%d,%u\n", features->fragment.pos, features->fragment.size);
+	faup_features_debug_print("features->scheme", features->scheme.pos, features->scheme.size);
+	faup_features_debug_print("features->hierarchical", features->hierarchical.pos, features->hierarchical.size);
+	faup_features_debug_print("features->credential", features->credential.pos, features->credential.size);
+	faup_features_debug_print("features->host", features->host.pos, features->host.size);
+	faup_features_debug_print("features->domain", features->domain.pos, features->domain.size);
+	faup_features_debug_print("features->domain_without_tld", features->domain_without_tld.pos, features->domain_without_tld.size);
+	faup_features_debug_print("features->subdomain", features->subdomain.pos, features->subdomain.size);
+	faup_features_debug_print("features->tld", features->tld.pos, features->tld.size);
+	faup_features_debug_print("features->port", features->port.pos, features->port.size);
+	faup_features_debug_print("features->resource_path", features->resource_path.pos, features->resource_path.size);
+	faup_features_debug_print("features->query_string", features->query_string.pos, features->query_string.size);
+	faup_features_debug_print("features->fragment", features->fragment.pos, features->fragment.size);
 }
