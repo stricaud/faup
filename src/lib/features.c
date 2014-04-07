@@ -82,6 +82,7 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 {
 	faup_features_t* url_features = &fh->faup.features;
 	char c;
+	char next_c;
 	size_t nb_slashes = 0;
 	//int char_counter[128];
 	int last_slash_pos = 0;
@@ -95,11 +96,20 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 	ssize_t buffer_pos = 0;
 	size_t i;
 
+	size_t special_char_after_colons_pos = -1;
+
 
 	faup_features_init(url_features);
 
 	for (i = 0; i < url_len; i++) {
 		c = url[i];
+
+		if ((i + 1) < url_len) {
+			next_c = url[i+1];
+		} else {
+			next_c = '\0';
+		}
+
 		if (c == '/') {
 			nb_slashes++;
 		}
@@ -153,13 +163,26 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 				buffer_pos=-1;
 				break;
 			case '@':
-				if (!faup_features_exist(url_features->credential)) {
-					whatever_len = buffer_pos;
-					if ((last_slash_meaning == FAUP_LAST_SLASH_HIERARCHICAL) || /* This '@' belongs to the authentication if http://foo:bar@host/blah */
-							(last_slash_meaning == FAUP_LAST_SLASH_NOTFOUND)) {     /* This '@' belongs to the authentication if foo:bar@host/blah */
-					        url_features->credential.pos = url_features->host.pos; /* The credential starts where we thought it was a pos */
-						url_features->host.pos = current_pos + 1;
-						url_features->port.pos = -1; /* So the last ':' we've found was not for a port but for credential */
+				if (last_slash_meaning < FAUP_LAST_SLASH_AFTER_DOMAIN) {
+					if (special_char_after_colons_pos != current_pos) {
+						if (!faup_features_exist(url_features->credential)) {
+							whatever_len = buffer_pos;
+							if ((last_slash_meaning == FAUP_LAST_SLASH_HIERARCHICAL) || /* This '@' belongs to the authentication if http://foo:bar@host/blah */
+									(last_slash_meaning == FAUP_LAST_SLASH_NOTFOUND)) {     /* This '@' belongs to the authentication if foo:bar@host/blah */
+								url_features->credential.pos = url_features->host.pos; /* The credential starts where we thought it was a pos */
+								url_features->host.pos = current_pos + 1;
+								url_features->port.pos = -1; /* So the last ':' we've found was not for a port but for credential */
+							} else {
+								if (special_char_after_colons_pos != url_features->hierarchical.pos) {
+									// That '/' belongs to the password after colons ':'
+									last_slash_meaning = FAUP_LAST_SLASH_HIERARCHICAL;
+									url_features->credential.pos = url_features->host.pos; 
+									url_features->host.pos = current_pos + 1;
+									url_features->port.pos = -1;
+									url_features->resource_path.pos = -1;
+								}
+							}
+						}
 					}
 				}
 				buffer_pos=-1;
@@ -169,11 +192,14 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 				   - a ':' for the credential
 				   - a ':' for the port number
 				   - a ':' in the query request */
-				/* url_features->port = -1; */
 				if (!faup_features_exist(url_features->port)) {
 					if (last_slash_meaning < FAUP_LAST_SLASH_AFTER_DOMAIN) {
-						url_features->port.pos = current_pos + 1;
-						/* faup_features_debug("", url_features); */
+						if (isalnum(next_c)) {
+							// Skip a special char that may come after a port. Thus, this would not be a port.
+							url_features->port.pos = current_pos + 1;
+						} else {
+							special_char_after_colons_pos = current_pos + 1;
+						}
 					}
 				}
 
@@ -181,24 +207,29 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 
 				break;
 			case '?':
-				url_features->query_string.pos = current_pos;
+				// printf("Current pos:%zd, special_char:%zd\n", current_pos, special_char_after_colons_pos);
+				if (special_char_after_colons_pos != current_pos) {
+					url_features->query_string.pos = current_pos;
+				}
 
 				buffer_pos=-1;
 				break;
 			case '#':
-				url_features->fragment.pos = current_pos;
+				if (special_char_after_colons_pos != current_pos) {
+					url_features->fragment.pos = current_pos;
+				}
 
 				buffer_pos=-1;
 				break;
-		        case '[': /* This can be an IPv6 URL, see RFC 2732*/
+		    case '[': /* This can be an IPv6 URL, see RFC 2732*/
 				if (url_features->host.pos < 0) {
 				  url_features->host.pos = current_pos;
 				  host_is_ipv6 = 1;
 				}
-			        break;
-		        case ']':
-			        host_is_ipv6 = 0; /* We stop handle the special IPv6 case*/
-			        break;
+			    break;
+		    case ']':
+			    host_is_ipv6 = 0; /* We stop handle the special IPv6 case*/
+			    break;
 			default:
 				//fh->allocated_buf[buffer_pos] = c;
 				if (current_pos == 0) {
@@ -208,7 +239,6 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 				/* We have a scheme, but no host nor no credential, then host is current_pos until we have a credential to remove it */
 				if ((!faup_features_exist(url_features->host)) && 
 						(!faup_features_exist(url_features->credential))) {
-
 					url_features->host.pos = current_pos;
 
 				}
@@ -220,6 +250,7 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 		current_pos++;
 	}
 
+	// faup_features_debug("features", &fh->faup.features);
 }
 
 void faup_features_debug_print(char *string, int32_t pos, uint32_t size)

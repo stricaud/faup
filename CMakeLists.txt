@@ -20,7 +20,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${faup-project_SOURCE_DIR}/cmake)
 include(CMakeOptions.txt)
 include(CMakeGetDistribution.txt)
 
-set(CMAKE_BUILD_TYPE "Release")
+#set(CMAKE_BUILD_TYPE "Release")
+set(CMAKE_BUILD_TYPE "Debug")
 
 if (DEBUG_MODE)
 add_definitions(-DFAUP_DEBUG=1)
