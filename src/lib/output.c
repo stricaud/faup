@@ -32,8 +32,13 @@ void faup_output_show(faup_handler_t const* fh, faup_options_t *opts, const faup
 		const char *tmpbuf = NULL;
 		tmpbuf = &fh->faup.org_str[feature.pos];
 
-		while (counter < feature.size) {
+		if (feature.size > FAUP_MAXLEN) {
+			fprintf(stderr, "Error: field(%s) with size(%d) is greater than the maximum default FAUP URL MAXLEN (%d). Cannot process the given url (%s).\n",
+					faup_features_get_field_name(feature), feature.size, FAUP_MAXLEN, fh->faup.org_str);
+			return;
+		}
 
+		while (counter < feature.size) {
 			if (escape_dquotes) {
 				if (tmpbuf[counter] == '"') {
 					fwrite(&"\\", 1, 1, out);

@@ -2,5 +2,8 @@ http://test:?test@example.com
 http://test:/test@example.com
 http://test:#test@example.com
 http://foo:#/bar@www.google.fr/foo@bar?fds
+http://foo:#\/bar@www.google.fr/foo@bar?fds
 http://foo:@@//bar@www.google.fr/foo@bar?fds
 http://foo:@/??#@/bar@www.google.fr/foo@bar?fds
+http://foo:@@/bar
+foo:@@/bar

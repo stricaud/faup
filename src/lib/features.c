@@ -123,6 +123,11 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 
 		switch(c) {
 			case '/':
+				// This is for URLs such as "http://test:\/test@example.com"
+				if (get_last_c(url_o, current_pos) == '\\') {
+					buffer_pos=-1;
+					break;
+				}
 				/* If it is the first time we have a '/' and previous char is ':' */
 				if ((nb_slashes == 1) && (get_last_c(url_o, current_pos) == ':')) {
 					if (last_slash_meaning < FAUP_LAST_SLASH_AFTER_DOMAIN) {
@@ -166,6 +171,10 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 				if (last_slash_meaning < FAUP_LAST_SLASH_AFTER_DOMAIN) {
 					if (special_char_after_colons_pos != current_pos) {
 						if (!faup_features_exist(url_features->credential)) {
+							if (get_last_c(url_o, current_pos) == '@') {
+								break;
+							}
+
 							whatever_len = buffer_pos;
 							if ((last_slash_meaning == FAUP_LAST_SLASH_HIERARCHICAL) || /* This '@' belongs to the authentication if http://foo:bar@host/blah */
 									(last_slash_meaning == FAUP_LAST_SLASH_NOTFOUND)) {     /* This '@' belongs to the authentication if foo:bar@host/blah */
@@ -209,14 +218,18 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 			case '?':
 				// printf("Current pos:%zd, special_char:%zd\n", current_pos, special_char_after_colons_pos);
 				if (special_char_after_colons_pos != current_pos) {
-					url_features->query_string.pos = current_pos;
+					if (last_slash_meaning == FAUP_LAST_SLASH_AFTER_DOMAIN) {
+						url_features->query_string.pos = current_pos;
+					}
 				}
 
 				buffer_pos=-1;
 				break;
 			case '#':
 				if (special_char_after_colons_pos != current_pos) {
-					url_features->fragment.pos = current_pos;
+					if (last_slash_meaning == FAUP_LAST_SLASH_AFTER_DOMAIN) {
+						url_features->fragment.pos = current_pos;
+					}
 				}
 
 				buffer_pos=-1;
@@ -250,7 +263,7 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 		current_pos++;
 	}
 
-	// faup_features_debug("features", &fh->faup.features);
+		// faup_features_debug("features", &fh->faup.features);
 }
 
 void faup_features_debug_print(char *string, int32_t pos, uint32_t size)
@@ -259,6 +272,51 @@ void faup_features_debug_print(char *string, int32_t pos, uint32_t size)
     fprintf(stdout, "%s:%d,%u\n", string, pos, size);               
   }
 }
+
+char *faup_features_get_field_name(faup_feature_t feature) 
+{
+	switch(feature.field) {
+		case FAUP_FEATURES_FIELD_SCHEME:
+			return "scheme";
+			break;
+		case FAUP_FEATURES_FIELD_HIERARCHICAL:
+			return "hierarchical";
+			break;
+		case FAUP_FEATURES_FIELD_CREDENTIAL:
+			return "credential";
+			break;
+		case FAUP_FEATURES_FIELD_SUBDOMAIN:
+			return "subdomain";
+			break;
+		case FAUP_FEATURES_FIELD_DOMAIN:
+			return "domain";
+			break;
+		case FAUP_FEATURES_FIELD_DOMAIN_WITHOUT_TLD:
+			return "domain_without_tld";
+			break;
+		case FAUP_FEATURES_FIELD_HOST:
+			return "host";
+			break;
+		case FAUP_FEATURES_FIELD_TLD:
+			return "tld";
+			break;
+		case FAUP_FEATURES_FIELD_PORT:
+			return "port";
+			break;
+		case FAUP_FEATURES_FIELD_RESOURCE_PATH:
+			return "resource_path";
+			break;
+		case FAUP_FEATURES_FIELD_QUERY_STRING:
+			return "query_string";
+			break;
+		case FAUP_FEATURES_FIELD_FRAGMENT:
+			return "fragment";
+			break;		
+		default:
+			return "Unknown field!";
+	}
+}
+
 
 void faup_features_debug(const char *url, faup_features_t const* features)
 {
