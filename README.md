@@ -104,6 +104,40 @@ to build the binary in the source directory, you have to create a build director
     cmake .. && make
     sudo make install
     
+CMake 2.8 for Redhat/CentOS 6.x
+-------------------------------
+The following error may appears if you have an outdated version of CMake (just like Redhat and CentOS systems):
+
+```
+CMake Error at CMakeLists.txt:1 (cmake_minimum_required):
+  CMake 2.8 or higher is required.  You are running version 2.6.4
+
+-- Configuring incomplete, errors occurred!
+```
+
+To manually install CMake 2.8 on Redhat/CentOS systems use the sources and follow those instructions:
+
+```
+# Install dependencies
+yum install ncurses-devel gcc gcc-c++ make
+
+# Get the sources
+cd /usr/local/
+wget http://www.cmake.org/files/v2.8/cmake-2.8.12.2.tar.gz
+tar xzf cmake-2.8.12.2.tar.gz
+cd cmake-2.8.12.2
+
+# Compile and install the sources
+./configure
+make
+make install
+
+# clean the env
+cd /usr/local
+rm -rf cmake-2.8.12.2 cmake-2.8.12.2.tar.gz
+```
+    
+    
 FAQ
 ---
 
