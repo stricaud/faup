@@ -14,27 +14,21 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-#ifndef _FAUP_OUTPUT_H_
-#define _FAUP_OUTPUT_H_
+#ifndef _FAUP_WEBSERVER_H_
+#define _FAUP_WEBSERVER_H_
 
-#include <stdio.h>
 #include <faup/faup.h>
-#include <faup/options.h>
+#include <faup/civetweb/civetweb.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void faup_output(faup_handler_t *fh, FILE* out);
-void faup_output_csv_header(faup_handler_t const* fh, faup_options_t *opts, FILE *out);
-void faup_output_csv(faup_handler_t const* fh, faup_options_t *opts, FILE* out);
-void faup_output_json(faup_handler_t const* fh, faup_options_t *opts, FILE* out);
-char *faup_output_json_buffer_allocate(void);
-void faup_output_json_buffer(faup_handler_t const* fh, faup_options_t *opts, char *buffer);
+int faup_webserver_start(faup_handler_t *fh, faup_options_t *faup_opts, char *listening_ports);
+int faup_webserver_stop();
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	/* _FAUP_OUTPUT_H_ */
-
+#endif	/* _FAUP_WEBSERVER_H_ */

@@ -28,6 +28,8 @@
 extern "C" {
 #endif
 
+#define FAUP_FEATURES_NUMBER 11
+
 enum _faup_features_field_t {
 	FAUP_FEATURES_FIELD_SCHEME,
 	FAUP_FEATURES_FIELD_HIERARCHICAL,

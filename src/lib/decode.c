@@ -132,6 +132,8 @@ const char *faup_decode(faup_handler_t *fh, const char *url, size_t url_len)
 		return NULL;
 	}
 
+	fh->faup.decoded = true;
+
 #ifdef FAUP_LUA_MODULES
 	if (fh->options->exec_modules != FAUP_MODULES_NOEXEC) {
 		url_transformed_by_modules = faup_modules_decode_url_start(fh, url, url_len);

@@ -20,6 +20,7 @@
 #include <faup/decode.h>
 #include <faup/options.h>
 #include <faup/output.h>
+#include <faup/webserver.h>
 
 #include "shell.h"
 
@@ -104,7 +105,7 @@ void print_help(char **argv)
 
 int main(int argc, char **argv)
 {
-	faup_handler_t *fh;
+	faup_handler_t *fh = NULL;
 	int ret = 0;
 
 	char *tld_file=NULL;
@@ -129,7 +130,7 @@ int main(int argc, char **argv)
 	  return faup_handle_shell(argc, argv);
 	}
 
-	while ((opt = getopt(argc, argv, "apld:vo:utf:m:")) != -1) {
+	while ((opt = getopt(argc, argv, "apld:vo:utf:m:w:")) != -1) {
 	  switch(opt) {
 	  case 'a':
 	  	skip_file_check = 1;
@@ -210,6 +211,10 @@ int main(int argc, char **argv)
 	    faup_options_free(faup_opts);
 	    exit(0);
 	    break;
+	  case 'w': // This should always be the last options, since we init faup and need previous options
+		fh = faup_init(faup_opts);
+	  	faup_webserver_start(fh, faup_opts, optarg);
+	  	break;
 	  default:
 	    print_help(argv);
 	    faup_options_free(faup_opts);
@@ -217,7 +222,9 @@ int main(int argc, char **argv)
 	  }
 	}
 
-	fh = faup_init(faup_opts);
+	if (!fh) {
+		fh = faup_init(faup_opts);
+	}
 
 //	printf("Lart arg:'%s'\n", argv[optind+1]);
 

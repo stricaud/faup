@@ -2,15 +2,25 @@ include_directories(AFTER "include/" ${FAUP_INCLUDE_DIRS})
 
 
 if(WIN32)
-set(WIN32_PORTABLE
-compat/bsd-asprintf.c
-compat/bsd-snprintf.c
-compat/inet_pton.c
-compat/memrchr.c
-)
+	set(WIN32_PORTABLE
+	compat/bsd-asprintf.c
+	compat/bsd-snprintf.c
+	compat/inet_pton.c
+	compat/memrchr.c
+	)
 else()
-set(WIN32_PORTABLE)
+	set(WIN32_PORTABLE)
 endif(WIN32)
+
+if(WEBSERVER)
+	set(WEBSERVER_SRC
+	civetweb/md5.inl
+	civetweb/civetweb.c
+	webserver.c
+	)
+else()
+	set(WEBSERVER_SRC)
+endif(WEBSERVER)
 
 
 if(${LUA51_FOUND})
@@ -33,6 +43,7 @@ endif()
 
 set(FAUP_LIB_SRC_FILES
 ${WIN32_PORTABLE}
+${WEBSERVER_SRC}
 ${LUA_MODULES_SRC_FILES}
 datadir.c
 decode.c
@@ -57,6 +68,7 @@ include/faup/output.h
 include/faup/portable.h
 include/faup/tld.h
 include/faup/tld-tree.h
+include/faup/webserver.h
 )
 
 # Our static library

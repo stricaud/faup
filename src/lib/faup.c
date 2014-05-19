@@ -28,6 +28,7 @@ faup_handler_t *faup_init(faup_options_t *options)
     int retval;
 
 	fh = malloc(sizeof(faup_handler_t));
+    fh->faup.decoded = false;
 
     if (options) {
         fh->options = options;

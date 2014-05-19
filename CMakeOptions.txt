@@ -10,3 +10,8 @@ endif()
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/cmake-options/nolua)
 	set(FAUP_NOLUA 1)
 endif()
+
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/cmake-options/webserver)
+        set(WEBSERVER 1)
+        message(STATUS "Compile with Web Server")
+endif()

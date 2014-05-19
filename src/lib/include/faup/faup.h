@@ -67,6 +67,7 @@ typedef enum _faup_last_slash_t faup_last_slash_t;
 
 struct _faup_t {
 	const char *org_str;
+	bool decoded;
 	faup_features_t features;
 };
 

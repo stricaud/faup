@@ -18,6 +18,7 @@
 #include <stdlib.h>
 
 #include <faup/faup.h>
+#include <faup/features.h>
 #include <faup/output.h>
 
 #ifdef FAUP_LUA_MODULES
@@ -77,7 +78,7 @@ void _faup_output_csv_header_single(faup_options_t *opts, FILE *out, faup_url_fi
 	}
 }
 
-void faup_output_csv_header(faup_handler_t const* fh, faup_options_t *opts, FILE *out) \
+void faup_output_csv_header(faup_handler_t const* fh, faup_options_t *opts, FILE *out) 
 {
 	if (!opts->print_header) return;
 
@@ -128,8 +129,144 @@ void _faup_output_json_single(faup_handler_t const* fh, faup_options_t *opts, ch
 
 }
 
+// If that function is called more than once, you are doing a bad thing.
+char *faup_output_json_buffer_allocate(void)
+{
+	char *allocated_buffer;
+
+	// domain_without_tld = 18, max potential key, includes extra {} and "", this is not 100% accurate but still allows to
+	// handle the worst case and avoid multiple allocations; 
+	// It is done two times because urls can be made if " that will be escaped. Preventing the worst cases situations.
+	// And since this is only one alloc, that does not hurt much.
+	allocated_buffer = calloc(2 * FAUP_FEATURES_NUMBER, (FAUP_MAXLEN + 18));
+	if (!allocated_buffer) {
+		fprintf(stderr, "Cannot allocate buffer for %s\n", __FUNCTION__);
+	}
+
+	return allocated_buffer;
+}
+
+void faup_output_buffer_append(char *buffer, int *buffer_pos, const char *data, size_t data_size)
+{
+	memcpy(&buffer[*buffer_pos], data, data_size);
+	*buffer_pos += data_size;
+	buffer[*buffer_pos] = '\0';
+}
+
+void faup_output_show_buffer(faup_handler_t const* fh, faup_options_t *opts, const faup_feature_t feature, char *buffer, int *buffer_pos, int escape_dquotes)
+{
+
+	if (faup_features_exist(feature)) {
+		uint32_t counter = 0;
+		const char *tmpbuf = NULL;
+		tmpbuf = &fh->faup.org_str[feature.pos];
+
+		if (feature.size > FAUP_MAXLEN) {
+			fprintf(stderr, "Error: field(%s) with size(%d) is greater than the maximum default FAUP URL MAXLEN (%d). Cannot process the given url (%s).\n",
+					faup_features_get_field_name(feature), feature.size, FAUP_MAXLEN, fh->faup.org_str);
+			return;
+		}
+
+		while (counter < feature.size) {
+			if (escape_dquotes) {
+				if (tmpbuf[counter] == '"') {
+					faup_output_buffer_append(buffer, buffer_pos, "\\", 1);
+				}
+			}
+
+			// printf("tmpbuf:%c\n", tmpbuf[counter]);
+			faup_output_buffer_append(buffer, buffer_pos, &fh->faup.org_str[feature.pos+counter], 1);
+
+			counter++;
+		}
+
+	}
+}
+
+void _faup_output_json_single_buffer(faup_handler_t const* fh, faup_options_t *opts, char *faup_feature_name, const faup_feature_t feature, faup_url_field_t field, char *buffer, int *buffer_pos)
+{
+
+	faup_output_buffer_append(buffer, buffer_pos, "\t\"", 2);
+	faup_output_buffer_append(buffer, buffer_pos, faup_feature_name, strlen(faup_feature_name));
+	faup_output_buffer_append(buffer, buffer_pos, "\": \"", 4);
+
+	faup_output_show_buffer(fh, opts, feature, buffer, buffer_pos, 1);
+
+	if (faup_options_url_field_has_greater_than(opts, field)) {
+		faup_output_buffer_append(buffer, buffer_pos, "\",\n", 3);
+	} else {
+		faup_output_buffer_append(buffer, buffer_pos, "\"", 1);
+	}
+
+}
+
+// Requires an allocated buffer. 
+void faup_output_json_buffer(faup_handler_t const* fh, faup_options_t *opts, char *buffer)
+{
+	int buffer_pos = 0;
+
+	if (!fh->faup.decoded) {
+		fprintf(stderr, "Error: Cannot output json, since the URL has not been decoded. Call faup_decode()!\n");
+		return;
+	}
+
+	faup_output_buffer_append(buffer, &buffer_pos, "{\n", 2);
+
+	if (opts->fields & FAUP_URL_FIELD_SCHEME) {
+		_faup_output_json_single_buffer(fh, opts, "scheme", fh->faup.features.scheme, FAUP_URL_FIELD_SCHEME, 
+										buffer, &buffer_pos);
+	}	
+	if (opts->fields & FAUP_URL_FIELD_CREDENTIAL) {
+		_faup_output_json_single_buffer(fh, opts, "credential", fh->faup.features.credential, FAUP_URL_FIELD_SCHEME, 
+										buffer, &buffer_pos);
+	}
+	if (opts->fields & FAUP_URL_FIELD_SUBDOMAIN) {
+		_faup_output_json_single_buffer(fh, opts, "subdomain", fh->faup.features.subdomain, FAUP_URL_FIELD_SCHEME, 
+										buffer, &buffer_pos);
+	}
+	if (opts->fields & FAUP_URL_FIELD_DOMAIN) {
+		_faup_output_json_single_buffer(fh, opts, "domain", fh->faup.features.domain, FAUP_URL_FIELD_SCHEME, 
+										buffer, &buffer_pos);
+	}
+	if (opts->fields & FAUP_URL_FIELD_DOMAIN_WITHOUT_TLD) {
+		_faup_output_json_single_buffer(fh, opts, "domain_without_tld", fh->faup.features.domain_without_tld, FAUP_URL_FIELD_SCHEME, 
+										buffer, &buffer_pos);
+	}
+	if (opts->fields & FAUP_URL_FIELD_HOST) {
+		_faup_output_json_single_buffer(fh, opts, "host", fh->faup.features.host, FAUP_URL_FIELD_SCHEME, 
+										buffer, &buffer_pos);
+	}
+	if (opts->fields & FAUP_URL_FIELD_TLD) {
+		_faup_output_json_single_buffer(fh, opts, "tld", fh->faup.features.tld, FAUP_URL_FIELD_SCHEME, 
+										buffer, &buffer_pos);
+	}
+	if (opts->fields & FAUP_URL_FIELD_PORT) {
+		_faup_output_json_single_buffer(fh, opts, "port", fh->faup.features.port, FAUP_URL_FIELD_SCHEME, 
+										buffer, &buffer_pos);
+	}
+	if (opts->fields & FAUP_URL_FIELD_RESOURCE_PATH) {
+		_faup_output_json_single_buffer(fh, opts, "resource_path", fh->faup.features.resource_path, FAUP_URL_FIELD_SCHEME, 
+										buffer, &buffer_pos);
+	}
+	if (opts->fields & FAUP_URL_FIELD_QUERY_STRING) {
+		_faup_output_json_single_buffer(fh, opts, "query_string", fh->faup.features.query_string, FAUP_URL_FIELD_SCHEME, 
+										buffer, &buffer_pos);
+	}
+	if (opts->fields & FAUP_URL_FIELD_FRAGMENT) {
+		_faup_output_json_single_buffer(fh, opts, "fragment", fh->faup.features.fragment, FAUP_URL_FIELD_SCHEME, 
+										buffer, &buffer_pos);
+	}
+
+	faup_output_buffer_append(buffer, &buffer_pos, "\n}\n", 3);
+		
+}
+
 void faup_output_json(faup_handler_t const* fh, faup_options_t *opts, FILE* out)
-{	
+{
+	if (!fh->faup.decoded) {
+		fprintf(stderr, "Error: Cannot output json, since the URL has not been decoded. Call faup_decode()!\n");
+		return;
+	}
 
 	fwrite(&"{\n", 2, 1, out);
 	if (opts->fields & FAUP_URL_FIELD_SCHEME) {
