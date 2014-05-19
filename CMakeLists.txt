@@ -75,6 +75,7 @@ endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   add_definitions(-DLINUX=1)
+  set(FAUP_LINK_LIBRARIES pthread)
   message("Discovered distribution type: ${LINUX_DIST}")
 endif()
 
