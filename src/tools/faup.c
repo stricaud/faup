@@ -4,6 +4,10 @@
 #define _BSD_SOURCE
 #endif
 
+#ifdef MACOS // Workaround daemon(): warning: 'daemon' is deprecated: first deprecated in Mac OS X 10.5 [-Wdeprecated-declarations]
+#define daemon sure_it_is_deprecated_for_non_portable_stuff
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,6 +27,11 @@
 #include <faup/webserver.h>
 
 #include "shell.h"
+
+#if MACOS
+#undef daemon
+extern int daemon(int, int);
+#endif
 
 /* readline() - read a line from the file handle.
  * Return an allocated string */
@@ -100,6 +109,7 @@ void print_help(char **argv)
 	printf("-p\tprint the header\n");
 	printf("-t\tdo not extract TLD > 1 (eg. only get 'uk' instead of 'co.uk')\n");
 	printf("-u\tupdate the mozilla list\n");
+	printf("-w listen_ip:port\n\tstarts webserver on the wanted ip:port\n");
 	printf("\n");
 }
 
@@ -213,6 +223,7 @@ int main(int argc, char **argv)
 	    break;
 	  case 'w': // This should always be the last options, since we init faup and need previous options
 		fh = faup_init(faup_opts);
+		daemon(1,1);
 	  	faup_webserver_start(fh, faup_opts, optarg);
 	  	break;
 	  default:

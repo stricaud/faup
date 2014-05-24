@@ -34,6 +34,24 @@ int log_message(const struct mg_connection *conn, const char *message)
     return 0;
 }
 
+int root_handler(struct mg_connection *conn, void *cbdata)
+{
+
+	mg_printf(conn, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n");
+	mg_printf(conn, " \
+		<html> \
+		<head><title>Faup webserver</title></head> \
+		<body> \
+		<h1>Faup webserver</h1> \
+		<p> \
+		No URL given. Please use the uri such as /json?url=base64_of_your_url \
+		</p> \
+		</body> \
+		</html>");
+
+	return 1;
+}
+
 int json_output(struct mg_connection *conn, void *cbdata)
 {
 	unsigned char *url_unbase64;
@@ -116,6 +134,7 @@ int faup_webserver_start(faup_handler_t *fh, faup_options_t *faup_opts, char *li
 	ctx = mg_start(&callbacks, NULL, options);
 
     mg_set_request_handler(ctx, "/json", json_output, NULL);
+    mg_set_request_handler(ctx, "/", root_handler, NULL);
 
 	while (1) {
 		#ifdef WIN32
