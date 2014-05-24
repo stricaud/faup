@@ -87,6 +87,15 @@ class Faup(object):
         size = faup_get_domain_size(self.fh)
 
         return self._get_param_from_pos_and_size(pos, size)
+
+    def get_domain_without_tld(self):
+        if not self.decoded:
+            raise UrlNotDecoded("You must call faup.decode() first")
+
+        pos = faup_get_domain_without_tld_pos(self.fh)
+        size = faup_get_domain_without_tld_size(self.fh)
+
+        return self._get_param_from_pos_and_size(pos, size)
         
     def get_host(self):
         if not self.decoded:
@@ -146,6 +155,7 @@ class Faup(object):
         self.retval["scheme"] = self.get_scheme()
         self.retval["tld"] = self.get_tld()    
         self.retval["domain"] = self.get_domain()
+        self.retval["domain_without_tld"] = self.get_domain_without_tld()
         self.retval["subdomain"] = self.get_subdomain()    
         self.retval["host"] = self.get_host()
         self.retval["port"] = self.get_port()
