@@ -101,6 +101,7 @@ void print_help(char **argv)
 
 	printf("Options:\n");
 	printf("-a\tskip provided argument file open check\n");
+	printf("-b\tRun the webserver in background\n");	
 	printf("-d {delimiter}\n\twill separate the fields with the wanted delimiter\n");
 	printf("-f {scheme|credential|subdomain|domain|domain_without_tld|host|tld|port|resource_path|query_string|fragment}\n\tfield to extract\n");
 	printf("-l\tprefix with the line number (csv only)\n");
@@ -123,6 +124,7 @@ int main(int argc, char **argv)
 	faup_options_t *faup_opts;
 	int opt;
 	int skip_file_check = 0;
+	int run_in_background = 0;
 
 	int tld_pos;
 
@@ -140,10 +142,13 @@ int main(int argc, char **argv)
 	  return faup_handle_shell(argc, argv);
 	}
 
-	while ((opt = getopt(argc, argv, "apld:vo:utf:m:w:")) != -1) {
+	while ((opt = getopt(argc, argv, "abpld:vo:utf:m:w:")) != -1) {
 	  switch(opt) {
 	  case 'a':
 	  	skip_file_check = 1;
+	  	break;
+	  case 'b':
+	  	run_in_background = 1;
 	  	break;
 	  case 'd':
 	  	if (optarg) {
@@ -223,7 +228,10 @@ int main(int argc, char **argv)
 	    break;
 	  case 'w': // This should always be the last options, since we init faup and need previous options
 		fh = faup_init(faup_opts);
-		daemon(1,1);
+		if (run_in_background) {
+			daemon(1,1);
+		}
+
 	  	faup_webserver_start(fh, faup_opts, optarg);
 	  	break;
 	  default:
