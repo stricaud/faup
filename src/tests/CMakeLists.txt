@@ -37,3 +37,7 @@ if(LINUX)
 	target_link_libraries(multithreads ${FAUP_LIBRARY} "pthread" )
 	add_test(MultiThreads ${TEST_FAUP_SCRIPT} multithreads)
 endif(LINUX)
+
+add_executable(base64 base64.c)
+target_link_libraries(base64 ${FAUP_LIBRARY})
+add_test(Base64 ${TEST_FAUP_SCRIPT} base64)
