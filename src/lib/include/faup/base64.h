@@ -34,7 +34,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-const static char* b64="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" ;
+// const static char* b64="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" ;
+
+// Base64 url replaces + with - and / with _
+// Read http://en.wikipedia.org/wiki/Base64#RFC_4648
+const static char* b64="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_" ;
 
 // maps A=>0,B=>1..
 const static unsigned char unb64[]={
