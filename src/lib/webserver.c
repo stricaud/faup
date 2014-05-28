@@ -96,11 +96,11 @@ int json_output(struct mg_connection *conn, void *cbdata)
 
 	faup_decode(_fh, (const char *)url_unbase64, strlen((const char *)url_unbase64));
 
-    mg_printf(conn, "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n");
+        mg_printf(conn, "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n");
 
 	faup_output_json_buffer(_fh, _faup_opts, buffer);
 
-	mg_printf(conn, buffer);
+	mg_printf(conn, "%s", buffer);
 
     // mg_printf(conn, "<html><body>");
     // mg_printf(conn, "<h2>This is the A handler!!!</h2>");
