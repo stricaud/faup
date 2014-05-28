@@ -135,6 +135,10 @@ make install
 # clean the env
 cd /usr/local
 rm -rf cmake-2.8.12.2 cmake-2.8.12.2.tar.gz
+
+# adding cmake to the PATH 
+echo "PATH=/usr/local/bin/:\$PATH" > /etc/profile.d/cmake28.sh 
+source /etc/profile
 ```
     
     
