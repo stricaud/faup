@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-#define FAUP_FEATURES_NUMBER 11
+#define FAUP_FEATURES_NUMBER 12
 
 enum _faup_features_field_t {
 	FAUP_FEATURES_FIELD_SCHEME,
