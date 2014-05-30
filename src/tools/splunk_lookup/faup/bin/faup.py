@@ -104,7 +104,5 @@ def main():
         csv_out.writerow(row)
 
 
-main()
-
 if __name__ == "__main__":
     main()
