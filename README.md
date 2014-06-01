@@ -110,7 +110,7 @@ Faup can be compiled without LUA support. In that case, CMake will output the fo
 -- Could NOT find Lua51 (missing:  LUA_INCLUDE_DIR) 
 ```
 
-If you want to add LUA functionnalities you need to install lua development headers prior to the previous building steps. 
+If you want to add LUA functionnality you need to install lua development headers prior to the previous building steps. 
 
 For example, on Redhat systems:
 ```
