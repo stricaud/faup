@@ -217,7 +217,7 @@ void faup_output_json_buffer(faup_handler_t const* fh, faup_options_t *opts, cha
 										buffer, &buffer_pos);
 	}	
 	if (opts->fields & FAUP_URL_FIELD_CREDENTIAL) {
-		_faup_output_json_single_buffer(fh, opts, "credential", fh->faup.features.credential, FAUP_URL_FIELD_FIELD_CREDENTIAL, 
+		_faup_output_json_single_buffer(fh, opts, "credential", fh->faup.features.credential, FAUP_URL_FIELD_CREDENTIAL, 
 										buffer, &buffer_pos);
 	}
 	if (opts->fields & FAUP_URL_FIELD_SUBDOMAIN) {
