@@ -5,7 +5,21 @@ import sys
 import os
 import json
 import logging, logging.handlers
+import platform
+#import subprocess
 import envoy
+import pprint, StringIO
+
+def where_is_faup():
+	if platform.system() == "Darwin":
+		return os.environ['SPLUNK_HOME'] + "/etc/apps/faup/opt/faup-darwin"
+	if platform.system() == "Linux":
+		return os.environ['SPLUNK_HOME'] + "/etc/apps/faup/opt/faup-linux"
+
+	# I don't know, so let's trust the system
+	return "faup"
+
+faup_bin = where_is_faup()
 
 def setup_logger():
         """                       
@@ -25,102 +39,70 @@ def setup_logger():
 
 
 def run_faup(logger, url_value):
-	url_value.replace("'", "''")
-	url_value.replace('"', '""')
-	url_value.decode('utf-8', 'ignore')
-	run_command = 'echo -n "%s" |faup -o json' % (url_value)
-	try:
-		faup_r = envoy.run(run_command)
-		json_from_faup = faup_r.std_out
-	except:
-		logger.info("Error with: %s" % run_command)
-		return None
+    url_value.replace("'", "''")
+    url_value.replace('"', '""')
+    url_value.decode('utf-8', 'ignore')
 
-	try:
-		json_tree = json.loads(json_from_faup)
-		return json_tree
-	except:
-		logger.info("ERROR TO LOAD JSON: %s" % (json_from_faup))
+    # known bug:
+    # urls with '\xAA' pattern in it.
+    run_command = 'echo -n "%s" |%s -o json' % (url_value, faup_bin)
 
-	return None
+    try:
+        faup_r = envoy.run(run_command)
+        json_from_faup = faup_r.std_out
+    except:
+        logger.info("Error running the command (url=[%s]: %s" % (url_value, run_command))
+        return None
+
+    if not faup_r.std_err == "":
+        logger.info("faup_r.std_err=%s" % (faup_r.std_err))
+
+    try:
+        json_tree = json.loads(json_from_faup)
+        json_modified = {}
+        for k, v in json_tree.iteritems():
+            json_modified["url_" + k] = v
+
+    #logger.info("json=%s" % json_modified)
+
+        return json_modified
+    except:
+        logger.info("Error loading Json (url=[%s]): %s" % (url_value, json_from_faup))
 
 
+    return None
+
+
+# Faup output fields
+# scheme credential subdomain domain domain_without_tld host tld port resource_path query_string fragment
 def main():
+
     logger = setup_logger()
 
-    # Get url column
-    if len(sys.argv) < 2:
-        print("No argument provided")
+    if( len(sys.argv) != 2 ):
+        print "Usage: python faup.py url"
         sys.exit(0)
 
-    urlColumn = sys.argv[1]
+    header  = [
+        'url', 'url_scheme', 'url_credential', 'url_subdomain', 'url_domain',
+        'url_domain_without_tld', 'url_host', 'url_tld', 'url_port', 'url_resource_path',
+        'url_query_string', 'url_fragment'
+    ]
 
-    # scheme,credential,subdomain,domain,host,tld,port,resource_path,query_string,fragment
-    SchemeColumn       = 'url_scheme'
-    CredentialColumn   = 'url_credential'
-    SubdomainColumn    = 'url_subdomain'
-    DomainColumn       = 'url_domain'
-    HostColumn         = 'url_host'
-    TLDColumn          = 'url_tld'
-    PortColumn         = 'url_port'
-    ResourcePathColumn = 'url_resource_path'
-    QueryStringColumn  = 'url_query_string'
-    FragmentColumn     = 'url_fragment'
-    ErrorColumn        = 'url_error'
+    csv_in  = csv.DictReader(sys.stdin) # automatically use the first line as header
+    csv_out = csv.DictWriter(sys.stdout, header)
 
-    reader = csv.reader(sys.stdin)
-    writer = None
-    header = []
+    # write header
+    csv_out.writerow(dict(zip(header,header)))
 
-    first = True
-    for line in reader:
-        if first:
-            header = line
+    for row in csv_in:
+        json_res = run_faup(logger, row['url'])
 
-            if urlColumn not in header:
-                logger.warn("URL not provided")
-                sys.exit(0)
+        if json_res:
+            row.update(json_res)
 
-            csv.writer(sys.stdout).writerow(header)
-            writer = csv.DictWriter(sys.stdout, header)
-            first = False
-            continue
-
-        result = {}
-        i = 0
-        #loop through the list of headers
-        while i < len(header):
-            if i < len(line):
-                result[header[i]] = line[i]
-            else:
-                result[header[i]] = ''
-            i += 1
-
-	url_value = result[urlColumn]
-	faup_url_results = []
-
-	# If we have an URL, split it using faup
-        if len(result[urlColumn]):
-		json_tree = run_faup(logger, url_value)
-
-		if json_tree is None:
-			writer.writerow(result)
-			return
-
-		result[SchemeColumn]       = json_tree['scheme']
-		result[CredentialColumn]   = json_tree['credential']
-		result[SubdomainColumn]    = json_tree['subdomain']
-		result[DomainColumn]       = json_tree['domain']
-		result[HostColumn]         = json_tree['host']
-		result[TLDColumn]          = json_tree['tld']
-		result[PortColumn]         = json_tree['port']
-		result[ResourcePathColumn] = json_tree['resource_path']
-		result[QueryStringColumn]  = json_tree['query_string']
-		result[FragmentColumn]     = json_tree['fragment']
-			
-		writer.writerow(result)
-	else:
-		writer.writerow(result)
+        csv_out.writerow(row)
 
 
-main()
+if __name__ == "__main__":
+    main()

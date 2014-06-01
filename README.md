@@ -103,6 +103,21 @@ to build the binary in the source directory, you have to create a build director
     cd build
     cmake .. && make
     sudo make install
+
+## LUA support
+Faup can be compiled without LUA support. In that case, CMake will output the following line
+```
+-- Could NOT find Lua51 (missing:  LUA_INCLUDE_DIR) 
+```
+
+If you want to add LUA functionnalities you need to install lua development headers prior to the previous building steps. 
+
+For example, on Redhat systems:
+```
+# yum -y install lua lua-devel
+```
+
+
     
 CMake 2.8 for Redhat/CentOS 6.x
 -------------------------------
@@ -135,6 +150,10 @@ make install
 # clean the env
 cd /usr/local
 rm -rf cmake-2.8.12.2 cmake-2.8.12.2.tar.gz
+
+# adding cmake to the PATH 
+echo "PATH=/usr/local/bin/:\$PATH" > /etc/profile.d/cmake28.sh 
+source /etc/profile
 ```
     
     

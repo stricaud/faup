@@ -217,43 +217,43 @@ void faup_output_json_buffer(faup_handler_t const* fh, faup_options_t *opts, cha
 										buffer, &buffer_pos);
 	}	
 	if (opts->fields & FAUP_URL_FIELD_CREDENTIAL) {
-		_faup_output_json_single_buffer(fh, opts, "credential", fh->faup.features.credential, FAUP_URL_FIELD_SCHEME, 
+		_faup_output_json_single_buffer(fh, opts, "credential", fh->faup.features.credential, FAUP_URL_FIELD_FIELD_CREDENTIAL, 
 										buffer, &buffer_pos);
 	}
 	if (opts->fields & FAUP_URL_FIELD_SUBDOMAIN) {
-		_faup_output_json_single_buffer(fh, opts, "subdomain", fh->faup.features.subdomain, FAUP_URL_FIELD_SCHEME, 
+		_faup_output_json_single_buffer(fh, opts, "subdomain", fh->faup.features.subdomain, FAUP_URL_FIELD_SUBDOMAIN, 
 										buffer, &buffer_pos);
 	}
 	if (opts->fields & FAUP_URL_FIELD_DOMAIN) {
-		_faup_output_json_single_buffer(fh, opts, "domain", fh->faup.features.domain, FAUP_URL_FIELD_SCHEME, 
+		_faup_output_json_single_buffer(fh, opts, "domain", fh->faup.features.domain, FAUP_URL_FIELD_DOMAIN, 
 										buffer, &buffer_pos);
 	}
 	if (opts->fields & FAUP_URL_FIELD_DOMAIN_WITHOUT_TLD) {
-		_faup_output_json_single_buffer(fh, opts, "domain_without_tld", fh->faup.features.domain_without_tld, FAUP_URL_FIELD_SCHEME, 
+		_faup_output_json_single_buffer(fh, opts, "domain_without_tld", fh->faup.features.domain_without_tld, FAUP_URL_FIELD_DOMAIN_WITHOUT_TLD, 
 										buffer, &buffer_pos);
 	}
 	if (opts->fields & FAUP_URL_FIELD_HOST) {
-		_faup_output_json_single_buffer(fh, opts, "host", fh->faup.features.host, FAUP_URL_FIELD_SCHEME, 
+		_faup_output_json_single_buffer(fh, opts, "host", fh->faup.features.host, FAUP_URL_FIELD_HOST, 
 										buffer, &buffer_pos);
 	}
 	if (opts->fields & FAUP_URL_FIELD_TLD) {
-		_faup_output_json_single_buffer(fh, opts, "tld", fh->faup.features.tld, FAUP_URL_FIELD_SCHEME, 
+		_faup_output_json_single_buffer(fh, opts, "tld", fh->faup.features.tld, FAUP_URL_FIELD_TLD, 
 										buffer, &buffer_pos);
 	}
 	if (opts->fields & FAUP_URL_FIELD_PORT) {
-		_faup_output_json_single_buffer(fh, opts, "port", fh->faup.features.port, FAUP_URL_FIELD_SCHEME, 
+		_faup_output_json_single_buffer(fh, opts, "port", fh->faup.features.port, FAUP_URL_FIELD_PORT, 
 										buffer, &buffer_pos);
 	}
 	if (opts->fields & FAUP_URL_FIELD_RESOURCE_PATH) {
-		_faup_output_json_single_buffer(fh, opts, "resource_path", fh->faup.features.resource_path, FAUP_URL_FIELD_SCHEME, 
+		_faup_output_json_single_buffer(fh, opts, "resource_path", fh->faup.features.resource_path, FAUP_URL_FIELD_RESOURCE_PATH, 
 										buffer, &buffer_pos);
 	}
 	if (opts->fields & FAUP_URL_FIELD_QUERY_STRING) {
-		_faup_output_json_single_buffer(fh, opts, "query_string", fh->faup.features.query_string, FAUP_URL_FIELD_SCHEME, 
+		_faup_output_json_single_buffer(fh, opts, "query_string", fh->faup.features.query_string, FAUP_URL_FIELD_QUERY_STRING, 
 										buffer, &buffer_pos);
 	}
 	if (opts->fields & FAUP_URL_FIELD_FRAGMENT) {
-		_faup_output_json_single_buffer(fh, opts, "fragment", fh->faup.features.fragment, FAUP_URL_FIELD_SCHEME, 
+		_faup_output_json_single_buffer(fh, opts, "fragment", fh->faup.features.fragment, FAUP_URL_FIELD_FRAGMENT, 
 										buffer, &buffer_pos);
 	}
 
