@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008-2013, Troy D. Hanson   http://troydhanson.github.com/uthash/
+Copyright (c) 2008-2014, Troy D. Hanson   http://troydhanson.github.com/uthash/
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef UTARRAY_H
 #define UTARRAY_H
 
-#define UTARRAY_VERSION 1.9.8
+#define UTARRAY_VERSION 1.9.9
 
 #ifdef __GNUC__
 #define _UNUSED_ __attribute__ ((__unused__)) 
@@ -34,13 +34,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _UNUSED_ 
 #endif
 
-#ifdef LINUX
-#define __USE_BSD
-#endif
-
 #include <stddef.h>  /* size_t */
+#include <sys/types.h>  /* ssize_t */
 #include <string.h>  /* memset, etc */
 #include <stdlib.h>  /* exit */
+
+#ifndef strdup
+char *strdup(const char *s);
+#endif
+
 
 #define oom() exit(-1)
 
