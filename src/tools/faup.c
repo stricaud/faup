@@ -8,10 +8,11 @@
 #define daemon sure_it_is_deprecated_for_non_portable_stuff
 #endif
 
+#include <signal.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
 #include <unistd.h>
 
 #ifdef WIN32
@@ -112,6 +113,13 @@ void print_help(char **argv)
 	printf("-u\tupdate the mozilla list\n");
 	printf("-w listen_ip:port\n\tstarts webserver on the wanted ip:port\n");
 	printf("\n");
+}
+
+void sighandler_webserver(int signal)
+{
+  faup_webserver_stop();
+  printf("Exiting faup webserver\n");
+  exit(0);
 }
 
 int main(int argc, char **argv)
@@ -232,6 +240,7 @@ int main(int argc, char **argv)
 			daemon(1,1);
 		}
 
+		signal(SIGINT, sighandler_webserver);
 	  	faup_webserver_start(fh, faup_opts, optarg);
 	  	break;
 	  default:
