@@ -243,7 +243,11 @@ TLDNode *faup_tld_tree_new(void)
 	}
 	Tree->c = '\0'; 
 
-	faup_tld_array_populate();
+	ret = faup_tld_array_populate();
+	if (ret < 0) {
+	  fprintf(stderr, "Error with faup_tld_array_populate from %s; Symptom: double initialization?\n", __FUNCTION__);
+	  return NULL;
+	}
 	faup_tld_array_foreach(faup_tld_tree_add_tld, Tree);
 	faup_tld_array_destroy();
 

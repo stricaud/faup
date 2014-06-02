@@ -130,7 +130,7 @@ int faup_tld_update(void)
 	return 0;
 }
 
-void faup_tld_array_populate(void)
+int faup_tld_array_populate(void)
 {
 
 	FILE *fp;
@@ -140,7 +140,7 @@ void faup_tld_array_populate(void)
 	if (_tlds) {
 		fprintf(stderr, "The tld array has already been populated!\n");
 		free(tld_file);
-		return;
+		return -1;
 	}
 	utarray_new(_tlds, &ut_str_icd);
 
@@ -182,6 +182,7 @@ void faup_tld_array_populate(void)
 		fclose(fp);
 	}
 
+	return 0;
 }
 
 void faup_tld_array_destroy(void)

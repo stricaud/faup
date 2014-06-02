@@ -28,7 +28,6 @@ add_test(Issue27           ${TEST_FAUP_SCRIPT} issue 27)
 add_test(Issue28           ${TEST_FAUP_SCRIPT} issue 28)
 add_test(Issue30           ${TEST_FAUP_SCRIPT} issue 30)
 
-
 # Some C tests
 include_directories(AFTER ${FAUP_INCLUDE_DIRS})
 
@@ -41,3 +40,9 @@ endif(LINUX)
 add_executable(base64 base64.c)
 target_link_libraries(base64 ${FAUP_LIBRARY})
 add_test(Base64 ${TEST_FAUP_SCRIPT} base64)
+
+# C API/ABI issues
+add_executable(issue36 issue36.c)
+target_link_libraries(issue36 ${FAUP_LIBRARY})
+add_test(Issue36 issue36)
+
