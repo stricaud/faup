@@ -72,9 +72,9 @@ int json_output(struct mg_connection *conn, void *buffer)
     	return 1;
     }
 
-     url_unbase64 = unbase64((const char *)url, url_len, &url_outlen);
-     
-    faup_decode(_fh, (const char *)url_unbase64, strlen(url_unbase64));
+    url_unbase64 = unbase64((const char *)url, url_len, &url_outlen);
+
+    faup_decode(_fh, (const char *)url_unbase64, url_outlen - 1 /* -1 because we don't count the '\0'! */);
 
     mg_printf(conn, "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n");
 
