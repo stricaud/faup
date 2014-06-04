@@ -330,7 +330,7 @@ static bool faup_tld_tree_tld_exists(TLDNode *Tree, const char *tld, int tld_len
  * - google.nawak => -1 (NOT FOUND)
  *
  */
-faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld_tree, const char *org_str)
+faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld_tree)
 {
 	const char *p;
 	int32_t host_last_pos;
@@ -340,6 +340,9 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 	uint32_t tld_len = 0;
 	uint32_t tld_exception_len = 0;
 	uint32_t last_len_just_for_host = 0;
+	size_t last_len;
+	size_t org_str_len;
+
 	faup_tld_tree_extracted_t tld_extracted;
 
 	uint32_t counter;
@@ -362,7 +365,7 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 
 	host_last_pos = fh->faup.features.host.pos + fh->faup.features.host.size;
 
-	p = org_str + host_last_pos - 1; 
+	p = fh->faup.org_str + host_last_pos - 1; 
 
 	counter = fh->faup.features.host.size - 1;
 	while( counter )
@@ -392,11 +395,12 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 	}
 
 
-	counter = 0;
 	// We want to retrieve the size of the tld without the useless chars the come afterwards
 	// www.foo.siemens.om/tagada != www.foo.siemens.om
-	last_len_just_for_host = strlen(last) - (strlen(org_str) - (fh->faup.features.host.pos + fh->faup.features.host.size));
+	last_len = counter;
+	last_len_just_for_host = last_len - (fh->faup.org_str_len - (fh->faup.features.host.pos + fh->faup.features.host.size));
 
+	counter = 0;
 	if (tld_tree->sibling) {
 		found = faup_tld_tree_tld_exists(tld_tree->sibling, last, last_len_just_for_host);
 		if( found )

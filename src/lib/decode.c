@@ -139,6 +139,7 @@ const char *faup_decode(faup_handler_t *fh, const char *url, size_t url_len)
 		url_transformed_by_modules = faup_modules_decode_url_start(fh, url, url_len);
 		if (url_transformed_by_modules) {
 			fh->faup.org_str = url_transformed_by_modules->url; // FIXME: Change to 'url' when the output has changed to reflect new way of doing with lua stuff
+			fh->faup.org_str_len = url_len;
 			faup_features_find(fh, url_transformed_by_modules->url, url_transformed_by_modules->url_len);
 			url_len = url_transformed_by_modules->url_len;
 			retval_url = url_transformed_by_modules->url;
@@ -146,11 +147,13 @@ const char *faup_decode(faup_handler_t *fh, const char *url, size_t url_len)
 	}
 	if (!url_transformed_by_modules) {
 		fh->faup.org_str = url;
+		fh->faup.org_str_len = url_len;
 		faup_features_find(fh, url, url_len);		
 	}
 #else
 	// Nothing has been transformed, so we simply use our original url
 	fh->faup.org_str = url;
+	fh->faup.org_str_len = url_len;
 	faup_features_find(fh, url, url_len);		
 #endif // FAUP_LUA_MODULES
 
@@ -184,7 +187,7 @@ const char *faup_decode(faup_handler_t *fh, const char *url, size_t url_len)
 			}
 
 			if (next_valid_token_pos > url_features->host.pos) {
-				const char *host;
+				const char *host = NULL;
 
 				total_size = next_valid_token_pos - url_features->host.pos;
 				url_features->host.size = total_size;
@@ -213,7 +216,7 @@ const char *faup_decode(faup_handler_t *fh, const char *url, size_t url_len)
 
 							// All the features are detected, we can do some extra operations now
 							if (fh->options->tld_greater_extraction) {
-								faup_tld_tree_extracted_t tld_extracted = faup_tld_tree_extract(fh, fh->options->tld_tree, fh->faup.org_str);
+								faup_tld_tree_extracted_t tld_extracted = faup_tld_tree_extract(fh, fh->options->tld_tree);
 								url_features->tld.pos = tld_extracted.pos;
 								url_features->tld.size = tld_extracted.size;
 

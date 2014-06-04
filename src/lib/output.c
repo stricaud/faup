@@ -132,7 +132,8 @@ void _faup_output_json_single(faup_handler_t const* fh, faup_options_t *opts, ch
 // If that function is called more than once, you are doing a bad thing.
 char *faup_output_json_buffer_allocate(void)
 {
-	char *allocated_buffer;
+	char *allocated_buffer = NULL;
+
 
 	// domain_without_tld = 18, max potential key, includes extra {} and "", this is not 100% accurate but still allows to
 	// handle the worst case and avoid multiple allocations; 
@@ -256,7 +257,6 @@ void faup_output_json_buffer(faup_handler_t const* fh, faup_options_t *opts, cha
 		_faup_output_json_single_buffer(fh, opts, "fragment", fh->faup.features.fragment, FAUP_URL_FIELD_FRAGMENT, 
 										buffer, &buffer_pos);
 	}
-
 	faup_output_buffer_append(buffer, &buffer_pos, "\n}\n", 3);
 		
 }

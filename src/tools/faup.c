@@ -34,6 +34,10 @@
 extern int daemon(int, int);
 #endif
 
+faup_handler_t *fh = NULL;
+faup_options_t *faup_opts = NULL;
+static char *faup_webserver_buffer = NULL;
+
 /* readline() - read a line from the file handle.
  * Return an allocated string */
 static char *readline(FILE *fp)
@@ -118,18 +122,19 @@ void print_help(char **argv)
 void sighandler_webserver(int signal)
 {
   faup_webserver_stop();
+  faup_options_free(faup_opts);
+  faup_terminate(fh);
+  free(faup_webserver_buffer);
   printf("Exiting faup webserver\n");
   exit(0);
 }
 
 int main(int argc, char **argv)
 {
-	faup_handler_t *fh = NULL;
 	int ret = 0;
 
 	char *tld_file=NULL;
 
-	faup_options_t *faup_opts;
 	int opt;
 	int skip_file_check = 0;
 	int run_in_background = 0;
@@ -241,7 +246,8 @@ int main(int argc, char **argv)
 		}
 
 		signal(SIGINT, sighandler_webserver);
-	  	faup_webserver_start(fh, faup_opts, optarg);
+		faup_webserver_buffer = faup_output_json_buffer_allocate();
+	  	faup_webserver_start(fh, faup_opts, optarg, faup_webserver_buffer);
 	  	break;
 	  default:
 	    print_help(argv);

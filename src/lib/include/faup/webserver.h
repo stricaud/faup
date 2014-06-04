@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-int faup_webserver_start(faup_handler_t *fh, faup_options_t *faup_opts, char *listening_ports);
+int faup_webserver_start(faup_handler_t *fh, faup_options_t *faup_opts, char *listening_ports, char *buffer);
 int faup_webserver_stop();
 
 #ifdef __cplusplus
