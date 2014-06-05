@@ -14,6 +14,7 @@
 
 #include <faup/webserver.h>
 
+
 static struct mg_context *ctx;
 static faup_handler_t *_fh;
 static faup_options_t *_faup_opts;
@@ -46,7 +47,7 @@ int root_handler(struct mg_connection *conn, void *cbdata)
 
 int json_output(struct mg_connection *conn, void *buffer)
 {
-	unsigned char *url_unbase64;
+    unsigned char *url_unbase64;
 
     const struct mg_request_info *ri = mg_get_request_info(conn);
 

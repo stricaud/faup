@@ -204,6 +204,12 @@ void _faup_output_json_single_buffer(faup_handler_t const* fh, faup_options_t *o
 // Requires an allocated buffer. 
 void faup_output_json_buffer(faup_handler_t const* fh, faup_options_t *opts, char *buffer)
 {
+#ifdef FAUP_LUA_MODULES
+	bool module_executed;
+
+	module_executed = faup_modules_url_output((faup_handler_t *)fh, NULL);
+#endif
+
 	int buffer_pos = 0;
 
 	if (!fh->faup.decoded) {
