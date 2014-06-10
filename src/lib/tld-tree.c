@@ -288,7 +288,7 @@ static bool faup_tld_tree_tld_exists(TLDNode *Tree, const char *tld, int tld_len
 	}
 
 	p = tld + tld_len - 1;
-	while (tld_len--) {
+	while (tld_len-- > 0) {
 		wildcard = false;
 		pNode = pNode->kid;
 

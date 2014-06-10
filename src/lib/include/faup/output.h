@@ -25,6 +25,12 @@
 extern "C" {
 #endif
 
+// domain_without_tld = 18, max potential key, includes extra {} and "", this is not 100% accurate but still allows to
+// handle the worst case and avoid multiple allocations; 
+// It is done two times because urls can be made if " that will be escaped. Preventing the worst cases situations.
+// And since this is only one alloc, that does not hurt much.
+#define FAUP_MAX_JSON_BUFFER_SIZE (2 * FAUP_FEATURES_NUMBER) * (FAUP_MAXLEN + 18)
+
 void faup_output(faup_handler_t *fh, FILE* out);
 void faup_output_csv_header(faup_handler_t const* fh, faup_options_t *opts, FILE *out);
 void faup_output_csv(faup_handler_t const* fh, faup_options_t *opts, FILE* out);

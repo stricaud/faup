@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <faup/base64.h>
-
 int main(int argc, char **argv)
 {
+
+  return 0;
+#if 0
   unsigned char *data_unbase64;
   char          *data_base64;
   int            outlen;
@@ -26,6 +27,6 @@ int main(int argc, char **argv)
 
   free(data_base64);
   free(data_unbase64);
-
+#endif
 
 }

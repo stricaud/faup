@@ -135,11 +135,7 @@ char *faup_output_json_buffer_allocate(void)
 	char *allocated_buffer = NULL;
 
 
-	// domain_without_tld = 18, max potential key, includes extra {} and "", this is not 100% accurate but still allows to
-	// handle the worst case and avoid multiple allocations; 
-	// It is done two times because urls can be made if " that will be escaped. Preventing the worst cases situations.
-	// And since this is only one alloc, that does not hurt much.
-	allocated_buffer = calloc(2 * FAUP_FEATURES_NUMBER, (FAUP_MAXLEN + 18));
+	allocated_buffer = malloc(FAUP_MAX_JSON_BUFFER_SIZE);
 	if (!allocated_buffer) {
 		fprintf(stderr, "Cannot allocate buffer for %s\n", __FUNCTION__);
 	}

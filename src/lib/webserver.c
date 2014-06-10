@@ -6,10 +6,11 @@
 
 #include <sys/mman.h>
 #include <sys/fcntl.h> // For O_RDWR
+#include <stdlib.h>
 
 #include <faup/faup.h>
 #include <faup/decode.h>
-#include <faup/base64.h>
+#include <faup/b64/cdecode.h>
 #include <faup/output.h>
 
 #include <faup/webserver.h>
@@ -46,7 +47,8 @@ int root_handler(struct mg_connection *conn, void *cbdata)
 
 int json_output(struct mg_connection *conn, void *buffer)
 {
-	unsigned char *url_unbase64;
+    unsigned char *url_unbase64;
+    base64_decodestate s;
 
     const struct mg_request_info *ri = mg_get_request_info(conn);
 
@@ -72,9 +74,12 @@ int json_output(struct mg_connection *conn, void *buffer)
     	return 1;
     }
 
-    url_unbase64 = unbase64((const char *)url, url_len, &url_outlen);
+    base64_init_decodestate(&s);
+    url_unbase64 = (char*)malloc(FAUP_MAX_JSON_BUFFER_SIZE);
 
-    faup_decode(_fh, (const char *)url_unbase64, url_outlen - 1 /* -1 because we don't count the '\0'! */);
+    url_outlen = base64_decode_block(url, url_len, url_unbase64, &s);
+
+    faup_decode(_fh, (const char *)url_unbase64, url_outlen);
 
     mg_printf(conn, "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n");
 
@@ -82,7 +87,6 @@ int json_output(struct mg_connection *conn, void *buffer)
 
     mg_printf(conn, "%s", buffer);
 
-    // free(buffer);
     free(url_unbase64);
 
     return 1;
