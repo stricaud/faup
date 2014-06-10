@@ -1,5 +1,9 @@
 set(MODULES_AVAILABLE
 emulation_ie.lua
+printcsv.lua
+redis-url-threatintel.lua
+writeall.lua
+writeinput.lua
 uppercase.lua
 )
 
