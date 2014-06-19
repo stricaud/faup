@@ -48,7 +48,7 @@ int root_handler(struct mg_connection *conn, void *cbdata)
 
 int json_output(struct mg_connection *conn, void *buffer)
 {
-    unsigned char *url_unbase64;
+    char *url_unbase64;
     base64_decodestate s;
 
     const struct mg_request_info *ri = mg_get_request_info(conn);
