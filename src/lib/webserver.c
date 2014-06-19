@@ -7,6 +7,7 @@
 #include <sys/mman.h>
 #include <sys/fcntl.h> // For O_RDWR
 #include <stdlib.h>
+#include <pthread.h>
 
 #include <faup/faup.h>
 #include <faup/decode.h>
@@ -19,7 +20,7 @@
 static struct mg_context *ctx;
 static faup_handler_t *_fh;
 static faup_options_t *_faup_opts;
-
+pthread_mutex_t lock;
 
 int log_message(const struct mg_connection *conn, const char *message)
 {
@@ -57,6 +58,8 @@ int json_output(struct mg_connection *conn, void *buffer)
     size_t url_len;
     int url_outlen;
 
+    pthread_mutex_lock(&lock);
+
     if (!ri->query_string) {
 	    mg_printf(conn, "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n");
 	    mg_printf(conn, "No URL given. Please use the uri such as /json?url=base64_of_your_url\n");
@@ -80,6 +83,7 @@ int json_output(struct mg_connection *conn, void *buffer)
 
     url_outlen = base64_decode_block(url, url_len, url_unbase64, &s);
 
+
     faup_decode(_fh, (const char *)url_unbase64, url_outlen);
 
     mg_printf(conn, "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n");
@@ -89,6 +93,8 @@ int json_output(struct mg_connection *conn, void *buffer)
     mg_printf(conn, "%s", buffer);
 
     free(url_unbase64);
+
+	pthread_mutex_unlock(&lock);
 
     return 1;
 }
