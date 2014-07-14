@@ -132,6 +132,12 @@ const char *faup_decode(faup_handler_t *fh, const char *url, size_t url_len)
 		return NULL;
 	}
 
+	if (fh->options->number_of_chars_to_remove >= url_len) {
+	  fprintf(stderr, "Warning: Cannot remove more characters than the url string! Not removing any character on this url: %s\n", url);
+	} else {
+	  url_len -= fh->options->number_of_chars_to_remove;
+	}
+
 	fh->faup.decoded = true;
 
 #ifdef FAUP_LUA_MODULES

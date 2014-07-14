@@ -79,6 +79,7 @@ struct _faup_options_t {
   faup_modules_exec_t exec_modules;
   char **modules_argv;
   int modules_argc;
+  int number_of_chars_to_remove;
 };
 typedef struct _faup_options_t faup_options_t;
 

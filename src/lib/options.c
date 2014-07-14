@@ -58,6 +58,7 @@ void faup_options_defaults(faup_options_t *opts)
 	opts->exec_modules = FAUP_MODULES_EXECPATH;
 	opts->modules_argv = NULL;
 	opts->modules_argc = 0;
+	opts->number_of_chars_to_remove = 0;
 
 	faup_options_enable_tld_above_one(opts);
 

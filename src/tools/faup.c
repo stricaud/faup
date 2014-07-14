@@ -113,6 +113,7 @@ void print_help(char **argv)
 	printf("-m\t{module1 module2 module3}\n\tLoad the modules in the given order.\n\tIf empty, load no modules. If this option is not provided, modules in the shared data in modules_enabled will be loaded by default\n");
 	printf("-o {csv,json,module}\n\toutput csv or json at your convenience. You can also just let the modules handle it.\n");
 	printf("-p\tprint the header\n");
+	printf("-r {N}\tremoves the last N chars from the url\n");
 	printf("-t\tdo not extract TLD > 1 (eg. only get 'uk' instead of 'co.uk')\n");
 	printf("-u\tupdate the mozilla list\n");
 	printf("-w listen_ip:port\n\tstarts webserver on the wanted ip:port\n");
@@ -143,7 +144,6 @@ int main(int argc, char **argv)
 
   	bool has_module = false;
 
-
 	faup_opts = faup_options_new();
 	if (!faup_opts) {
 	  fprintf(stderr, "Error: cannot allocate faup options!\n" );
@@ -155,7 +155,7 @@ int main(int argc, char **argv)
 	  return faup_handle_shell(argc, argv);
 	}
 
-	while ((opt = getopt(argc, argv, "abpld:vo:utf:m:w:")) != -1) {
+	while ((opt = getopt(argc, argv, "abpld:vo:utf:m:w:r:")) != -1) {
 	  switch(opt) {
 	  case 'a':
 	  	skip_file_check = 1;
@@ -225,6 +225,12 @@ int main(int argc, char **argv)
 	  	}
 	  	
 	  	break;
+	  case 'r':
+	  	if (optarg) {
+		  faup_opts->number_of_chars_to_remove = strtod(optarg, NULL);
+		  //		  printf("Number of chars to remove:%d\n", number_of_chars_to_remove);
+		}
+	    break;
 	  case 't':
 	  	faup_options_disable_tld_above_one(faup_opts);
 	  	break;
