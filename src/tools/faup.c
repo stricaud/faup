@@ -228,7 +228,6 @@ int main(int argc, char **argv)
 	  case 'r':
 	  	if (optarg) {
 		  faup_opts->number_of_chars_to_remove = strtod(optarg, NULL);
-		  //		  printf("Number of chars to remove:%d\n", number_of_chars_to_remove);
 		}
 	    break;
 	  case 't':
