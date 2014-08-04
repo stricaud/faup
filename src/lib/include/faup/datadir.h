@@ -26,6 +26,7 @@ extern "C" {
 
 char *faup_datadir_home_file_or_dir_exists(char *append);
 char *faup_datadir_get_file_from_home(char *append, bool to_symlink);
+bool faup_datadir_make_dir_from_home(char *append);
 char *faup_datadir_get_file(char *append, bool to_symlink);
 char *faup_datadir_get_global_file(char *append);
 char *faup_datadir_file_to_write(char *file, bool to_symlink);

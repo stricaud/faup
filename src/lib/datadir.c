@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #ifndef WIN32
 #include <unistd.h>
@@ -74,6 +75,7 @@ char *faup_datadir_get_file_from_home(char *append, bool to_symlink)
 	free(retbuf);
 
 	retval = asprintf(&retbuf, "%s%s.faup%s%s", homedir, FAUP_OS_DIRSEP, FAUP_OS_DIRSEP, append);
+
 	fp = fopen(retbuf, "w");
 	if (fp) {
 		if (to_symlink) {
@@ -84,6 +86,37 @@ char *faup_datadir_get_file_from_home(char *append, bool to_symlink)
 	}
 #endif
 	return NULL;
+}
+
+bool faup_datadir_make_dir_from_home(char *append)
+{
+#ifndef WIN32
+	int retval;
+	char *retbuf;
+	struct passwd *pw = getpwuid(getuid());
+	const char *homedir = pw->pw_dir;
+	FILE *fp;
+
+	retval = asprintf(&retbuf, "%s%s.faup", homedir, FAUP_OS_DIRSEP);
+	retval = mkdir(retbuf, 0700);
+	if (retval) {
+	  if (errno != EEXIST) {
+	    free(retbuf);
+	    return false;
+	  }
+	}
+	free(retbuf);
+
+	retval = asprintf(&retbuf, "%s%s.faup%s%s", homedir, FAUP_OS_DIRSEP, FAUP_OS_DIRSEP, append);
+	retval = mkdir(retbuf, 0700);
+	if (retval) {
+	  if (errno != EEXIST) {
+	    free(retbuf);
+	    return false;
+	  }
+	}
+#endif
+	return true;
 }
 
 char *faup_datadir_get_file(char *append, bool to_symlink)

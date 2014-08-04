@@ -70,6 +70,12 @@ int faup_handle_shell_modules(int argc, char **argv)
 
       retval = asprintf(&enabled_filename, "modules_enabled%s%s", FAUP_OS_DIRSEP, argv[4]);
       symlink_file = faup_datadir_file_to_write(enabled_filename, true);
+      if (!symlink_file) {
+	// I have no symlink, because there is nowhere I can write. Let's create the homedir path and do it again
+	retval = faup_datadir_make_dir_from_home("modules_enabled");
+	symlink_file = faup_datadir_file_to_write(enabled_filename, true);
+      }
+
       free(enabled_filename);
       retval = asprintf(&origin_filename, "modules_available%s%s", FAUP_OS_DIRSEP, argv[4]);
       available_filename = faup_datadir_get_global_file(origin_filename);

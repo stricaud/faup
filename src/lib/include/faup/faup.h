@@ -60,6 +60,7 @@ extern "C" {
 #define FAUP_MAXPATHLEN 1024 /* Because MAXPATHLEN, MAX_PATH, PATH_MAX are all different 'standards' (ahah!) */
 
 #define FAUP_OS_DIRSEP "/"
+#define FAUP_OS_DIRSEP_C '/'
 
 
 typedef struct _faup_t faup_t;
