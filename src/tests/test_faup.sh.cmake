@@ -182,23 +182,23 @@ then
 fi
 
 case $1 in
-    vanilla) test_vanilla;;
-    vanilla_scheme) test_vanilla_scheme;;
-    vanilla_credential) test_vanilla_credential;;
-    vanilla_subdomain) test_vanilla_subdomain;;
-    vanilla_domain) test_vanilla_domain;;
-    vanilla_host) test_vanilla_host;;
-    vanilla_tld) test_vanilla_tld;;
-    vanilla_port) test_vanilla_port;;
-    vanilla_resource_path) test_vanilla_resource_path;;
-    vanilla_query_string) test_vanilla_query_string;;
-    vanilla_fragment) test_vanilla_fragment;;
-    tld_one_only) test_tld_one_only;;
-    json) test_json;;
-    json_tld_one_only) test_json_tld_one_only;;
+    Vanilla) test_vanilla;;
+    VanillaScheme) test_vanilla_scheme;;
+    VanillaCredential) test_vanilla_credential;;
+    VanillaSubdomain) test_vanilla_subdomain;;
+    VanillaDomain) test_vanilla_domain;;
+    VanillaHost) test_vanilla_host;;
+    VanillaTLD) test_vanilla_tld;;
+    VanillaPort) test_vanilla_port;;
+    VanillaResourcePath) test_vanilla_resource_path;;
+    VanillaQueryString) test_vanilla_query_string;;
+    VanillaFragment) test_vanilla_fragment;;
+    TLD_One_Only) test_tld_one_only;;
+    JSON) test_json;;
+    JSON_TLD_One_Only) test_json_tld_one_only;;
     issue) test_issue $2;;
-    url_arg) test_argument "http://foo:bar@www3.altavista.digital.com:8080/index.php1?tada=da&fremo=genial#anchor1234" "$SRC_TEST_DIR/ref-files/argument.txt";;
-    file_arg) test_argument $URLS "$SRC_TEST_DIR/ref-files/urls.txt.vanilla";;
+    Url_Argument) test_argument "http://foo:bar@www3.altavista.digital.com:8080/index.php1?tada=da&fremo=genial#anchor1234" "$SRC_TEST_DIR/ref-files/argument.txt";;
+    File_Argument) test_argument $URLS "$SRC_TEST_DIR/ref-files/urls.txt.vanilla";;
     module) test_module $2;;
     *) echo "Unknown option '$1'"
     exit 42
