@@ -1,0 +1,4 @@
+message("Mandir: ${CMAKE_INSTALL_MANDIR}")
+
+install(FILES faup.1
+  DESTINATION ${CMAKE_INSTALL_MANDIR}/man1 COMPONENT doc)
