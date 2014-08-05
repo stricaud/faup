@@ -23,10 +23,17 @@ extern "C" {
 
 #define MAX_RECVBUF 4096
 
-#define MOZILLA_TLD_LIST_DOMAIN "mxr.mozilla.org"
-#define MOZILLA_TLD_LIST_IP "63.245.215.42"
+  /*
+   * Originally, the list was on http://mxr.mozilla.org/mozilla-central/source/netwerk/dns/effective_tld_names.dat?raw=1
+   * However, it recently moved to https://publicsuffix.org/list/effective_tld_names.dat
+   * and I don't want to handle SSL in this simple stupid code. So I move to my own server that stuff that I mirror and 
+   * we are good to go.
+   */
+#define MOZILLA_TLD_LIST_DOMAIN "io.libio.so"
+#define MOZILLA_TLD_LIST_IP "37.187.73.159"
 #define MOZILLA_TLD_LIST_PORT 80
-#define MOZILLA_TLD_LIST_URL "http://mxr.mozilla.org/mozilla-central/source/netwerk/dns/effective_tld_names.dat?raw=1"
+#define MOZILLA_TLD_LIST_URL "http://io.libio.so/effective_tld_names.dat"
+
 #define MOZILLA_TLD_LIST_GET "GET " MOZILLA_TLD_LIST_URL " HTTP/1.0\n\n"
 
 int faup_tld_download_mozilla_list(char *store_to_file);
