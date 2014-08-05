@@ -30,6 +30,6 @@ if(${LUA51_FOUND})
 endif()
 
 add_executable(faup ${FAUP_SRC_FILES} ${WIN32_PORTABLE})
-target_link_libraries(faup ${FAUP_LINK_LIBRARIES})
+target_link_libraries(faup ${FAUP_LINK_LIBRARIES} ${CMAKE_DL_LIBS})
 
 install(TARGETS faup DESTINATION bin COMPONENT Application)
