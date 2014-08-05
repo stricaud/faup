@@ -44,7 +44,10 @@ include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(CheckLibraryExists)
 
+include(GNUInstallDirs)
+
 include(FindPkgConfig)
+
 
 # Find LUA
 # If we don't have lua, then we have no modules, it still works, but is less cool :)
@@ -93,6 +96,7 @@ endif(APPLE)
 set(FAUP_DATA_DIR "${CMAKE_INSTALL_PREFIX}/share/faup/")
 add_definitions(-DFAUP_DATA_DIR="${FAUP_DATA_DIR}")
 
+add_subdirectory(doc)
 add_subdirectory(src)
 
 include(CMakePackage.txt)

@@ -1,0 +1,83 @@
+.\" Written by Sebastien Tricaud (c) 2012, 2013, 2014
+.\" http://www.github.com/stricaud/faup
+.Dd August 5,2014
+.Dt FAUP 1
+.Os
+.Sh NAME
+.Nm faup
+.Nd Finally An Url Parser!
+.Sh SYNOPSIS
+.Nm faup
+.Op Fl ablptu
+.Op Fl d Ar delim
+.Op Fl f Ar scheme | credential | subdomain | domain | domain_without_tld | host | tld | port | resource_path | query_string | fragment
+.Op Fl m Ar module1 module2 ...
+.Op Fl o Ar csv | json | module
+.Op Fl r Ar count
+.Op Fl w Ar ip:port
+.Ao Ar url | file Ac
+.Sh DESCRIPTION
+Everytime 
+.Nm faup 
+is called with an
+.Ar url
+or a 
+.Ar file 
+containing a list of URLs, it will split the various parts of it.
+.Pp
+.Nm faup
+is designed to be really fast to do that operation, much faster than a regex, and give you much more features. The problem is harder than
+what it first appears. If you want to get fields like subdomains from an URL, you will need to extract the TLD properly. And since extracting
+the TLD properly is impossible with a regex, you will be stuck.
+.Pp
+The following options are available:
+.Bl -tag -width indent
+.It Fl a
+skip provided argument file open check
+.It Fl b
+Run the webserver in background
+.It Fl d Ar delim
+Use
+.Ar delim
+as the field delimiter character instead of the comma character.
+.It Fl f Ar field
+Extract only the wanted
+.Ar field
+which can be one of the following: scheme, credential, subdomain, domain, domain_without_tld, host, tld, port, resource_path, query_string, fragment
+.It Fl l
+Prefix each line with the line number. Works only if the output is CSV.
+.It Fl m Ar module1 module2 ..
+Load the modules in the wanted order. If the list is empty, 
+.Nm faup
+will run without any module.
+.It Fl o Ar format
+Output in the wanted 
+.Ar format
+which can be one of the following: csv, json, module
+.It Fl p
+print the header (applies to CSV only)
+.It Fl r Ar count
+Remove the
+.Ar count
+number of characters from the end. Useful to remove the dot in DNS urls given.
+.It Fl t
+do not extract TLD > 1 (eg. only get 'uk' instead of 'co.uk')
+.It Fl u
+Update the TLD suffix list
+.It Fl w Ar ip:port
+Start
+.Nm faup
+in webserver mode
+
+.Sh EXIT STATUS
+.Ex -std
+
+.Sh EXAMPLES
+Extract the TLD from slashdot.org:
+.Pp
+.Dl "faup -f tld www.slashdot.org"
+.Pp
+
+
+
+
