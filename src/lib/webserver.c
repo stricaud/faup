@@ -90,7 +90,7 @@ int json_output(struct mg_connection *conn, void *buffer)
 
     faup_output_json_buffer(_fh, _faup_opts, buffer);
 
-    mg_printf(conn, "%s", buffer);
+    mg_printf(conn, "%s", (char *)buffer);
 
     free(url_unbase64);
 
