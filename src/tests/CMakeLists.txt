@@ -33,16 +33,16 @@ include_directories(AFTER ${FAUP_INCLUDE_DIRS})
 
 if(LINUX)
 	add_executable(multithreads multithreads.c)
-	target_link_libraries(multithreads ${FAUP_LIBRARY} "pthread" )
+	target_link_libraries(multithreads ${FAUP_LIBRARY} "pthread" ${CMAKE_DL_LIBS})
 	add_test(MultiThreads ${TEST_FAUP_SCRIPT} multithreads)
 endif(LINUX)
 
 add_executable(base64 base64.c)
-target_link_libraries(base64 ${FAUP_LIBRARY})
+target_link_libraries(base64 ${FAUP_LIBRARY} ${CMAKE_DL_LIBS})
 add_test(Base64 ${TEST_FAUP_SCRIPT} base64)
 
 # C API/ABI issues
 add_executable(issue36 issue36.c)
-target_link_libraries(issue36 ${FAUP_LIBRARY})
+target_link_libraries(issue36 ${FAUP_LIBRARY} ${CMAKE_DL_LIBS})
 add_test(Issue36 issue36)
 
