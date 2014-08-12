@@ -77,7 +77,33 @@ Extract the TLD from slashdot.org:
 .Pp
 .Dl "faup -f tld www.slashdot.org"
 .Pp
+Run faup in webserver mode in background:
+.Pp
+.Dl "faup -b -w 0.0.0.0:9876"
+.Pp
+List all the available modules:
+.Pp
+.Dl "faup $ modules list all"
+.Pp
+Enable the uppercase lua module:
+.Pp
+.Dl "faup $ modules enable uppercase.lua"
+.Pp
+Output the wanted url in json
+.Pp
+.Dl "faup -o json http://www.example.co.uk:1234/foo.html#bar"
+.Pp
 
-
+.Sh ENVIRONMENT
+The following environment variable affects the exectution of 
+.Nm faup
+:
+.Bl -tag -width ".Ev CLICOLOR_FORCE"
+.It Ev FAUP_DATA_DIR
+If the environment variable 
+.Ev FAUP_DATA_DIR
+is set, tell
+.Nm faup
+where to find its datadir, to get modules or the tld prefix list ('mozilla.tlds')
 
 
