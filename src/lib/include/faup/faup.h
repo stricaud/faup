@@ -63,8 +63,6 @@ extern "C" {
 #define FAUP_OS_DIRSEP_C '/'
 
 
-typedef struct _faup_t faup_t;
-typedef enum _faup_last_slash_t faup_last_slash_t;
 
 struct _faup_t {
 	const char *org_str;
@@ -72,6 +70,7 @@ struct _faup_t {
 	bool decoded;
 	faup_features_t features;
 };
+typedef struct _faup_t faup_t;
 
 struct _faup_handler_t {
 	faup_t faup;
@@ -86,6 +85,7 @@ enum _faup_last_slash_t {
 	FAUP_LAST_SLASH_HIERARCHICAL,
 	FAUP_LAST_SLASH_AFTER_DOMAIN,
 };
+typedef enum _faup_last_slash_t faup_last_slash_t;
 
 #define faup_get_pos(fh, name) (fh)->faup.features.name.pos
 #define faup_get_size(fh, name) (fh)->faup.features.name.size
