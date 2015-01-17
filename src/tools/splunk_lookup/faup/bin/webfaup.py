@@ -14,7 +14,7 @@ import logging, logging.handlers
 ##########
 
 FAUP_SERVER = "127.0.0.1"
-FAUP_SERVER_PORT = "1212"
+FAUP_SERVER_PORT = "9876"
 
 header  = [
 	'url', 
