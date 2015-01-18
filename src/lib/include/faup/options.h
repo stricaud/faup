@@ -49,6 +49,7 @@ enum _faup_url_field_t {
 	FAUP_URL_FIELD_RESOURCE_PATH      = (1 << 10),
 	FAUP_URL_FIELD_QUERY_STRING       = (1 << 11),
 	FAUP_URL_FIELD_FRAGMENT           = (1 << 12),
+	FAUP_URL_FIELD_URL_TYPE           = (1 << 13),
 };
 typedef enum _faup_url_field_t faup_url_field_t;
 

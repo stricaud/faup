@@ -228,14 +228,17 @@ const char *faup_decode(faup_handler_t *fh, const char *url, size_t url_len)
 
 								// Since we do not have the -t option, check if the TLD wasn't > 1
 								if (tld_extracted.pos >= 0) {
+									fh->faup.url_type = FAUP_URL_HAS_MOZILLA_TLD;
 									tld_pos = tld_extracted.pos;
 									tld_len = tld_extracted.size;
 								} else {
+									fh->faup.url_type = FAUP_URL_HAS_UNKNOWN_TLD;
 									url_features->tld.pos = tld_pos + url_features->host.pos;
 									url_features->tld.size = tld_len;
 								}
 
 							} else {
+								fh->faup.url_type = FAUP_URL_HAS_UNKNOWN_TLD;
 								url_features->tld.pos = tld_pos + url_features->host.pos;
 								url_features->tld.size = tld_len;
 							}
@@ -267,6 +270,12 @@ const char *faup_decode(faup_handler_t *fh, const char *url, size_t url_len)
 				else {
 					// If this is an IPv4, put it also in the host field
 					url_features->domain = url_features->host;
+					if (ipv4_host) {
+					  fh->faup.url_type = FAUP_URL_IPV4;
+					}
+					if (ipv6_host) {
+					  fh->faup.url_type = FAUP_URL_IPV6;
+					}
 				}
 			}
 		}

@@ -54,10 +54,43 @@ void faup_output_show(faup_handler_t const* fh, faup_options_t *opts, const faup
 	}
 }
 
+char *faup_output_get_string_from_url_type(faup_handler_t const* fh)
+{
+  switch (fh->faup.url_type) {
+  case FAUP_URL_HAS_NO_TLD:
+    return "no_tld";
+    break;
+  case FAUP_URL_HAS_MOZILLA_TLD:
+    return "mozilla_tld";
+    break;
+  case FAUP_URL_HAS_UNKNOWN_TLD:
+    return "unknown_tld";
+    break;
+  case FAUP_URL_IPV4:
+    return "ipv4";
+    break;
+  case FAUP_URL_IPV6:
+    return "ipv6";
+    break;
+  default:
+    fprintf(stderr, "Woops, we should never be here: cannot guess the faup url type in the output!\n");
+    return "error";
+    break;
+  }
+
+    return "error";
+}
+
 void _faup_output_csv_single(faup_handler_t const* fh, faup_options_t *opts, FILE *out, faup_url_field_t field)
 {
 		if (opts->fields & field) {
-			faup_output_show(fh, opts, faup_options_field_get_feature(fh, field), out, 0);
+		  if (field != FAUP_URL_FIELD_URL_TYPE) {
+		    faup_output_show(fh, opts, faup_options_field_get_feature(fh, field), out, 0);
+		  } else {
+		    char *url_type_str = faup_output_get_string_from_url_type(fh);
+		    // We have a field that is not built from the url string
+		    fprintf(out, "%s", url_type_str);
+		  }
 			if (faup_options_url_field_has_greater_than(opts, field)) {
 				fwrite(&opts->sep_char, 1, 1, out);
 			} else {
@@ -94,6 +127,7 @@ void faup_output_csv_header(faup_handler_t const* fh, faup_options_t *opts, FILE
 	_faup_output_csv_header_single(opts, out, FAUP_URL_FIELD_RESOURCE_PATH, "resource_path");
 	_faup_output_csv_header_single(opts, out, FAUP_URL_FIELD_QUERY_STRING, "query_string");
 	_faup_output_csv_header_single(opts, out, FAUP_URL_FIELD_FRAGMENT, "fragment");
+	_faup_output_csv_header_single(opts, out, FAUP_URL_FIELD_URL_TYPE, "url_type");
 }
 
 void faup_output_csv(faup_handler_t const* fh, faup_options_t *opts, FILE* out)
@@ -110,6 +144,7 @@ void faup_output_csv(faup_handler_t const* fh, faup_options_t *opts, FILE* out)
 	_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_RESOURCE_PATH);
 	_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_QUERY_STRING);
 	_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_FRAGMENT);
+	_faup_output_csv_single(fh, opts, out, FAUP_URL_FIELD_URL_TYPE);
 }
 
 void _faup_output_json_single(faup_handler_t const* fh, faup_options_t *opts, char *faup_feature_name, const faup_feature_t feature, FILE *out, faup_url_field_t field)
@@ -259,6 +294,22 @@ void faup_output_json_buffer(faup_handler_t const* fh, faup_options_t *opts, cha
 		_faup_output_json_single_buffer(fh, opts, "fragment", fh->faup.features.fragment, FAUP_URL_FIELD_FRAGMENT, 
 										buffer, &buffer_pos);
 	}
+	if (opts->fields & FAUP_URL_FIELD_URL_TYPE) {
+	  char *url_type;
+
+	  faup_output_buffer_append(buffer, &buffer_pos, "\t\"", 2);
+	  faup_output_buffer_append(buffer, &buffer_pos, "url_type", 8);
+	  faup_output_buffer_append(buffer, &buffer_pos, "\": \"", 4);
+
+	  url_type = faup_output_get_string_from_url_type(fh);
+	  faup_output_buffer_append(buffer, &buffer_pos, url_type, strlen(url_type));
+
+	  if (faup_options_url_field_has_greater_than(opts, FAUP_URL_FIELD_URL_TYPE)) {
+	    faup_output_buffer_append(buffer, &buffer_pos, "\",\n", 3);
+	  } else {
+	    faup_output_buffer_append(buffer, &buffer_pos, "\"", 1);
+	  }
+	}
 	faup_output_buffer_append(buffer, &buffer_pos, "\n}\n", 3);
 		
 }
@@ -303,6 +354,22 @@ void faup_output_json(faup_handler_t const* fh, faup_options_t *opts, FILE* out)
 	}
 	if (opts->fields & FAUP_URL_FIELD_FRAGMENT) {
 		_faup_output_json_single(fh, opts, "fragment", fh->faup.features.fragment, out, FAUP_URL_FIELD_FRAGMENT);
+	}
+	if (opts->fields & FAUP_URL_FIELD_URL_TYPE) {
+	  char *url_type;
+
+	  fwrite(&"\t\"", 2, 1, out);
+	  fwrite("url_type", 8, 1, out);
+	  fwrite("\": \"", 4, 1, out);
+
+	  url_type = faup_output_get_string_from_url_type(fh);
+	  fwrite(url_type, strlen(url_type), 1, out);
+	  
+	  if (faup_options_url_field_has_greater_than(opts, FAUP_URL_FIELD_URL_TYPE)) {
+	    fwrite("\",\n", 3, 1, out);
+	  } else {
+	    fwrite("\"", 1, 1, out);
+	  }
 	}
 
 

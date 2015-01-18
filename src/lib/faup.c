@@ -24,11 +24,12 @@
 
 faup_handler_t *faup_init(faup_options_t *options)
 {
-	faup_handler_t *fh;
+    faup_handler_t *fh;
     int retval;
 
-	fh = malloc(sizeof(faup_handler_t));
+    fh = malloc(sizeof(faup_handler_t));
     fh->faup.decoded = false;
+    fh->faup.url_type = FAUP_URL_HAS_NO_TLD;
 
     if (options) {
         fh->options = options;

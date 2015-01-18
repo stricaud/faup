@@ -66,11 +66,21 @@ extern "C" {
 typedef struct _faup_t faup_t;
 typedef enum _faup_last_slash_t faup_last_slash_t;
 
+enum _faup_url_type_t {
+	FAUP_URL_HAS_NO_TLD, 
+	FAUP_URL_HAS_MOZILLA_TLD,
+	FAUP_URL_HAS_UNKNOWN_TLD,
+	FAUP_URL_IPV4,
+	FAUP_URL_IPV6,
+};
+typedef enum _faup_url_type_t faup_url_type_t;
+
 struct _faup_t {
 	const char *org_str;
         size_t org_str_len;
 	bool decoded;
 	faup_features_t features;
+	faup_url_type_t url_type;
 };
 
 struct _faup_handler_t {
