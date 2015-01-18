@@ -36,6 +36,60 @@ Of course, speed is what we had in mind all the time. The mozilla.tlds file is l
        faup_terminate(fh);
 ```
 
+C++ example (usefull for multithreading)
+
+```C++
+       #include <iostream>
+       
+       #include <faup/faup.h>
+       #include <faup/decode.h>
+       #include <faup/options.h>
+       #include <faup/output.h>
+       
+       using namespace std;
+       
+       int main()
+       {
+         // faup_options_new() is not thread safe, and should only be runned once per code, it is also the part that loads the cached publicsuffix.org file
+         // faup_tld_update(); // updates the cached publicsuffix.org file
+         faup_options_t *faup_opts;
+         faup_opts = faup_options_new();
+         // no need for the default csv output
+         faup_opts->output = FAUP_OUTPUT_NONE;
+         // modules slow down faup_init(), should be loaded only when needed 
+         faup_opts->exec_modules = FAUP_MODULES_NOEXEC;
+        
+         for(int i=0; i<1000000; i++)
+         {
+           // fh is a pointer to a c struct that has, among others, all the positions where the uri splits in host, tld, etc.
+           faup_handler_t *fh;
+          
+           // check if the options are set
+           if (!faup_opts) {
+              fprintf(stderr, "Error: cannot allocate faup options!\n");
+           }
+       
+           // init the faup handler
+           fh = faup_init(faup_opts);
+       
+           //the url to parse
+           string url = "https://domain.co.uk";
+       
+           // this is the only command you need to run, to parse a url (if you are not running in multithreaded mode)
+           faup_decode(fh, url.c_str(), url.size() );
+       
+           // equivalent to url.substr(fh->faup.features.tld.pos, fh->faup.features.tld.size);
+           string tld = url.substr(faup_get_tld_pos(fh),faup_get_tld_size(fh));
+       
+           // cleanup
+           faup_terminate(fh);
+         }
+         return 0;
+       }
+```
+For simple projects you can compile with
+g++ -W -Wall "faup_simple_example.cpp" -o "faup_simple_example" -lfaupl
+
 
 ### Modules
 

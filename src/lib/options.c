@@ -54,8 +54,8 @@ void faup_options_defaults(faup_options_t *opts)
 	opts->sep_char = ',';
 	opts->input_source = FAUP_INPUT_SOURCE_ARGUMENT;
 	opts->current_line = 1;
-	opts->output = FAUP_OUTPUT_CSV;
-	opts->exec_modules = FAUP_MODULES_EXECPATH;
+	opts->output = FAUP_OUTPUT_NONE;
+	opts->exec_modules = FAUP_MODULES_NOEXEC;
 	opts->modules_argv = NULL;
 	opts->modules_argc = 0;
 	opts->number_of_chars_to_remove = 0;
