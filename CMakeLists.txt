@@ -96,6 +96,16 @@ endif(APPLE)
 set(FAUP_DATA_DIR "${CMAKE_INSTALL_PREFIX}/share/faup/")
 add_definitions(-DFAUP_DATA_DIR="${FAUP_DATA_DIR}")
 
+#
+# Make version variables from the VERSION file
+#
+file(STRINGS "VERSION" FAUP_VERSION)
+string(REGEX MATCH "^[0-9]+" FAUP_VERSION_MAJOR ${FAUP_VERSION})
+string(REGEX MATCH "[0-9]+$" FAUP_VERSION_MINOR ${FAUP_VERSION})
+message("Version: ${FAUP_VERSION}")
+message("Version Major: ${FAUP_VERSION_MAJOR}")
+message("Version Minor: ${FAUP_VERSION_MINOR}")
+
 add_subdirectory(doc)
 add_subdirectory(src)
 
