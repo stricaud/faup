@@ -62,14 +62,18 @@ set(FAUP_LIB_HDR_FILES
 include/faup/compat.h
 include/faup/datadir.h
 include/faup/decode.h
-include/faup/features.h
+include/faup/errors.h
 include/faup/faup.h
+include/faup/features.h
 ${LUA_MODULES_HDR_FILES}
 include/faup/options.h
 include/faup/output.h
 include/faup/portable.h
+include/faup/return-codes.h
+include/faup/scheme-codes.h
 include/faup/tld.h
 include/faup/tld-tree.h
+include/faup/urllengths.h
 include/faup/webserver.h
 )
 
