@@ -150,6 +150,10 @@ int main(int argc, char **argv)
 	  return -1;
 	}
 
+	// Faup default output is CSV
+	faup_opts->output = FAUP_OUTPUT_CSV;
+
+
 	if ((argc > 1) && (!strcmp(argv[1],"$"))) {
 	  // Handle some specific shell operations
 	  return faup_handle_shell(argc, argv);
@@ -276,7 +280,7 @@ int main(int argc, char **argv)
 			faup_options_free(faup_opts);
 			faup_terminate(fh);
 			exit(1);
-		}
+	}	
 
 		if (!argv[optind]) {
 		  faup_options_free(faup_opts);
