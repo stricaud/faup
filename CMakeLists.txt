@@ -64,7 +64,7 @@ endif()
 file(STRINGS VERSION VERSION)
 set(FAUP_VERSION ${VERSION})
 configure_file("src/lib/include/faup/version.h.cmake" "src/lib/include/faup/version.h")
-
+install(FILES "${faup-project_BINARY_DIR}/src/lib/include/faup/version.h" DESTINATION include/faup COMPONENT Headers)
 
 message("CMake system: ${CMAKE_SYSTEM_NAME}")
 # Mac OS Specifics

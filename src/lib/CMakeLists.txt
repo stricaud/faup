@@ -66,6 +66,7 @@ include/faup/errors.h
 include/faup/faup.h
 include/faup/features.h
 ${LUA_MODULES_HDR_FILES}
+include/faup/handler.h
 include/faup/options.h
 include/faup/output.h
 include/faup/portable.h
