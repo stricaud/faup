@@ -165,7 +165,6 @@ int faup_tld_array_populate(void)
 						break;
 					case '\n':
 					case '\r':
-					case '0':
 					case ' ':
 					case '\0':
 						break;
