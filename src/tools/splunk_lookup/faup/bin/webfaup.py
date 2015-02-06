@@ -19,7 +19,7 @@ FAUP_SERVER_PORT = "9876"
 header  = [
 	'url', 
 	'url_scheme', 'url_credential', 'url_subdomain', 'url_domain', 'url_domain_without_tld', 
-	'url_host', 'url_tld', 'url_port', 'url_resource_path', 'url_query_string', 'url_fragment'
+	'url_host', 'url_tld', 'url_port', 'url_resource_path', 'url_query_string', 'url_fragment', 'url_url_type'
 ]
 
 #############
