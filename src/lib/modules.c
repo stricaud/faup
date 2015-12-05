@@ -43,7 +43,6 @@ int faup_modules_new(faup_handler_t *fh)
 		break;
 		case FAUP_MODULES_EXECPATH:
 			fh->modules = faup_modules_load_from_datadir();
-
 		break;
 		case FAUP_MODULES_EXECARG:
 			fh->modules = faup_modules_load_from_arg(fh->options->modules_argv, fh->options->modules_argc);

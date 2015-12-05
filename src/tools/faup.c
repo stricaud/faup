@@ -152,7 +152,7 @@ int main(int argc, char **argv)
 
 	// Faup default output is CSV
 	faup_opts->output = FAUP_OUTPUT_CSV;
-
+	faup_opts->exec_modules = FAUP_MODULES_EXECPATH;
 
 	if ((argc > 1) && (!strcmp(argv[1],"$"))) {
 	  // Handle some specific shell operations
