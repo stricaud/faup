@@ -9,7 +9,8 @@
 	"port": "80",
 	"resource_path": "/index.html",
 	"query_string": "",
-	"fragment": ""
+	"fragment": "",
+	"url_type": "ipv6"
 }
 {
 	"scheme": "http",
@@ -22,7 +23,8 @@
 	"port": "",
 	"resource_path": "/index.html",
 	"query_string": "",
-	"fragment": ""
+	"fragment": "",
+	"url_type": "ipv6"
 }
 {
 	"scheme": "http",
@@ -35,7 +37,8 @@
 	"port": "",
 	"resource_path": "",
 	"query_string": "",
-	"fragment": ""
+	"fragment": "",
+	"url_type": "ipv6"
 }
 {
 	"scheme": "http",
@@ -48,7 +51,8 @@
 	"port": "",
 	"resource_path": "/foo",
 	"query_string": "",
-	"fragment": ""
+	"fragment": "",
+	"url_type": "ipv6"
 }
 {
 	"scheme": "http",
@@ -61,7 +65,8 @@
 	"port": "",
 	"resource_path": "/ipng",
 	"query_string": "",
-	"fragment": ""
+	"fragment": "",
+	"url_type": "ipv6"
 }
 {
 	"scheme": "http",
@@ -74,7 +79,8 @@
 	"port": "80",
 	"resource_path": "/index.html",
 	"query_string": "",
-	"fragment": ""
+	"fragment": "",
+	"url_type": "ipv6"
 }
 {
 	"scheme": "http",
@@ -87,5 +93,6 @@
 	"port": "",
 	"resource_path": "",
 	"query_string": "",
-	"fragment": ""
+	"fragment": "",
+	"url_type": "ipv6"
 }
