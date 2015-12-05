@@ -139,6 +139,7 @@ const char *faup_decode(faup_handler_t *fh, const char *url, size_t url_len)
 	}
 
 	fh->faup.decoded = true;
+	fh->faup.url_type = FAUP_URL_HAS_NO_TLD;
 
 #ifdef FAUP_LUA_MODULES
 	if (fh->options->exec_modules != FAUP_MODULES_NOEXEC) {
@@ -348,6 +349,7 @@ const char *faup_decode(faup_handler_t *fh, const char *url, size_t url_len)
 				url_features->domain_without_tld.size -= (url_features->tld.size +1); //+1 for the dot before the tld
 			}
 		}
+		
 		//faup_features_debug(url, url_features);
 #ifdef FAUP_LUA_MODULES
 		if (url_transformed_by_modules) {
