@@ -27,6 +27,7 @@ add_test(Issue24           ${TEST_FAUP_SCRIPT} issue 24)
 add_test(Issue27           ${TEST_FAUP_SCRIPT} issue 27)
 add_test(Issue28           ${TEST_FAUP_SCRIPT} issue 28)
 add_test(Issue30           ${TEST_FAUP_SCRIPT} issue 30)
+add_test(Issue69           ${TEST_FAUP_SCRIPT} issue 69)
 
 # Some C tests
 include_directories(AFTER ${FAUP_INCLUDE_DIRS})
