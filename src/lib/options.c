@@ -176,6 +176,9 @@ faup_url_field_t faup_options_get_field_from_name(char *name)
   	if (!strcmp("fragment", name)) {
   		return FAUP_URL_FIELD_FRAGMENT;
   	}
+  	if (!strcmp("url_type", name)) {
+  		return FAUP_URL_FIELD_URL_TYPE;
+  	}
 
   	return FAUP_URL_FIELD_NONE;
 }
