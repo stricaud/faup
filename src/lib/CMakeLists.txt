@@ -88,7 +88,7 @@ add_library(faupl SHARED ${FAUP_LIB_SRC_FILES})
 set_target_properties(faupl PROPERTIES SOVERSION 1)
 target_link_libraries(faupl ${FAUP_LINK_LIBRARIES})
 
-install(TARGETS faupl LIBRARY DESTINATION lib COMPONENT Libraries)
+install(TARGETS faupl LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR} COMPONENT Libraries)
 
 install(FILES ${FAUP_LIB_HDR_FILES} DESTINATION include/faup COMPONENT Headers)
 

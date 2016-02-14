@@ -63,7 +63,7 @@ function test_argument
 
 function test_vanilla
 {
-    test_generic "" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla"
+    test_generic "-o json" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla"
 }
 
 function test_vanilla_scheme
