@@ -43,3 +43,8 @@ add_executable(issue36 issue36.c)
 target_link_libraries(issue36 ${FAUP_LIBRARY} ${CMAKE_DL_LIBS})
 add_test(Issue36 issue36)
 
+# Snapshot Tests
+add_executable(snapshot snapshot.c)
+target_link_libraries(snapshot ${FAUP_LIBRARY} ${CMAKE_DL_LIBS})
+add_test(Snapshot snapshot)
+
