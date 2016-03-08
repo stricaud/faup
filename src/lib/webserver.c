@@ -83,7 +83,6 @@ int json_output(struct mg_connection *conn, void *buffer)
 
     url_outlen = base64_decode_block(url, url_len, url_unbase64, &s);
 
-
     faup_decode(_fh, (const char *)url_unbase64, url_outlen);
 
     mg_printf(conn, "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n");
@@ -94,17 +93,24 @@ int json_output(struct mg_connection *conn, void *buffer)
 
     free(url_unbase64);
 
-	pthread_mutex_unlock(&lock);
+    pthread_mutex_unlock(&lock);
 
     return 1;
+}
+
+int snapshot_handler(struct mg_connection *conn, void *cbdata)
+{
+  
+    pthread_mutex_lock(&lock);
+    
+    pthread_mutex_unlock(&lock);
 }
 
 int faup_webserver_start(faup_handler_t *fh, faup_options_t *faup_opts, char *listening_ports, char *buffer)
 {
 	const char *options[] = {"document_root", ".", 
-							 "listening_ports", listening_ports, 
-							 NULL};
-
+				 "listening_ports", listening_ports, 
+				 NULL};
 
 	_faup_opts = faup_opts;
 	if (!faup_opts) {
@@ -123,9 +129,10 @@ int faup_webserver_start(faup_handler_t *fh, faup_options_t *faup_opts, char *li
 
 	ctx = mg_start(&callbacks, NULL, options);
 
-    mg_set_request_handler(ctx, "/json", json_output, buffer);
-    mg_set_request_handler(ctx, "/", root_handler, NULL);
-
+	mg_set_request_handler(ctx, "/json", json_output, buffer);
+	mg_set_request_handler(ctx, "/", root_handler, NULL);
+	mg_set_request_handler(ctx, "/snapshot", snapshot_handler, NULL);
+	
 	while (1) {
 		#ifdef WIN32
 			Sleep(1000);

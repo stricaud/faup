@@ -14,11 +14,12 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-#include <faup/faup.h>
-#include <faup/features.h>
-
 #include <stdio.h>
 #include <ctype.h>
+#include <stdlib.h>
+
+#include <faup/faup.h>
+#include <faup/features.h>
 
 void faup_features_init(faup_features_t* features)
 {
@@ -333,4 +334,84 @@ void faup_features_debug(const char *url, faup_features_t const* features)
 	faup_features_debug_print("features->resource_path", features->resource_path.pos, features->resource_path.size);
 	faup_features_debug_print("features->query_string", features->query_string.pos, features->query_string.size);
 	faup_features_debug_print("features->fragment", features->fragment.pos, features->fragment.size);
+}
+
+char *faup_features_get_string(faup_handler_t *fh, faup_features_field_t field)
+{
+  char *retstring = NULL;
+
+  switch(field) {
+  case FAUP_FEATURES_FIELD_SCHEME:    
+    if (fh->faup.features.scheme.pos < 0) return NULL;
+    retstring = malloc(fh->faup.features.scheme.size + 1);
+    retstring[fh->faup.features.scheme.size + 1] = '\0';
+    return memcpy(retstring, fh->faup.org_str + fh->faup.features.scheme.pos, fh->faup.features.scheme.size);
+    break;
+  case FAUP_FEATURES_FIELD_HIERARCHICAL:
+    if (fh->faup.features.hierarchical.pos < 0) return NULL;
+    retstring = malloc(fh->faup.features.hierarchical.size + 1);
+    retstring[fh->faup.features.hierarchical.size + 1] = '\0';
+    return memcpy(retstring, fh->faup.org_str + fh->faup.features.hierarchical.pos, fh->faup.features.hierarchical.size);
+    break;
+  case FAUP_FEATURES_FIELD_CREDENTIAL:
+    if (fh->faup.features.credential.pos < 0) return NULL;
+    retstring = malloc(fh->faup.features.credential.size + 1);
+    retstring[fh->faup.features.credential.size + 1] = '\0';
+    return memcpy(retstring, fh->faup.org_str + fh->faup.features.credential.pos, fh->faup.features.credential.size);
+    break;
+  case FAUP_FEATURES_FIELD_SUBDOMAIN:
+    if (fh->faup.features.subdomain.pos < 0) return NULL;
+    retstring = malloc(fh->faup.features.subdomain.size + 1);
+    retstring[fh->faup.features.subdomain.size + 1] = '\0';
+    return memcpy(retstring, fh->faup.org_str + fh->faup.features.subdomain.pos, fh->faup.features.subdomain.size);
+    break;
+  case FAUP_FEATURES_FIELD_DOMAIN:
+    if (fh->faup.features.domain.pos < 0) return NULL;
+    retstring = malloc(fh->faup.features.domain.size + 1);
+    retstring[fh->faup.features.domain.size + 1] = '\0';
+    return memcpy(retstring, fh->faup.org_str + fh->faup.features.domain.pos, fh->faup.features.domain.size);
+    break;
+  case FAUP_FEATURES_FIELD_DOMAIN_WITHOUT_TLD:
+    if (fh->faup.features.domain_without_tld.pos < 0) return NULL;
+    retstring = malloc(fh->faup.features.domain_without_tld.size + 1);
+    retstring[fh->faup.features.domain_without_tld.size + 1] = '\0';
+    return memcpy(retstring, fh->faup.org_str + fh->faup.features.domain_without_tld.pos, fh->faup.features.domain_without_tld.size);
+    break;
+  case FAUP_FEATURES_FIELD_HOST:
+    if (fh->faup.features.host.pos < 0) return NULL;
+    retstring = malloc(fh->faup.features.host.size + 1);
+    retstring[fh->faup.features.host.size + 1] = '\0';
+    return memcpy(retstring, fh->faup.org_str + fh->faup.features.host.pos, fh->faup.features.host.size);
+    break;
+  case FAUP_FEATURES_FIELD_TLD:
+    if (fh->faup.features.tld.pos < 0) return NULL;
+    retstring = malloc(fh->faup.features.tld.size + 1);
+    retstring[fh->faup.features.tld.size + 1] = '\0';
+    return memcpy(retstring, fh->faup.org_str + fh->faup.features.tld.pos, fh->faup.features.tld.size);
+    break;
+  case FAUP_FEATURES_FIELD_PORT:
+    if (fh->faup.features.port.pos < 0) return NULL;
+    retstring = malloc(fh->faup.features.port.size + 1);
+    retstring[fh->faup.features.port.size + 1] = '\0';
+    return memcpy(retstring, fh->faup.org_str + fh->faup.features.port.pos, fh->faup.features.port.size);
+    break;
+  case FAUP_FEATURES_FIELD_RESOURCE_PATH:
+    if (fh->faup.features.resource_path.pos < 0) return NULL;
+    retstring = malloc(fh->faup.features.resource_path.size + 1);
+    retstring[fh->faup.features.resource_path.size + 1] = '\0';
+    return memcpy(retstring, fh->faup.org_str + fh->faup.features.resource_path.pos, fh->faup.features.resource_path.size);
+    break;
+  case FAUP_FEATURES_FIELD_QUERY_STRING:
+    if (fh->faup.features.query_string.pos < 0) return NULL;
+    retstring = malloc(fh->faup.features.query_string.size + 1);
+    retstring[fh->faup.features.query_string.size + 1] = '\0';
+    return memcpy(retstring, fh->faup.org_str + fh->faup.features.query_string.pos, fh->faup.features.query_string.size);
+    break;
+  case FAUP_FEATURES_FIELD_FRAGMENT:
+    if (fh->faup.features.fragment.pos < 0) return NULL;
+    retstring = malloc(fh->faup.features.fragment.size + 1);
+    retstring[fh->faup.features.fragment.size + 1] = '\0';
+    return memcpy(retstring, fh->faup.org_str + fh->faup.features.fragment.pos, fh->faup.features.fragment.size);
+    break;
+  }
 }

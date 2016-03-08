@@ -22,6 +22,9 @@ faup_snapshot_t *faup_snapshot_new(void)
 
 void faup_snapshot_value_count_debug(faup_snapshot_value_count_t *vc)
 {
+  if (!vc) {
+    fprintf(stderr, "%s: No such value_count object\n", __FUNCTION__);
+  }
   printf("**\t\tvalue:->%s<-\n", vc->value);
   printf("**\t\tfirst time seen: %s", ctime(&vc->first_time_seen));
   printf("**\t\tlast time seen: %s", ctime(&vc->last_time_seen));
@@ -32,7 +35,6 @@ void faup_snapshot_item_debug(faup_snapshot_item_t *item)
 {
   size_t counter;
   printf("** \titem\n");
-  printf("** \tis_fd_open:%d\n", item->is_fd_open);
   printf("** \tlength:%ld\n", item->length);
   for (counter = 0; counter < item->length; counter++) {
     faup_snapshot_value_count_debug(item->value_count[counter]);
@@ -66,6 +68,23 @@ faup_snapshot_value_count_t *faup_snapshot_value_count_new(void)
   return vc;
 }
 
+faup_snapshot_value_count_t *faup_snapshot_value_count_copy(faup_snapshot_value_count_t *vc)
+{
+  faup_snapshot_value_count_t *copy;
+
+  copy = faup_snapshot_value_count_new();
+  if (!copy) {
+    fprintf(stderr, "%s: could not copy object!\n", __FUNCTION__);
+    return NULL;
+  }
+  copy->value = strdup(vc->value);
+  copy->first_time_seen = vc->first_time_seen;
+  copy->last_time_seen = vc->last_time_seen;
+  copy->count = vc->count;
+
+  return copy;
+}
+
 void faup_snapshot_value_count_free(faup_snapshot_value_count_t *vc)
 {
   free(vc->value);
@@ -82,13 +101,29 @@ faup_snapshot_item_t *faup_snapshot_item_new(void)
     return NULL;
   }
 
-  item->fd = NULL;
   item->length = 0;
-  item->is_fd_open = 0;
   item->value_count = NULL;
 
   return item;
 
+}
+
+faup_snapshot_item_t *faup_snapshot_item_copy(faup_snapshot_item_t *item)
+{
+  faup_snapshot_item_t *copy;
+  size_t counter;
+
+  copy = faup_snapshot_item_new();
+  copy->length = item->length;
+  copy->value_count = malloc(sizeof(faup_snapshot_value_count_t *) * (item->length+1));
+  
+  /* printf("item len:%ld\n", item->length); */
+  for (counter = 0; counter < item->length; counter++) {
+    faup_snapshot_value_count_t *vc = item->value_count[counter];
+    copy->value_count[counter] = faup_snapshot_value_count_copy(vc);
+  }
+
+  return copy;
 }
 
 faup_snapshot_value_count_t *faup_snapshot_value_count_get(faup_snapshot_item_t *item, char *value)
@@ -175,9 +210,6 @@ void faup_snapshot_item_free(faup_snapshot_item_t *item)
     faup_snapshot_value_count_free(item->value_count[count]);
   }
   free(item->value_count);
-  if (item->is_fd_open) {
-    fclose(item->fd);
-  }
   free(item);
 }
 
@@ -199,26 +231,6 @@ faup_snapshot_item_t *faup_snapshot_item_get(faup_snapshot_t *snapshot, char *it
   /* fprintf(stderr, "No such item found:%s\n", item_name); */
   return NULL;
 }
-
-/* int faup_snapshot_item_set(faup_snapshot_t *snapshot, faup_snapshot_item_t *item, char *item_name) */
-/* { */
-/*   size_t counter; */
-
-/*   if (!snapshot) { */
-/*     fprintf(stderr, "Snapshot is NULL!\n"); */
-/*     return -1; */
-/*   } */
-
-/*   for (counter = 0; counter < snapshot->length; counter++) { */
-/*     if (!strcmp(snapshot->items_names[counter], item_name)) { */
-/*       snapshot->items[counter] = item; */
-/*       return 0; */
-/*     } */
-/*   } */
-
-/*   /\* fprintf(stderr, "No such item found:%s\n", item_name); *\/ */
-/*   return -1; */
-/* } */
 
 int faup_snapshot_item_append(faup_snapshot_t *snapshot, char *item_name)
 {
@@ -284,3 +296,31 @@ int faup_snapshot_append(faup_snapshot_t *snapshot, char *key, char *value)
 
   return 0;
 }
+
+int faup_snapshot_append_item(faup_snapshot_t *snapshot, char *item_name, faup_snapshot_item_t *item)
+{
+  if (!snapshot) {
+    fprintf(stderr, "Cannot append item to an unexisting snapshot!\n");
+    return -1;
+  }
+  
+  snapshot->items = realloc(snapshot->items, sizeof(faup_snapshot_item_t *) * (snapshot->length + 1));
+  if (!snapshot->items) {
+    fprintf(stderr, "Cannot allocatate a snapshot_item!\n");
+    return -1;
+  }
+
+  snapshot->items_names = realloc(snapshot->items_names, sizeof(char *) * (snapshot->length + 1));
+  if (!snapshot->items_names) {
+    fprintf(stderr, "Cannot allocatate a snapshot items names!\n");
+    return -1;
+  }
+  
+  snapshot->items[snapshot->length] = item;
+  snapshot->items_names[snapshot->length] = strdup(item_name);
+  snapshot->length++;
+  
+  return 0;
+  
+}
+

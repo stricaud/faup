@@ -34,8 +34,6 @@ typedef struct _faup_snapshot_value_count_t faup_snapshot_value_count_t;
 
 struct _faup_snapshot_item_t {
   faup_snapshot_value_count_t **value_count;
-  FILE *fd;
-  int is_fd_open;
   size_t length;
 };
 typedef struct _faup_snapshot_item_t faup_snapshot_item_t;
@@ -55,8 +53,10 @@ void faup_snapshot_value_count_debug(faup_snapshot_value_count_t *vc);
 void faup_snapshot_item_debug(faup_snapshot_item_t *item);
 void faup_snapshot_debug(faup_snapshot_t *snapshot);
 faup_snapshot_value_count_t *faup_snapshot_value_count_new(void);
+faup_snapshot_value_count_t *faup_snapshot_value_count_copy(faup_snapshot_value_count_t *vc);
 void faup_snapshot_value_count_free(faup_snapshot_value_count_t *vc);
 faup_snapshot_item_t *faup_snapshot_item_new(void);
+faup_snapshot_item_t *faup_snapshot_item_copy(faup_snapshot_item_t *item);
 faup_snapshot_value_count_t *faup_snapshot_value_count_get(faup_snapshot_item_t *item, char *value);
 int faup_snapshot_value_count_append(faup_snapshot_item_t *item, char *value);
 int faup_snapshot_value_count_append_object(faup_snapshot_item_t *item, faup_snapshot_value_count_t *vc);
@@ -72,7 +72,7 @@ void faup_snapshot_free(faup_snapshot_t *snapshot);
 faup_snapshot_t  *faup_snapshot_open(char *name);
 void faup_snapshot_close(faup_snapshot_t *snapshot);
 int faup_snapshot_append(faup_snapshot_t *snapshot, char *key, char *value);
-
+int faup_snapshot_append_item(faup_snapshot_t *snapshot, char *item_name, faup_snapshot_item_t *item);
   
 #ifdef __cplusplus
 }

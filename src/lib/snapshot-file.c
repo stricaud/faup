@@ -19,13 +19,11 @@ static int _read_item(faup_snapshot_t *snapshot, FILE *fp, char *item_name)
   faup_snapshot_item_t *item;
   faup_snapshot_value_count_t *vc;
   
-  printf("Reading item %s\n", item_name);
-
-
   while (!feof(fp)) {
     vc = faup_snapshot_value_count_new();
     readsize = fread(&value_len, sizeof(size_t), 1, fp);
     if (readsize <= 0) {
+      faup_snapshot_value_count_free(vc);
       break;
     }
     vc->value = malloc(value_len + 1);
@@ -77,7 +75,7 @@ faup_snapshot_t *faup_snapshot_read(char *dirpath)
 
   closedir(dir);
 
-  faup_snapshot_debug(snapshot);
+  /* faup_snapshot_debug(snapshot); */
   
   return snapshot;
 }
@@ -149,31 +147,78 @@ faup_snapshot_t *faup_snapshot_compare(char *snapshot_dir_a, char *snapshot_dir_
 
   faup_snapshot_t *result;
 
-  faup_snapshot_item_t *item_a;
+  faup_snapshot_item_t *item;
   faup_snapshot_item_t *item_b;
-
+  faup_snapshot_item_t *newitem;
+  
   size_t counter;
-
+  size_t counter_vc_a;
+  size_t counter_vc_b;
+  size_t counter_newitem;
+  
+  int found;
+  int retval;
+  
+  result = faup_snapshot_new();
   
   snapshot_a = faup_snapshot_read(snapshot_dir_a);
   if (!snapshot_a) {
     fprintf(stderr, "Error: cannot build snapshot from dir '%s'\n", snapshot_dir_a);
+    faup_snapshot_free(result);
     return NULL;
   }
   snapshot_b = faup_snapshot_read(snapshot_dir_b);
   if (!snapshot_b) {
     fprintf(stderr, "Error: cannot build snapshot from dir '%s'\n", snapshot_dir_b);
+    faup_snapshot_free(result);
     return NULL;
   }
 
-  for (counter = 0; counter < snapshot_a->length; counter++) {
+  retval = asprintf(&result->name, "%s-%s", snapshot_b->name, snapshot_a->name);
+  
+  for (counter = 0; counter < snapshot_b->length; counter++) {
+    item = faup_snapshot_item_get(snapshot_a, snapshot_b->items_names[counter]);
+    // Case 1: our item in B does not exists in A, so we add it to our result
+    if (!item) {
+      item = faup_snapshot_item_copy(snapshot_b->items[counter]);
+      faup_snapshot_append_item(result, snapshot_b->items_names[counter], item);
+    } else {
+    // Case 2: the item exists in both, so we check values
+      item_b = faup_snapshot_item_get(snapshot_b, snapshot_b->items_names[counter]);
 
+      newitem = faup_snapshot_item_new();
+      for (counter_vc_b = 0; counter_vc_b < item_b->length; counter_vc_b++) {
+	char *bval = item_b->value_count[counter_vc_b]->value;
+	found = 0;
+	for (counter_vc_a = 0; counter_vc_a < item->length; counter_vc_a++) {
+	char *aval = item->value_count[counter_vc_a]->value;	
+	  if (!strcmp(bval, aval)) {
+	    found = counter_vc_a;	    
+	    break;
+	  }
+	  if (!found) {
+	    // Let's make sure this is not already in our item!
+	    faup_snapshot_value_count_t *vc;
+
+	    vc = faup_snapshot_value_count_get(newitem, bval);
+	    if (!vc) {
+	      vc = faup_snapshot_value_count_copy(item_b->value_count[counter_vc_b]);
+	      faup_snapshot_value_count_append_object(newitem, vc);
+	    }
+	  }
+	}
+      }	/* for counter_vc_b = 0 */
+
+      if (newitem->length > 0) {
+	faup_snapshot_append_item(result, snapshot_b->items_names[counter], newitem);
+      } else {
+	faup_snapshot_item_free(newitem);
+      }
+    }
   }
-  /* item = faup_snapshot_item_get(snapshot, item_name); */
   
   faup_snapshot_free(snapshot_a);
   faup_snapshot_free(snapshot_b);
   
   return result;
 }
-

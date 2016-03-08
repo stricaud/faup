@@ -25,6 +25,8 @@
 #include <faup/decode.h>
 #include <faup/options.h>
 #include <faup/output.h>
+#include <faup/snapshot.h>
+#include <faup/snapshot-file.h>
 #include <faup/webserver.h>
 
 #include "shell.h"
@@ -76,7 +78,13 @@ static char *readline(FILE *fp)
 static int run_from_stream(faup_handler_t *fh, FILE *stream) 
 {
 		char *strbuf=NULL;
-
+		faup_snapshot_t *snapshot = NULL;
+		char *value;
+		
+		if (fh->options->snapshot_name) {
+		  snapshot = faup_snapshot_open(fh->options->snapshot_name);
+		}
+		
 		while (!feof(stream)) {
 			strbuf = readline(stream);
 			if (!strbuf) {
@@ -90,13 +98,77 @@ static int run_from_stream(faup_handler_t *fh, FILE *stream)
 
 			faup_decode(fh, strbuf, strlen(strbuf));
 
+			if (fh->options->snapshot_name) {
+			  value = faup_features_get_string(fh, FAUP_FEATURES_FIELD_SCHEME);
+			  if (value) {
+			    faup_snapshot_append(snapshot, "scheme", value);
+			  }
+			  free(value);
+			  value = faup_features_get_string(fh, FAUP_FEATURES_FIELD_HIERARCHICAL);
+			  if (value) {
+			    faup_snapshot_append(snapshot, "herarchical", value);
+			  }
+			  free(value);
+			  value = faup_features_get_string(fh, FAUP_FEATURES_FIELD_SUBDOMAIN);
+			  if (value) {
+			    faup_snapshot_append(snapshot, "subdomain", value);
+			  }
+			  free(value);
+			  value = faup_features_get_string(fh, FAUP_FEATURES_FIELD_DOMAIN);
+			  if (value) {
+			    faup_snapshot_append(snapshot, "domain", value);
+			  }
+			  free(value);
+			  value = faup_features_get_string(fh, FAUP_FEATURES_FIELD_DOMAIN_WITHOUT_TLD);
+			  if (value) {
+			    faup_snapshot_append(snapshot, "domain_without_tld", value);
+			  }
+			  free(value);
+			  value = faup_features_get_string(fh, FAUP_FEATURES_FIELD_HOST);
+			  if (value) {
+			    faup_snapshot_append(snapshot, "host", value);
+			  }
+			  free(value);
+			  value = faup_features_get_string(fh, FAUP_FEATURES_FIELD_TLD);
+			  if (value) {
+			    faup_snapshot_append(snapshot, "tld", value);
+			  }
+			  free(value);
+			  value = faup_features_get_string(fh, FAUP_FEATURES_FIELD_PORT);
+			  if (value) {
+			    faup_snapshot_append(snapshot, "port", value);
+			  }
+			  free(value);
+			  value = faup_features_get_string(fh, FAUP_FEATURES_FIELD_RESOURCE_PATH);
+			  if (value) {
+			    faup_snapshot_append(snapshot, "resource_path", value);
+			  }
+			  free(value);
+			  value = faup_features_get_string(fh, FAUP_FEATURES_FIELD_QUERY_STRING);
+			  if (value) {
+			    faup_snapshot_append(snapshot, "query_string", value);
+			  }
+			  free(value);
+			  value = faup_features_get_string(fh, FAUP_FEATURES_FIELD_FRAGMENT);
+			  if (value) {
+			    faup_snapshot_append(snapshot, "fragment", value);
+			  }
+			  free(value);
+			} // if (fh->options->snapshot_name) {
+			
 			faup_output(fh, stdout);
 
 			fh->options->print_header = 0; // We don't need to output the header anymore!
 			free(strbuf);
 			fh->options->current_line++;
 		}
-	return 0;
+
+		if (fh->options->snapshot_name) {
+		  faup_snapshot_write(snapshot, NULL);
+		  faup_snapshot_free(snapshot);
+		}
+		
+		return 0;
 }
 
 
@@ -107,6 +179,7 @@ void print_help(char **argv)
 	printf("Options:\n");
 	printf("-a\tskip provided argument file open check\n");
 	printf("-b\tRun the webserver in background\n");	
+	printf("-c <snapshot>\tcompare with snapshot selected with -s\n");
 	printf("-d {delimiter}\n\twill separate the fields with the wanted delimiter\n");
 	printf("-f {scheme|credential|subdomain|domain|domain_without_tld|host|tld|port|resource_path|query_string|fragment|url_type}\n\tfield to extract\n");
 	printf("-l\tprefix with the line number (csv only)\n");
@@ -114,6 +187,7 @@ void print_help(char **argv)
 	printf("-o {csv,json,module}\n\toutput csv or json at your convenience. You can also just let the modules handle it.\n");
 	printf("-p\tprint the header\n");
 	printf("-r {N}\tremoves the last N chars from the url\n");
+	printf("-s <snapshot_name>\tcreate a snapshot\n");
 	printf("-t\tdo not extract TLD > 1 (eg. only get 'uk' instead of 'co.uk')\n");
 	printf("-u\tupdate the mozilla list\n");
 	printf("-w listen_ip:port\n\tstarts webserver on the wanted ip:port\n");
@@ -144,6 +218,8 @@ int main(int argc, char **argv)
 
   	bool has_module = false;
 
+	char *snapshot_compare = NULL;
+	
 	faup_opts = faup_options_new();
 	if (!faup_opts) {
 	  fprintf(stderr, "Error: cannot allocate faup options!\n" );
@@ -159,7 +235,7 @@ int main(int argc, char **argv)
 	  return faup_handle_shell(argc, argv);
 	}
 
-	while ((opt = getopt(argc, argv, "abpld:vo:utf:m:w:r:")) != -1) {
+	while ((opt = getopt(argc, argv, "abpld:vo:utf:m:w:r:s:c:")) != -1) {
 	  switch(opt) {
 	  case 'a':
 	  	skip_file_check = 1;
@@ -167,6 +243,9 @@ int main(int argc, char **argv)
 	  case 'b':
 	  	run_in_background = 1;
 	  	break;
+	  case 'c':
+	    snapshot_compare = strdup(optarg);
+	    break;
 	  case 'd':
 	  	if (optarg) {
 	    	faup_opts->sep_char = optarg[0];
@@ -176,7 +255,7 @@ int main(int argc, char **argv)
 	    faup_opts->print_header = 1;
 	    break;
 	  case 'l':
-	  	faup_opts->fields |= FAUP_URL_FIELD_LINE;
+	    faup_opts->fields |= FAUP_URL_FIELD_LINE;
 	    faup_opts->print_line = 1;
 	    break;
 	  case 'm':
@@ -233,7 +312,12 @@ int main(int argc, char **argv)
 	  	if (optarg) {
 		  faup_opts->number_of_chars_to_remove = strtod(optarg, NULL);
 		}
-	    break;
+		break;
+	  case 's':
+	  	if (optarg) {
+		  faup_opts->snapshot_name = strdup(optarg);
+		}
+		break;	    
 	  case 't':
 	  	faup_options_disable_tld_above_one(faup_opts);
 	  	break;
@@ -271,6 +355,13 @@ int main(int argc, char **argv)
 
 //	printf("Lart arg:'%s'\n", argv[optind+1]);
 
+	/* Snapshot Comparison */
+	if (snapshot_compare) {
+	  faup_snapshot_t *result = faup_snapshot_compare(faup_opts->snapshot_name, snapshot_compare);
+	  faup_snapshot_debug(result);
+	  free(snapshot_compare);
+	  goto terminate;
+	}
 
 	if (isatty(fileno(stdin))) {
 		faup_opts->input_source = FAUP_INPUT_SOURCE_ARGUMENT;
@@ -300,7 +391,7 @@ int main(int argc, char **argv)
 		}
 
 		faup_decode(fh, argv[optind], strlen(argv[optind]));
-
+		
 		faup_output(fh, stdout);
 	} else {       	/* We read from stdin */
 		faup_opts->input_source = FAUP_INPUT_SOURCE_PIPE;

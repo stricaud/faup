@@ -81,6 +81,7 @@ struct _faup_options_t {
   char **modules_argv;
   int modules_argc;
   int number_of_chars_to_remove;
+  char *snapshot_name;
 };
 typedef struct _faup_options_t faup_options_t;
 

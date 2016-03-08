@@ -83,6 +83,7 @@ int faup_features_exist(faup_feature_t feature);
 void faup_features_show(faup_handler_t const* fh, const faup_feature_t feature, FILE* out);
 int faup_features_errors_lookup(faup_features_t const* url_features);
 char *faup_features_get_field_name(faup_feature_t feature);
+char *faup_features_get_string(faup_handler_t *fh, faup_features_field_t field);
 
 #ifdef __cplusplus
 }
