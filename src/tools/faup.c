@@ -102,58 +102,58 @@ static int run_from_stream(faup_handler_t *fh, FILE *stream)
 			  value = faup_features_get_string(fh, FAUP_FEATURES_FIELD_SCHEME);
 			  if (value) {
 			    faup_snapshot_append(snapshot, "scheme", value);
+			    free(value);
 			  }
-			  free(value);
 			  value = faup_features_get_string(fh, FAUP_FEATURES_FIELD_HIERARCHICAL);
 			  if (value) {
 			    faup_snapshot_append(snapshot, "herarchical", value);
+			    free(value);
 			  }
-			  free(value);
 			  value = faup_features_get_string(fh, FAUP_FEATURES_FIELD_SUBDOMAIN);
 			  if (value) {
 			    faup_snapshot_append(snapshot, "subdomain", value);
+			    free(value);
 			  }
-			  free(value);
 			  value = faup_features_get_string(fh, FAUP_FEATURES_FIELD_DOMAIN);
 			  if (value) {
 			    faup_snapshot_append(snapshot, "domain", value);
+			    free(value);
 			  }
-			  free(value);
 			  value = faup_features_get_string(fh, FAUP_FEATURES_FIELD_DOMAIN_WITHOUT_TLD);
 			  if (value) {
 			    faup_snapshot_append(snapshot, "domain_without_tld", value);
+			    free(value);
 			  }
-			  free(value);
 			  value = faup_features_get_string(fh, FAUP_FEATURES_FIELD_HOST);
 			  if (value) {
 			    faup_snapshot_append(snapshot, "host", value);
+			    free(value);
 			  }
-			  free(value);
 			  value = faup_features_get_string(fh, FAUP_FEATURES_FIELD_TLD);
 			  if (value) {
 			    faup_snapshot_append(snapshot, "tld", value);
+			    free(value);
 			  }
-			  free(value);
 			  value = faup_features_get_string(fh, FAUP_FEATURES_FIELD_PORT);
 			  if (value) {
 			    faup_snapshot_append(snapshot, "port", value);
+			    free(value);
 			  }
-			  free(value);
 			  value = faup_features_get_string(fh, FAUP_FEATURES_FIELD_RESOURCE_PATH);
 			  if (value) {
 			    faup_snapshot_append(snapshot, "resource_path", value);
+			    free(value);
 			  }
-			  free(value);
 			  value = faup_features_get_string(fh, FAUP_FEATURES_FIELD_QUERY_STRING);
 			  if (value) {
 			    faup_snapshot_append(snapshot, "query_string", value);
+			    free(value);
 			  }
-			  free(value);
 			  value = faup_features_get_string(fh, FAUP_FEATURES_FIELD_FRAGMENT);
 			  if (value) {
 			    faup_snapshot_append(snapshot, "fragment", value);
+			    free(value);
 			  }
-			  free(value);
 			} // if (fh->options->snapshot_name) {
 			
 			faup_output(fh, stdout);
