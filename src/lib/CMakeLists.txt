@@ -74,8 +74,8 @@ include/faup/output.h
 include/faup/portable.h
 include/faup/return-codes.h
 include/faup/scheme-codes.h
-include/faup/snapshot.c
-include/faup/snapshot-file.c
+include/faup/snapshot.h
+include/faup/snapshot-file.h
 include/faup/tld.h
 include/faup/tld-tree.h
 include/faup/urllengths.h
