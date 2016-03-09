@@ -30,7 +30,8 @@ faup_handler_t *faup_init(faup_options_t *options)
     fh = malloc(sizeof(faup_handler_t));
     fh->faup.decoded = false;
     fh->faup.url_type = FAUP_URL_HAS_NO_TLD;
-
+    memset(&fh->faup.features, 0, sizeof(fh->faup.features));
+    
     if (options) {
         fh->options = options;
     } else {
