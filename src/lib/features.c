@@ -340,8 +340,10 @@ char *_get_feature_string(faup_handler_t *fh, faup_feature_t feature)
 {
   char *retstring = NULL;
   if (feature.pos < 0) return NULL;
+  if (feature.size <= 0) return NULL;
+  
   retstring = malloc(feature.size + 1);
-  retstring[feature.size + 1] = '\0';
+  retstring[feature.size] = '\0';
   return memcpy(retstring, fh->faup.org_str + feature.pos, feature.size);
 }
 
@@ -387,4 +389,6 @@ char *faup_features_get_string(faup_handler_t *fh, faup_features_field_t field)
     return _get_feature_string(fh, fh->faup.features.fragment);
     break;
   }
+
+  return NULL;
 }
