@@ -373,6 +373,7 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 		while( *(p-1) && (*p != '.') ) {
 			p--;
 			counter--;
+			if (counter <= 0) break;
 		}
 
 		step = ( *p == '.' ) ? 1 : 0;
