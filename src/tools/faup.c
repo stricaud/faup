@@ -360,6 +360,7 @@ int main(int argc, char **argv)
 	  faup_snapshot_t *result = faup_snapshot_compare(faup_opts->snapshot_name, snapshot_compare);
 	  faup_snapshot_debug(result);
 	  free(snapshot_compare);
+	  faup_snapshot_free(result);
 	  goto terminate;
 	}
 
