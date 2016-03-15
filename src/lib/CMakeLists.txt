@@ -51,6 +51,7 @@ datadir.c
 decode.c
 features.c
 faup.c
+hash_64a.c
 options.c
 output.c
 portable.c
