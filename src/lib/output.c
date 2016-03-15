@@ -388,6 +388,7 @@ void faup_output(faup_handler_t *fh, FILE* out)
 
 	switch(fh->options->output) {
 		case FAUP_OUTPUT_CSV:
+		  if (fh->options->quiet) break;
 			faup_output_csv_header(fh, fh->options, out);
 
 			if (fh->options->print_line) {
@@ -404,6 +405,7 @@ void faup_output(faup_handler_t *fh, FILE* out)
 			faup_output_csv(fh, fh->options, out);
 			break;
 		case FAUP_OUTPUT_JSON:
+		  if (fh->options->quiet) break;
 			faup_output_json(fh, fh->options, out);
 			break;
 		case FAUP_OUTPUT_MODULE:

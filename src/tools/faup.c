@@ -186,6 +186,7 @@ void print_help(char **argv)
 	printf("-m\t{module1 module2 module3}\n\tLoad the modules in the given order.\n\tIf empty, load no modules. If this option is not provided, modules in the shared data in modules_enabled will be loaded by default\n");
 	printf("-o {csv,json,module}\n\toutput csv or json at your convenience. You can also just let the modules handle it.\n");
 	printf("-p\tprint the header\n");
+	printf("-q\tquiet mode, do not print anything\n");
 	printf("-r {N}\tremoves the last N chars from the url\n");
 	printf("-s <snapshot_name>\tcreate a snapshot\n");
 	printf("-t\tdo not extract TLD > 1 (eg. only get 'uk' instead of 'co.uk')\n");
@@ -235,7 +236,7 @@ int main(int argc, char **argv)
 	  return faup_handle_shell(argc, argv);
 	}
 
-	while ((opt = getopt(argc, argv, "abpld:vo:utf:m:w:r:s:c:")) != -1) {
+	while ((opt = getopt(argc, argv, "abpld:vo:utf:m:w:r:s:c:q")) != -1) {
 	  switch(opt) {
 	  case 'a':
 	  	skip_file_check = 1;
@@ -308,6 +309,9 @@ int main(int argc, char **argv)
 	  	}
 	  	
 	  	break;
+	  case 'q':
+	    faup_opts->quiet = 1;
+	    break;
 	  case 'r':
 	  	if (optarg) {
 		  faup_opts->number_of_chars_to_remove = strtod(optarg, NULL);
