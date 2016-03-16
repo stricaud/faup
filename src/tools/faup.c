@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 
 #ifdef WIN32
 	#include "win32-getopt.h"
@@ -341,7 +342,11 @@ int main(int argc, char **argv)
 	  case 'w': // This should always be the last options, since we init faup and need previous options
 		fh = faup_init(faup_opts);
 		if (run_in_background) {
-			daemon(1,1);
+			ret = daemon(1,1);
+			if (ret != 0) {
+			  fprintf(stderr, "Error starting daemon mode:%s\n", strerror(errno));
+			  exit(ret);
+			}
 		}
 
 		signal(SIGINT, sighandler_webserver);
