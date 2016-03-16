@@ -122,7 +122,7 @@ int faup_snapshot_write(faup_snapshot_t *snapshot, char *workdir)
   }
 
   for (counter = 0; counter < snapshot->length; counter++) {
-    retval = asprintf(&item_file, "%s%c%s", full_dir_path, FAUP_OS_DIRSEP_C, snapshot->items_names[counter]);
+    retval = asprintf(&item_file, "%s%c%s", full_dir_path, FAUP_OS_DIRSEP_C, snapshot->items[counter]->key);
     fp = fopen(item_file, "wb+");
     faup_snapshot_item_write(snapshot->items[counter], fp);
     fclose(fp);
@@ -177,14 +177,14 @@ faup_snapshot_t *faup_snapshot_compare(char *snapshot_dir_a, char *snapshot_dir_
   retval = asprintf(&result->name, "%s-%s", snapshot_b->name, snapshot_a->name);
   
   for (counter = 0; counter < snapshot_b->length; counter++) {
-    item = faup_snapshot_item_get(snapshot_a, snapshot_b->items_names[counter]);
+    item = faup_snapshot_item_get(snapshot_a, snapshot_b->items[counter]->key);
     // Case 1: our item in B does not exists in A, so we add it to our result
     if (!item) {
       item = faup_snapshot_item_copy(snapshot_b->items[counter]);
-      faup_snapshot_append_item(result, snapshot_b->items_names[counter], item);
+      faup_snapshot_append_item(result, snapshot_b->items[counter]->key, item);
     } else {
     // Case 2: the item exists in both, so we check values
-      item_b = faup_snapshot_item_get(snapshot_b, snapshot_b->items_names[counter]);
+      item_b = faup_snapshot_item_get(snapshot_b, snapshot_b->items[counter]->key);
 
       newitem = faup_snapshot_item_new();
       for (counter_vc_b = 0; counter_vc_b < item_b->length; counter_vc_b++) {
@@ -210,7 +210,7 @@ faup_snapshot_t *faup_snapshot_compare(char *snapshot_dir_a, char *snapshot_dir_
       }	/* for counter_vc_b = 0 */
 
       if (newitem->length > 0) {
-	faup_snapshot_append_item(result, snapshot_b->items_names[counter], newitem);
+	faup_snapshot_append_item(result, snapshot_b->items[counter]->key, newitem);
       } else {
 	faup_snapshot_item_free(newitem);
       }

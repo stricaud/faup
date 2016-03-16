@@ -15,7 +15,6 @@ faup_snapshot_t *faup_snapshot_new(void)
   snapshot = malloc(sizeof(*snapshot));
   snapshot->length = 0;
   snapshot->items = NULL;
-  snapshot->items_names = NULL;
 
   return snapshot;
 }
@@ -35,6 +34,7 @@ void faup_snapshot_item_debug(faup_snapshot_item_t *item)
 {
   size_t counter;
   printf("** \titem\n");
+  printf("** \tkey:%s\n", item->key);
   printf("** \tlength:%ld\n", item->length);
   for (counter = 0; counter < item->length; counter++) {
     faup_snapshot_value_count_debug(item->value_count[counter]);
@@ -49,7 +49,6 @@ void faup_snapshot_debug(faup_snapshot_t *snapshot)
   printf("** Snapshot debug:");
   printf("** items length:%ld\n", snapshot->length);
   for (counter = 0; counter < snapshot->length; counter++) {
-    printf("** item name:%s\n", snapshot->items_names[counter]);
     faup_snapshot_item_debug(snapshot->items[counter]);
   }
 }
@@ -223,7 +222,7 @@ faup_snapshot_item_t *faup_snapshot_item_get(faup_snapshot_t *snapshot, char *it
   }
 
   for (counter = 0; counter < snapshot->length; counter++) {
-    if (!strcmp(snapshot->items_names[counter], item_name)) {
+    if (!strcmp(snapshot->items[counter]->key, item_name)) {
       return snapshot->items[counter];
     }
   }
@@ -243,10 +242,8 @@ int faup_snapshot_item_append(faup_snapshot_t *snapshot, char *item_name)
       fprintf(stderr, "Cannot allocatate a snapshot_item!\n");
       return -1;
     }
-    snapshot->items_names = realloc(snapshot->items_names, sizeof(char *) * (snapshot->length + 1));
-    
     snapshot->items[snapshot->length] = faup_snapshot_item_new();
-    snapshot->items_names[snapshot->length] = strdup(item_name);
+    snapshot->items[snapshot->length]->key = strdup(item_name);
     snapshot->length++;
   }
   
@@ -262,9 +259,8 @@ void faup_snapshot_free(faup_snapshot_t *snapshot)
   }
   free(snapshot->items);
   for (counter = 0; counter < snapshot->length; counter++) {
-    free(snapshot->items_names[counter]);
+    free(snapshot->items[counter]->key);
   }
-  free(snapshot->items_names);
   
   free(snapshot);
 }
@@ -310,14 +306,8 @@ int faup_snapshot_append_item(faup_snapshot_t *snapshot, char *item_name, faup_s
     return -1;
   }
 
-  snapshot->items_names = realloc(snapshot->items_names, sizeof(char *) * (snapshot->length + 1));
-  if (!snapshot->items_names) {
-    fprintf(stderr, "Cannot allocatate a snapshot items names!\n");
-    return -1;
-  }
-  
   snapshot->items[snapshot->length] = item;
-  snapshot->items_names[snapshot->length] = strdup(item_name);
+  snapshot->items[snapshot->length]->key = strdup(item_name);
   snapshot->length++;
   
   return 0;

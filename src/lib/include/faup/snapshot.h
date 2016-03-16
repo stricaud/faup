@@ -33,6 +33,7 @@ struct _faup_snapshot_value_count_t {
 typedef struct _faup_snapshot_value_count_t faup_snapshot_value_count_t;
 
 struct _faup_snapshot_item_t {
+  char *key;
   faup_snapshot_value_count_t **value_count;
   size_t length;
 };
@@ -42,7 +43,6 @@ struct _faup_snapshot_t {
   char *name;
 
   faup_snapshot_item_t **items;
-  char **items_names;
   size_t length;
 };
 typedef struct _faup_snapshot_t faup_snapshot_t;
