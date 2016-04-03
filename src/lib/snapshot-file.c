@@ -95,10 +95,12 @@ void faup_snapshot_value_count_write(faup_snapshot_value_count_t *vc, FILE *fp)
 void faup_snapshot_item_write(faup_snapshot_item_t *item, FILE *fp)
 {
   size_t counter;
+  struct htable_iter iter;
+  faup_snapshot_value_count_t *vc;
 
-  for (counter = 0; counter < item->length; counter++) {
-    faup_snapshot_value_count_write(item->value_count[counter], fp);
-  }
+  for (vc = htable_first(&item->values, &iter); vc; vc = htable_next(&item->values, &iter)) {
+      faup_snapshot_value_count_write(vc, fp);
+    }
 }
 
 int faup_snapshot_write(faup_snapshot_t *snapshot, char *workdir)
@@ -146,7 +148,7 @@ faup_snapshot_t *faup_snapshot_compare(char *snapshot_dir_a, char *snapshot_dir_
   faup_snapshot_t *snapshot_b;
 
   faup_snapshot_t *result;
-
+  
   faup_snapshot_item_t *item;
   faup_snapshot_item_t *item_b;
   faup_snapshot_item_t *newitem;
@@ -155,6 +157,12 @@ faup_snapshot_t *faup_snapshot_compare(char *snapshot_dir_a, char *snapshot_dir_
   size_t counter_vc_a;
   size_t counter_vc_b;
   size_t counter_newitem;
+
+  struct htable_iter iter_a;
+  struct htable_iter iter_b;
+
+  faup_snapshot_value_count_t *vc_a;
+  faup_snapshot_value_count_t *vc_b;
   
   int found;
   int retval;
@@ -167,15 +175,15 @@ faup_snapshot_t *faup_snapshot_compare(char *snapshot_dir_a, char *snapshot_dir_
     faup_snapshot_free(result);
     return NULL;
   }
+
   snapshot_b = faup_snapshot_read(snapshot_dir_b);
   if (!snapshot_b) {
     fprintf(stderr, "Error: cannot build snapshot from dir '%s'\n", snapshot_dir_b);
     faup_snapshot_free(result);
     return NULL;
   }
-
-  retval = asprintf(&result->name, "%s-%s", snapshot_b->name, snapshot_a->name);
   
+  retval = asprintf(&result->name, "%s-%s", snapshot_b->name, snapshot_a->name);
   for (counter = 0; counter < snapshot_b->length; counter++) {
     item = faup_snapshot_item_get(snapshot_a, snapshot_b->items[counter]->key);
     // Case 1: our item in B does not exists in A, so we add it to our result
@@ -183,39 +191,30 @@ faup_snapshot_t *faup_snapshot_compare(char *snapshot_dir_a, char *snapshot_dir_
       item = faup_snapshot_item_copy(snapshot_b->items[counter]);
       faup_snapshot_append_item(result, snapshot_b->items[counter]->key, item);
     } else {
-    // Case 2: the item exists in both, so we check values
+      // Case 2: the item exists in both, so we check values
       item_b = faup_snapshot_item_get(snapshot_b, snapshot_b->items[counter]->key);
-
       newitem = faup_snapshot_item_new();
-      for (counter_vc_b = 0; counter_vc_b < item_b->length; counter_vc_b++) {
-	char *bval = item_b->value_count[counter_vc_b]->value;
-	found = 0;
-	for (counter_vc_a = 0; counter_vc_a < item->length; counter_vc_a++) {
-	char *aval = item->value_count[counter_vc_a]->value;	
-	  if (!strcmp(bval, aval)) {
-	    found = counter_vc_a;	    
-	    break;
-	  }
-	  if (!found) {
-	    // Let's make sure this is not already in our item!
-	    faup_snapshot_value_count_t *vc;
+      newitem->key = item_b->key;
 
-	    vc = faup_snapshot_value_count_get(newitem, bval);
-	    if (!vc) {
-	      vc = faup_snapshot_value_count_copy(item_b->value_count[counter_vc_b]);
-	      faup_snapshot_value_count_append_object(newitem, vc);
-	    }
-	  }
+      vc_b = htable_first(&item_b->values, &iter_b);
+      while (vc_b) {
+
+      	vc_a = faup_snapshot_value_count_get(item, vc_b->value);
+	if (!vc_a) {
+	  /* printf("we copy %s\n", vc_b->value); */
+	  faup_snapshot_value_count_append_object(newitem, vc_b);
 	}
-      }	/* for counter_vc_b = 0 */
+	
+	vc_b = htable_next(&item_b->values, &iter_b);     
+      } // while (vc_b)
 
       if (newitem->length > 0) {
-	faup_snapshot_append_item(result, snapshot_b->items[counter]->key, newitem);
+      faup_snapshot_append_item(result, snapshot_b->items[counter]->key, newitem);
       } else {
 	faup_snapshot_item_free(newitem);
       }
-    }
-  }
+    } // { else {
+  } // for (counter = 0; counter < snapshot_b->length; counter++) {
   
   faup_snapshot_free(snapshot_a);
   faup_snapshot_free(snapshot_b);

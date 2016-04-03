@@ -8,6 +8,12 @@ int main(int argc, char **argv)
   faup_snapshot_t *snapshot;
   faup_snapshot_t *snapshot_cmp;
 
+  struct htable_iter iter;
+  
+  size_t counter;
+  
+  printf("Creating snapshort test\n");
+  
   snapshot = faup_snapshot_open("test");
   faup_snapshot_append(snapshot, "foo", "bar");
   faup_snapshot_append(snapshot, "ahah", "ihih");
@@ -15,13 +21,15 @@ int main(int argc, char **argv)
   faup_snapshot_append(snapshot, "ahah", "hehe");
 
   faup_snapshot_debug(snapshot);
-
   faup_snapshot_write(snapshot, NULL);
-  
   faup_snapshot_close(snapshot);
+
+  printf("Snapshot closed\n");
 
   snapshot = faup_snapshot_read("test");
 
+  faup_snapshot_debug(snapshot);
+  
   faup_snapshot_close(snapshot);
 
   snapshot = faup_snapshot_open("arf");
@@ -32,8 +40,11 @@ int main(int argc, char **argv)
   faup_snapshot_append(snapshot, "jean", "nemard");
   faup_snapshot_append(snapshot, "jean", "fonce");
   faup_snapshot_write(snapshot, NULL);
-  faup_snapshot_close(snapshot);
 
+  faup_snapshot_debug(snapshot);
+
+  faup_snapshot_close(snapshot);
+  
   snapshot_cmp = faup_snapshot_compare("test", "arf");
 
   printf("\nComparison function:\n");
@@ -42,6 +53,6 @@ int main(int argc, char **argv)
   printf("\n===== END OF COMPARISON =====\n");
 
   faup_snapshot_free(snapshot_cmp);
-  
+
   return 0;
 }

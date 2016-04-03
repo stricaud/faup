@@ -47,6 +47,8 @@ ${WEBSERVER_SRC}
 ${LUA_MODULES_SRC_FILES}
 b64/cencode.c
 b64/cdecode.c
+hash/hash.c
+hash/htable.c
 datadir.c
 decode.c
 features.c

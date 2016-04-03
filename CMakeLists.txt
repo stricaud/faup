@@ -54,6 +54,15 @@ include(GNUInstallDirs)
 
 include(FindPkgConfig)
 
+include(TestBigEndian)
+TEST_BIG_ENDIAN(BIGENDIAN)
+if (${BIGENDIAN})
+  add_definitions(-DHAVE_LITTLE_ENDIAN=0)
+  add_definitions(-DHAVE_BIG_ENDIAN=1)
+else()
+  add_definitions(-DHAVE_LITTLE_ENDIAN=1)
+  add_definitions(-DHAVE_BIG_ENDIAN=0)
+endif()
 
 # Find LUA
 # If we don't have lua, then we have no modules, it still works, but is less cool :)

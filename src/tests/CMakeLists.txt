@@ -48,3 +48,8 @@ add_executable(snapshot snapshot.c)
 target_link_libraries(snapshot ${FAUP_LIBRARY} ${CMAKE_DL_LIBS})
 add_test(Snapshot snapshot)
 
+# Hash Table Tests
+add_executable(hashtable hashtable.c)
+target_link_libraries(hashtable ${FAUP_LIBRARY} ${CMAKE_DL_LIBS})
+add_test(Hashtable hashtable)
+

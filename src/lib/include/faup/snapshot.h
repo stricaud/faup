@@ -20,6 +20,9 @@
 #include <stdio.h>
 #include <time.h>
 
+#include <faup/hash/hash.h>
+#include <faup/hash/htable.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -34,7 +37,8 @@ typedef struct _faup_snapshot_value_count_t faup_snapshot_value_count_t;
 
 struct _faup_snapshot_item_t {
   char *key;
-  faup_snapshot_value_count_t **value_count;
+  struct htable values;
+  /* faup_snapshot_value_count_t **value_count; */
   size_t length;
 };
 typedef struct _faup_snapshot_item_t faup_snapshot_item_t;

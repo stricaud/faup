@@ -9,6 +9,15 @@
 
 #include <faup/snapshot.h>
 
+static size_t rehash(const void *e, void *unused)
+{
+  return hash_string(((faup_snapshot_value_count_t *)e)->value);
+}
+
+static bool streq(const void *e, void *string)
+{
+  return strcmp(((faup_snapshot_value_count_t *)e)->value, string) == 0;
+}
 
 faup_snapshot_t *faup_snapshot_new(void)
 {
@@ -34,7 +43,9 @@ void faup_snapshot_value_count_debug(faup_snapshot_value_count_t *vc)
 void faup_snapshot_item_debug(faup_snapshot_item_t *item)
 {
   size_t counter;
-
+  struct htable_iter iter;
+  faup_snapshot_value_count_t *vc;
+  
   if (!item) {
     printf("** item empty, cannot debug!\n");
     return;
@@ -43,18 +54,23 @@ void faup_snapshot_item_debug(faup_snapshot_item_t *item)
   printf("** \titem\n");
   printf("** \tkey:%s\n", item->key);
   printf("** \tlength:%ld\n", item->length);
-  for (counter = 0; counter < item->length; counter++) {
-    faup_snapshot_value_count_debug(item->value_count[counter]);
-  }
 
+  if (item->length) {
+    vc = htable_first(&item->values, &iter);
+    while (vc) {
+      faup_snapshot_value_count_debug(vc);
+      vc = htable_next(&item->values, &iter);
+    }
+  }
 }
 
 void faup_snapshot_debug(faup_snapshot_t *snapshot)
 {
   size_t counter;
 
-  printf("** Snapshot debug:");
-  printf("** items length:%ld\n", snapshot->length);
+  printf("** Snapshot debug:\n");
+  printf("** Name: %s\n", snapshot->name);
+  printf("** items length: %ld\n", snapshot->length);
   for (counter = 0; counter < snapshot->length; counter++) {
     faup_snapshot_item_debug(snapshot->items[counter]);
   }
@@ -74,14 +90,9 @@ static int compare_search(const void *key, const void *member)
 {
   faup_snapshot_item_t *k = (faup_snapshot_item_t *)key;
   faup_snapshot_item_t *m = (faup_snapshot_item_t *)member;
-  
-  /* faup_snapshot_item_t *k = (faup_snapshot_item_t *)key;   */
-  /* faup_snapshot_item_t **m = (faup_snapshot_item_t **)member; */
 
   
   return strcmp(k->key, m->key);
-
-  /* printf("key:%s\n", (*m)->key); */
 }
 
 static int compare_simple(const void *p1, const void *p2)
@@ -141,8 +152,8 @@ faup_snapshot_item_t *faup_snapshot_item_new(void)
   }
 
   item->length = 0;
-  item->value_count = NULL;
-
+  htable_init(&item->values, rehash, NULL);
+  
   return item;
 
 }
@@ -154,13 +165,8 @@ faup_snapshot_item_t *faup_snapshot_item_copy(faup_snapshot_item_t *item)
 
   copy = faup_snapshot_item_new();
   copy->length = item->length;
-  copy->value_count = malloc(sizeof(faup_snapshot_value_count_t *) * (item->length+1));
-  
-  /* printf("item len:%ld\n", item->length); */
-  for (counter = 0; counter < item->length; counter++) {
-    faup_snapshot_value_count_t *vc = item->value_count[counter];
-    copy->value_count[counter] = faup_snapshot_value_count_copy(vc);
-  }
+  copy->key = strdup(item->key);
+  memcpy(&copy->values, &item->values, sizeof(item->values));
 
   return copy;
 }
@@ -174,12 +180,8 @@ faup_snapshot_value_count_t *faup_snapshot_value_count_get(faup_snapshot_item_t 
     return NULL;
   }
 
-  for (counter = 0; counter < item->length; counter++) {
-    if (!strcmp(item->value_count[counter]->value, value)) {
-      return item->value_count[counter];
-    }
-  }
-  return NULL;
+  return (faup_snapshot_value_count_t *)htable_get(&item->values, hash_string(value), streq, value);
+
 }
 
 int faup_snapshot_value_count_set_value(faup_snapshot_value_count_t *vc, char *value)
@@ -210,20 +212,17 @@ int faup_snapshot_value_count_append(faup_snapshot_item_t *item, char *value)
     fprintf(stderr, "Cannot append value '%s' to item\n", value);
     return -1;
   }
+
+  /* printf("Adding value '%s' to the item '%s'\n", item->key, value); */
   
   vc = faup_snapshot_value_count_get(item, value);
   if (!vc) {
-    item->value_count = realloc(item->value_count, sizeof(faup_snapshot_value_count_t *) * (item->length+1));
-    if (!item->value_count) {
-      fprintf(stderr, "Cannot allocatate a value_count!\n");
-      return -1;
-    }
-
-    item->value_count[item->length] = faup_snapshot_value_count_new();
-
-    item->value_count[item->length]->value = strdup(value);
-    item->value_count[item->length]->first_time_seen = item->value_count[item->length]->last_time_seen = time(NULL);
-    item->value_count[item->length]->count++;
+    vc = faup_snapshot_value_count_new();
+    vc->value = strdup(value);
+    vc->first_time_seen = vc->last_time_seen = time(NULL);
+    vc->count++;
+    
+    htable_add(&item->values, hash_string(vc->value), vc);
 
     item->length++;
   } else {
@@ -231,29 +230,23 @@ int faup_snapshot_value_count_append(faup_snapshot_item_t *item, char *value)
     vc->last_time_seen = time(NULL);
   }
 
-
   return 0;
 }
 
 int faup_snapshot_value_count_append_object(faup_snapshot_item_t *item, faup_snapshot_value_count_t *vc)
 {
-  item->value_count = realloc(item->value_count, sizeof(faup_snapshot_value_count_t *) * (item->length+1));
-  if (!item->value_count) {
-    fprintf(stderr, "Cannot allocatate a value_count!\n");
-    return -1;
-  }
+  htable_add(&item->values, hash_string(vc->value), vc);
 
-  item->value_count[item->length] = vc;
   item->length++;
 }
 
 void faup_snapshot_item_free(faup_snapshot_item_t *item)
 {
   size_t count;
-  for (count=0; count < item->length; count++) {
-    faup_snapshot_value_count_free(item->value_count[count]);
-  }
-  free(item->value_count);
+  /* for (count=0; count < item->length; count++) { */
+  /*   faup_snapshot_value_count_free(item->value_count[count]); */
+  /* } */
+  /* free(item->value_count); */
   free(item);
 }
 
@@ -267,9 +260,6 @@ faup_snapshot_item_t *faup_snapshot_item_get(faup_snapshot_t *snapshot, char *it
     return NULL;
   }
 
-  /* key.key = item_name; */
-  /* res = bsearch(&key, snapshot->items, snapshot->length, sizeof(faup_snapshot_item_t *), compare_simple); */
-  /* faup_snapshot_item_debug(res); */
   for (counter = 0; counter < snapshot->length; counter++) {
     if (!strcmp(snapshot->items[counter]->key, item_name)) {
       return snapshot->items[counter];
@@ -343,7 +333,7 @@ int faup_snapshot_append(faup_snapshot_t *snapshot, char *key, char *value)
 
   faup_snapshot_item_append(snapshot, key);
   item = faup_snapshot_item_get(snapshot, key);  
-  if (item) {
+  if (item) {    
     faup_snapshot_value_count_append(item, value);
   } else {
     fprintf(stderr, "Item does not exists. Cannot append value!\n");
