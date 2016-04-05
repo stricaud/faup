@@ -116,7 +116,7 @@ int faup_handle_shell_modules(int argc, char **argv)
       if (!retval) {
         printf("Module '%s' enabled with success!\n", argv[4]);
       } else {
-        printf("Module '%s' cannot be enabled: %s\n", argv[4], strerror(errno));
+        printf("Module '%s' cannot be enabled [symlink failed from %s to %s]: %s\n", argv[4], available_filename, symlink_file, strerror(errno));
       }
       free(available_filename);
       free(symlink_file);
