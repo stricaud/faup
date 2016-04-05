@@ -369,7 +369,7 @@ int main(int argc, char **argv)
 	/* Snapshot Comparison */
 	if (snapshot_compare) {
 	  faup_snapshot_t *result = faup_snapshot_compare(faup_opts->snapshot_name, snapshot_compare);
-	  faup_snapshot_debug(result);
+	  faup_snapshot_output(fh, result, stdout);
 	  free(snapshot_compare);
 	  faup_snapshot_free(result);
 	  goto terminate;

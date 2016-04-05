@@ -23,6 +23,8 @@
 #include <faup/hash/hash.h>
 #include <faup/hash/htable.h>
 
+#include <faup/faup.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -77,6 +79,7 @@ faup_snapshot_t  *faup_snapshot_open(char *name);
 void faup_snapshot_close(faup_snapshot_t *snapshot);
 int faup_snapshot_append(faup_snapshot_t *snapshot, char *key, char *value);
 int faup_snapshot_append_item(faup_snapshot_t *snapshot, char *item_name, faup_snapshot_item_t *item);
+void faup_snapshot_output(faup_handler_t *fh, faup_snapshot_t *snapshot, FILE *fd);
   
 #ifdef __cplusplus
 }

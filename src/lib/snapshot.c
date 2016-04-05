@@ -5,8 +5,10 @@
 #include <string.h>
 #define __USE_GNU // qsort_r()
 #include <stdlib.h>
+#define _POSIX_SOURCE
 #include <time.h>
 
+#include <faup/faup.h>
 #include <faup/snapshot.h>
 
 static size_t rehash(const void *e, void *unused)
@@ -42,7 +44,6 @@ void faup_snapshot_value_count_debug(faup_snapshot_value_count_t *vc)
 
 void faup_snapshot_item_debug(faup_snapshot_item_t *item)
 {
-  size_t counter;
   struct htable_iter iter;
   faup_snapshot_value_count_t *vc;
   
@@ -162,12 +163,23 @@ faup_snapshot_item_t *faup_snapshot_item_copy(faup_snapshot_item_t *item)
 {
   faup_snapshot_item_t *copy;
   size_t counter;
-
+  struct htable_iter iter;
+  /* faup_snapshot_value_count_t *vc; */
+  /* faup_snapshot_value_count_t *vc_copy; */
+  
   copy = faup_snapshot_item_new();
-  copy->length = item->length;
   copy->key = strdup(item->key);
   memcpy(&copy->values, &item->values, sizeof(item->values));
-
+  /* vc = htable_first(&copy->values, &iter); */
+  /* while (vc) { */
+  /* /\*   vc_copy = faup_snapshot_value_count_copy(vc); *\/ */
+  /* /\*   faup_snapshot_value_count_append_object(item, vc_copy); *\/ */
+  /*   printf("vc->value:%s\n", vc->value); */
+    
+  /*   vc = htable_next(&copy->values, &iter); */
+  /* } */
+  copy->length = item->length;
+  
   return copy;
 }
 
@@ -242,11 +254,17 @@ int faup_snapshot_value_count_append_object(faup_snapshot_item_t *item, faup_sna
 
 void faup_snapshot_item_free(faup_snapshot_item_t *item)
 {
-  size_t count;
-  /* for (count=0; count < item->length; count++) { */
-  /*   faup_snapshot_value_count_free(item->value_count[count]); */
-  /* } */
-  /* free(item->value_count); */
+  struct htable_iter iter;
+  faup_snapshot_value_count_t *vc;
+  
+  vc = htable_first(&item->values, &iter);
+  while (vc) {
+    htable_del(&item->values, hash_string(vc->value), vc);
+    /* faup_snapshot_value_count_free(vc); */
+    vc = htable_next(&item->values, &iter);
+  }
+  
+  /* free(item->key); */
   free(item);
 }
 
@@ -285,7 +303,6 @@ int faup_snapshot_item_append(faup_snapshot_t *snapshot, char *item_name)
     snapshot->items[snapshot->length]->key = strdup(item_name);
     snapshot->length++;
 
-    /* qsort_r(snapshot->items, snapshot->length, sizeof(faup_snapshot_item_t *), compare_items, arg); */
     qsort(snapshot->items, snapshot->length, sizeof(faup_snapshot_item_t *), compare_simple);
 
   }
@@ -301,11 +318,6 @@ void faup_snapshot_free(faup_snapshot_t *snapshot)
     faup_snapshot_item_free(snapshot->items[counter]);
   }
   free(snapshot->items);
-  for (counter = 0; counter < snapshot->length; counter++) {
-    /* if (snapshot->items[counter]) { */
-    /*   free(snapshot->items[counter]->key); */
-    /* } */
-  }
   
   free(snapshot);
 }
@@ -356,10 +368,59 @@ int faup_snapshot_append_item(faup_snapshot_t *snapshot, char *item_name, faup_s
     return -1;
   }
 
-  snapshot->items[snapshot->length] = item;
+  snapshot->items[snapshot->length] = faup_snapshot_item_copy(item);
+  
   snapshot->length++;
   
   return 0;
   
 }
 
+void faup_snapshot_output(faup_handler_t *fh, faup_snapshot_t *snapshot, FILE *fd)
+{
+  size_t counter;
+  size_t values_count;
+  faup_snapshot_value_count_t *vc;
+  struct htable_iter iter;
+  char first_timebuf[200];
+  char last_timebuf[200];
+
+  fprintf(fd, "{\n");
+  fprintf(fd,"\t\"snapshot name\": \"%s\",\n", snapshot->name);
+  fprintf(fd,"\t\"snapshot length\": %ld,\n", snapshot->length);
+  fprintf(fd,"\t\"items\":[");
+  for (counter = 0; counter < snapshot->length; counter++) {
+    faup_snapshot_item_t *item = snapshot->items[counter];
+    fprintf(fd,"\t\t{\n");
+    fprintf(fd,"\t\t\"key\": \"%s\",\n", item->key);
+    fprintf(fd,"\t\t\"length\": %ld,\n", item->length);
+    fprintf(fd,"\t\t\"values\": [\n");
+
+    if (item->length) {
+      values_count = 1;
+      vc = htable_first(&item->values, &iter);
+      while (vc) {
+	strftime(first_timebuf, sizeof(first_timebuf), "%Y-%d-%d %H:%M:%S %z", localtime(&vc->first_time_seen));
+	strftime(last_timebuf, sizeof(last_timebuf), "%Y-%d-%d %H:%M:%S %z", localtime(&vc->last_time_seen));
+	fprintf(fd,"\t\t\t{\"value\": \"%s\", \"count\": %ld, \"first seen\": \"%s\", \"last seen\": \"%s\"}", vc->value, vc->count, first_timebuf, last_timebuf);
+
+	if (values_count == item->length) {
+	  fprintf(fd,"\n");
+	} else {
+	  fprintf(fd,",\n");
+	}
+	  
+	values_count++;
+	vc = htable_next(&item->values, &iter);
+      }
+    }    
+    fprintf(fd,"\t\t]\n\t}");     
+    if (counter == snapshot->length - 1) {
+      fprintf(fd,"\n");
+      fprintf(fd, "\t]\n");
+    } else {
+      fprintf(fd,",\n");
+    }
+  }
+  fprintf(fd, "\n}\n");
+}

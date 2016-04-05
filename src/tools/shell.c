@@ -9,6 +9,7 @@
 
 #include <faup/datadir.h>
 #include <faup/modules.h>
+#include <faup/snapshot-file.h>
 
 
 int shell_modules_list_cb(faup_modules_t *modules, char *modules_dir, char *module, void *user_data, int count)
@@ -18,6 +19,34 @@ int shell_modules_list_cb(faup_modules_t *modules, char *modules_dir, char *modu
   return 0;
 }
 
+int faup_handle_shell_snapshot(int argc, char **argv)
+{
+  char *snapshot_name;
+  char *action;
+  faup_snapshot_t *snapshot = NULL;
+  
+  if (argc < 5) {
+    printf("Usage: %s $ snapshot action name\n", argv[0]);
+    printf("\nWhere name is your snapshot name\n");
+    printf("\nWhere action can be:\n");
+    printf("print: Print content of snapshot\n");
+    return -1;
+  }
+
+  action = argv[3];
+  snapshot_name = argv[4];
+
+  if (!strcmp(action, "read")) { 
+    snapshot = faup_snapshot_read(snapshot_name);
+    if (!snapshot) {
+      fprintf(stderr, "Cannot read snapshot: %s\n", snapshot_name);
+      return -1;
+    }
+    faup_snapshot_output(NULL, snapshot, stdout);
+    faup_snapshot_free(snapshot);
+  }
+  
+}
 
 int faup_handle_shell_modules(int argc, char **argv)
 {
@@ -119,13 +148,16 @@ int faup_handle_shell(int argc, char **argv)
 {
   if (argc <= 2) {
     printf("Usage: %s $ shell_command [parameters]\n", argv[0]);
-    printf("\nAvailable shell comands: modules\n");
+    printf("\nAvailable shell comands: modules snapshot\n");
     printf("\n");
     return -1;
   }
 
   if (!strcmp(argv[2], "modules")) {
     faup_handle_shell_modules(argc, argv);
+  }
+  if (!strcmp(argv[2], "snapshot")) {
+    faup_handle_shell_snapshot(argc, argv);
   }
 
   return 0;

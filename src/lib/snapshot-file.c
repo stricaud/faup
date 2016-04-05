@@ -59,7 +59,7 @@ faup_snapshot_t *faup_snapshot_read(char *dirpath)
   }
   snapshot = faup_snapshot_open(dirpath);
   while ((ent = readdir(dir)) != NULL) {
-    if ((ent->d_name) && (ent->d_name[0] != '.')) {
+    if ((ent->d_name) && (ent->d_name[0] != '.') && (ent->d_name[0] != '_')) {
       char *full_file_path;
       int retval;
       retval = asprintf(&full_file_path, "%s%c%s", dirpath, FAUP_OS_DIRSEP_C, ent->d_name);
@@ -103,6 +103,23 @@ void faup_snapshot_item_write(faup_snapshot_item_t *item, FILE *fp)
     }
 }
 
+void faup_snapshot_info_write(char *snapshot_dir)
+{
+  FILE *fp;
+  time_t current;
+  char *info_file;
+  int retval;
+  
+  current = time(NULL);
+
+  retval = asprintf(&info_file, "%s%c%s", snapshot_dir, FAUP_OS_DIRSEP_C, "_info");
+  fp = fopen(info_file, "wb+");
+  fwrite(&current, sizeof(time_t), 1, fp);  
+  fclose(fp);
+
+  free(info_file);
+}
+
 int faup_snapshot_write(faup_snapshot_t *snapshot, char *workdir)
 {
   int retval;
@@ -123,6 +140,8 @@ int faup_snapshot_write(faup_snapshot_t *snapshot, char *workdir)
     return -1;
   }
 
+  faup_snapshot_info_write(full_dir_path);
+  
   for (counter = 0; counter < snapshot->length; counter++) {
     retval = asprintf(&item_file, "%s%c%s", full_dir_path, FAUP_OS_DIRSEP_C, snapshot->items[counter]->key);
     fp = fopen(item_file, "wb+");
@@ -150,6 +169,7 @@ faup_snapshot_t *faup_snapshot_compare(char *snapshot_dir_a, char *snapshot_dir_
   faup_snapshot_t *result;
   
   faup_snapshot_item_t *item;
+  faup_snapshot_item_t *item_a;
   faup_snapshot_item_t *item_b;
   faup_snapshot_item_t *newitem;
   
@@ -186,38 +206,33 @@ faup_snapshot_t *faup_snapshot_compare(char *snapshot_dir_a, char *snapshot_dir_
   retval = asprintf(&result->name, "%s-%s", snapshot_b->name, snapshot_a->name);
   for (counter = 0; counter < snapshot_b->length; counter++) {
     item = faup_snapshot_item_get(snapshot_a, snapshot_b->items[counter]->key);
-    // Case 1: our item in B does not exists in A, so we add it to our result
-    if (!item) {
-      item = faup_snapshot_item_copy(snapshot_b->items[counter]);
-      faup_snapshot_append_item(result, snapshot_b->items[counter]->key, item);
-    } else {
-      // Case 2: the item exists in both, so we check values
-      item_b = faup_snapshot_item_get(snapshot_b, snapshot_b->items[counter]->key);
-      newitem = faup_snapshot_item_new();
-      newitem->key = item_b->key;
-
-      vc_b = htable_first(&item_b->values, &iter_b);
-      while (vc_b) {
-
-      	vc_a = faup_snapshot_value_count_get(item, vc_b->value);
+    item_b = faup_snapshot_item_get(snapshot_b, snapshot_b->items[counter]->key);
+      
+    newitem = faup_snapshot_item_new();
+    newitem->key = item_b->key;
+    vc_b = htable_first(&item_b->values, &iter_b);
+    while (vc_b) {
+      vc_a = faup_snapshot_value_count_get(item, vc_b->value);
+      if (!item) {
+	faup_snapshot_value_count_append_object(newitem, vc_b);
+      } else {
 	if (!vc_a) {
-	  /* printf("we copy %s\n", vc_b->value); */
 	  faup_snapshot_value_count_append_object(newitem, vc_b);
 	}
-	
-	vc_b = htable_next(&item_b->values, &iter_b);     
-      } // while (vc_b)
-
-      if (newitem->length > 0) {
-      faup_snapshot_append_item(result, snapshot_b->items[counter]->key, newitem);
-      } else {
-	faup_snapshot_item_free(newitem);
       }
-    } // { else {
+	
+      vc_b = htable_next(&item_b->values, &iter_b);     
+    } // while (vc_b)
+
+    if (newitem->length > 0) {
+      faup_snapshot_append_item(result, snapshot_b->items[counter]->key, newitem);
+    } else {
+      faup_snapshot_item_free(newitem);
+    }
   } // for (counter = 0; counter < snapshot_b->length; counter++) {
-  
+
   faup_snapshot_free(snapshot_a);
   faup_snapshot_free(snapshot_b);
-  
+ 
   return result;
 }
