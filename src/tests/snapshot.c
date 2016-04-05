@@ -44,7 +44,11 @@ int main(int argc, char **argv)
   faup_snapshot_debug(snapshot);
 
   faup_snapshot_close(snapshot);
+
+  snapshot = faup_snapshot_read("test");
+  faup_snapshot_close(snapshot);
   
+  //#if 0  
   snapshot_cmp = faup_snapshot_compare("test", "arf");
 
   printf("\nComparison function:\n");
@@ -52,7 +56,8 @@ int main(int argc, char **argv)
   faup_snapshot_debug(snapshot_cmp);
   printf("\n===== END OF COMPARISON =====\n");
 
-  faup_snapshot_free(snapshot_cmp);
-
+  faup_snapshot_close(snapshot_cmp);
+  //#endif
+  
   return 0;
 }

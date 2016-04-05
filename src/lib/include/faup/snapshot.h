@@ -61,7 +61,7 @@ void faup_snapshot_debug(faup_snapshot_t *snapshot);
 faup_snapshot_value_count_t *faup_snapshot_value_count_new(void);
 faup_snapshot_value_count_t *faup_snapshot_value_count_copy(faup_snapshot_value_count_t *vc);
 void faup_snapshot_value_count_free(faup_snapshot_value_count_t *vc);
-faup_snapshot_item_t *faup_snapshot_item_new(void);
+faup_snapshot_item_t *faup_snapshot_item_new(char *key);
 faup_snapshot_item_t *faup_snapshot_item_copy(faup_snapshot_item_t *item);
 faup_snapshot_value_count_t *faup_snapshot_value_count_get(faup_snapshot_item_t *item, char *value);
 int faup_snapshot_value_count_append(faup_snapshot_item_t *item, char *value);

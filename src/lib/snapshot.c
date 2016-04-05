@@ -142,7 +142,7 @@ void faup_snapshot_value_count_free(faup_snapshot_value_count_t *vc)
   free(vc);
 }
 
-faup_snapshot_item_t *faup_snapshot_item_new(void)
+faup_snapshot_item_t *faup_snapshot_item_new(char *key)
 {
   faup_snapshot_item_t *item;
 
@@ -153,6 +153,7 @@ faup_snapshot_item_t *faup_snapshot_item_new(void)
   }
 
   item->length = 0;
+  item->key = strdup(key);
   htable_init(&item->values, rehash, NULL);
   
   return item;
@@ -167,8 +168,7 @@ faup_snapshot_item_t *faup_snapshot_item_copy(faup_snapshot_item_t *item)
   /* faup_snapshot_value_count_t *vc; */
   /* faup_snapshot_value_count_t *vc_copy; */
   
-  copy = faup_snapshot_item_new();
-  copy->key = strdup(item->key);
+  copy = faup_snapshot_item_new(item->key);
   memcpy(&copy->values, &item->values, sizeof(item->values));
   /* vc = htable_first(&copy->values, &iter); */
   /* while (vc) { */
@@ -260,11 +260,14 @@ void faup_snapshot_item_free(faup_snapshot_item_t *item)
   vc = htable_first(&item->values, &iter);
   while (vc) {
     htable_del(&item->values, hash_string(vc->value), vc);
-    /* faup_snapshot_value_count_free(vc); */
+    faup_snapshot_value_count_free(vc);
+
     vc = htable_next(&item->values, &iter);
   }
+
+  htable_clear(&item->values);
   
-  /* free(item->key); */
+  free(item->key);
   free(item);
 }
 
@@ -299,8 +302,7 @@ int faup_snapshot_item_append(faup_snapshot_t *snapshot, char *item_name)
       fprintf(stderr, "Cannot allocatate a snapshot_item!\n");
       return -1;
     }
-    snapshot->items[snapshot->length] = faup_snapshot_item_new();
-    snapshot->items[snapshot->length]->key = strdup(item_name);
+    snapshot->items[snapshot->length] = faup_snapshot_item_new(item_name);
     snapshot->length++;
 
     qsort(snapshot->items, snapshot->length, sizeof(faup_snapshot_item_t *), compare_simple);
