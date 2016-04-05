@@ -24,7 +24,7 @@ int faup_handle_shell_snapshot(int argc, char **argv)
   char *snapshot_name;
   char *action;
   faup_snapshot_t *snapshot = NULL;
-  
+
   if (argc < 5) {
     printf("Usage: %s $ snapshot action name\n", argv[0]);
     printf("\nWhere name is your snapshot name\n");
@@ -32,7 +32,6 @@ int faup_handle_shell_snapshot(int argc, char **argv)
     printf("print: Print content of snapshot\n");
     return -1;
   }
-
   action = argv[3];
   snapshot_name = argv[4];
 
@@ -44,6 +43,8 @@ int faup_handle_shell_snapshot(int argc, char **argv)
     }
     faup_snapshot_output(NULL, snapshot, stdout);
     faup_snapshot_free(snapshot);
+  } else {
+    printf("Unknown action: '%s\'n", action);
   }
   
 }
