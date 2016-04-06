@@ -53,7 +53,7 @@ int main(int argc, char **argv)
 
   printf("\nComparison function:\n");
   printf("====================\n");
-  faup_snapshot_debug(snapshot_cmp);
+  faup_snapshot_output(NULL, snapshot_cmp, stdout);
   printf("\n===== END OF COMPARISON =====\n");
 
   faup_snapshot_close(snapshot_cmp);

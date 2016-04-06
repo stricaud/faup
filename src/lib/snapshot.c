@@ -402,8 +402,8 @@ void faup_snapshot_output(faup_handler_t *fh, faup_snapshot_t *snapshot, FILE *f
       values_count = 1;
       vc = htable_first(&item->values, &iter);
       while (vc) {
-	strftime(first_timebuf, sizeof(first_timebuf), "%Y-%d-%d %H:%M:%S %z", localtime(&vc->first_time_seen));
-	strftime(last_timebuf, sizeof(last_timebuf), "%Y-%d-%d %H:%M:%S %z", localtime(&vc->last_time_seen));
+	strftime(first_timebuf, sizeof(first_timebuf), "%Y-%m-%d %H:%M:%S %z", localtime(&vc->first_time_seen));
+	strftime(last_timebuf, sizeof(last_timebuf), "%Y-%m-%d %H:%M:%S %z", localtime(&vc->last_time_seen));
 	fprintf(fd,"\t\t\t{\"value\": \"%s\", \"count\": %ld, \"first seen\": \"%s\", \"last seen\": \"%s\"}", vc->value, vc->count, first_timebuf, last_timebuf);
 
 	if (values_count == item->length) {

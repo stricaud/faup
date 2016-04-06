@@ -208,7 +208,7 @@ faup_snapshot_t *faup_snapshot_compare(char *snapshot_dir_a, char *snapshot_dir_
   for (counter = 0; counter < snapshot_b->length; counter++) {
     item = faup_snapshot_item_get(snapshot_a, snapshot_b->items[counter]->key);
     item_b = faup_snapshot_item_get(snapshot_b, snapshot_b->items[counter]->key);
-      
+
     newitem = faup_snapshot_item_new(item_b->key);
     vc_b = htable_first(&item_b->values, &iter_b);
     while (vc_b) {
@@ -221,7 +221,7 @@ faup_snapshot_t *faup_snapshot_compare(char *snapshot_dir_a, char *snapshot_dir_
 	  vc_copy = faup_snapshot_value_count_copy(vc_b);
 	  faup_snapshot_value_count_append_object(newitem, vc_copy);
 	}
-      }
+      } // if (!item)
 	
       vc_b = htable_next(&item_b->values, &iter_b);     
     } // while (vc_b)
@@ -231,6 +231,7 @@ faup_snapshot_t *faup_snapshot_compare(char *snapshot_dir_a, char *snapshot_dir_
     } else {
       faup_snapshot_item_free(newitem);
     }
+
   } // for (counter = 0; counter < snapshot_b->length; counter++) {
 
   faup_snapshot_free(snapshot_a);
