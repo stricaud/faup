@@ -217,11 +217,30 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 
 				break;
 			case '?':
-				// printf("Current pos:%zd, special_char:%zd\n", current_pos, special_char_after_colons_pos);
+				/* printf("Current pos:%zd, special_char:%zd\n", current_pos, special_char_after_colons_pos); */
 				if (special_char_after_colons_pos != current_pos) {
 					if (last_slash_meaning == FAUP_LAST_SLASH_AFTER_DOMAIN) {
 						url_features->query_string.pos = current_pos;
+					} else if (last_slash_meaning < FAUP_LAST_SLASH_AFTER_DOMAIN) {
+					  /* printf("Before last slash after domain"); */
+					  					if (!faup_features_exist(url_features->resource_path)) {
+						if (!faup_features_exist(url_features->scheme)) {
+							if (!faup_features_exist(url_features->hierarchical)) {
+								/* This host has a '/' with no hierarchy */
+								/* The seen '/' is not a hierarchy so it is something like foo/bar.html */
+								last_slash_meaning = FAUP_LAST_SLASH_AFTER_DOMAIN;
+								url_features->query_string.pos = current_pos;
+							}
+						} else {
+							if (faup_features_exist(url_features->host)) {
+								last_slash_meaning = FAUP_LAST_SLASH_AFTER_DOMAIN;
+								url_features->query_string.pos = current_pos;
+							}
+						}
 					}
+
+					}
+					
 				}
 
 				buffer_pos=-1;

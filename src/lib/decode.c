@@ -217,7 +217,7 @@ const char *faup_decode(faup_handler_t *fh, const char *url, size_t url_len)
 						if (tld_len>0) {
 							const char* domain;
 							/* We sometime have no resource_path after but a trailing slash ('www.honeynet.org/') */
-							if (tld[tld_len-1] == '/') {
+							if ((tld[tld_len-1] == '/') || (tld[tld_len-1] == '?')) {
 								tld_len--;
 							}
 
