@@ -61,6 +61,7 @@ snapshot.c
 snapshot-file.c
 tld.c
 tld-tree.c
+utils.c
 )
 
 set(FAUP_LIB_HDR_FILES
@@ -82,6 +83,7 @@ include/faup/snapshot-file.h
 include/faup/tld.h
 include/faup/tld-tree.h
 include/faup/urllengths.h
+include/faup/utils.h
 include/faup/webserver.h
 )
 

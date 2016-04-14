@@ -14,23 +14,17 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
-#ifndef _SNAPSHOT_FILE_FAUP_H_
-#define _SNAPSHOT_FILE_FAUP_H_
-
-#include <faup/snapshot.h>
+#ifndef _FAUP_UTILS_H_
+#define _FAUP_UTILS_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int faup_snapshot_write(faup_snapshot_t *snapshot, char *workdir);
-faup_snapshot_t *faup_snapshot_read(char *dirpath);
-faup_snapshot_t *faup_snapshot_compare(char *snapshot_dir_a, char *snapshot_dir_b);
-int faup_snapshot_file_zip(char *dirpath);
-int faup_snapshot_file_unzip(char *zipfile);
+int faup_utils_remove_dir(char *dir);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	/* _SNAPSHOT_FILE_FAUP_H_ */
+#endif	/* _FAUP_UTILS_H_ */

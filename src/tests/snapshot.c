@@ -35,10 +35,10 @@ int main(int argc, char **argv)
   snapshot = faup_snapshot_open("arf");
   faup_snapshot_append(snapshot, "foo", "bar");
   faup_snapshot_append(snapshot, "ahah", "mouarf"); // A
-  faup_snapshot_append(snapshot, "ahah", "ihih");
-  faup_snapshot_append(snapshot, "ahah", "tagada"); // A
-  faup_snapshot_append(snapshot, "jean", "nemard");
-  faup_snapshot_append(snapshot, "jean", "fonce");
+  /* faup_snapshot_append(snapshot, "ahah", "ihih"); */
+  /* faup_snapshot_append(snapshot, "ahah", "tagada"); // A */
+  /* faup_snapshot_append(snapshot, "jean", "nemard"); */
+  /* faup_snapshot_append(snapshot, "jean", "fonce"); */
   faup_snapshot_write(snapshot, NULL);
 
   faup_snapshot_debug(snapshot);
@@ -48,7 +48,6 @@ int main(int argc, char **argv)
   snapshot = faup_snapshot_read("test");
   faup_snapshot_close(snapshot);
   
-  //#if 0  
   snapshot_cmp = faup_snapshot_compare("test", "arf");
 
   printf("\nComparison function:\n");
@@ -57,7 +56,6 @@ int main(int argc, char **argv)
   printf("\n===== END OF COMPARISON =====\n");
 
   faup_snapshot_close(snapshot_cmp);
-  //#endif
   
   return 0;
 }

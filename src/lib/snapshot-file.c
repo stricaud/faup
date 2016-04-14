@@ -10,7 +10,10 @@
 
 #include <faup/faup.h>
 #include <faup/snapshot.h>
+#include <faup/snapshot-file.h>
+#include <faup/utils.h>
 
+#include "miniz.c"
 
 static int _read_item(faup_snapshot_t *snapshot, FILE *fp, char *item_name)
 {
@@ -52,6 +55,8 @@ faup_snapshot_t *faup_snapshot_read(char *dirpath)
   struct dirent *ent;
   FILE *fp;
   
+  faup_snapshot_file_unzip(dirpath);
+
   dir = opendir(dirpath);
   if (!dir) {
     fprintf(stderr, "Error reading directory '%s': %s\n", dirpath, strerror(errno));
@@ -131,7 +136,7 @@ int faup_snapshot_write(faup_snapshot_t *snapshot, char *workdir)
   if (workdir) {
     retval = asprintf(&full_dir_path, "%s%c%s", workdir, FAUP_OS_DIRSEP_C, snapshot->name);
   } else {
-    full_dir_path=snapshot->name;
+    full_dir_path = snapshot->name;
   }
   
   retval = mkdir(full_dir_path, 0700);
@@ -150,10 +155,92 @@ int faup_snapshot_write(faup_snapshot_t *snapshot, char *workdir)
     free(item_file);
   }
 
+  // will create a file <full_dir_path>.urls (url snapshot)
+  faup_snapshot_file_zip(full_dir_path);
+
+  // now it is zipped and can be shared as a single file,
+  retval = faup_utils_remove_dir(full_dir_path);
+  if (retval < 0) {
+    fprintf(stderr, "Error removing '%s': %s\n", full_dir_path, strerror(errno));
+  }
+  
   if (workdir) {
     free(full_dir_path);
   }
   
+  return 0;
+}
+
+int faup_snapshot_file_zip(char *dirpath)
+{
+  DIR *dir;
+  struct dirent *ent;
+  FILE *fp;
+
+  char *zip_filename;
+  long file_size;
+  void *file_content;
+
+  mz_bool status;
+  mz_zip_archive zip_archive;
+
+  struct stat zipstats;
+  int retval;
+
+
+  dir = opendir(dirpath);
+  if (!dir) {
+    fprintf(stderr, "Error reading directory '%s': %s\n", dirpath, strerror(errno));
+    return -1;
+  }
+
+  retval = asprintf(&zip_filename, "%s.urls", dirpath);
+  retval = stat(zip_filename, &zipstats);
+  if (retval == 0) {
+    fprintf(stderr, "The snapshot %s already exists!\n", zip_filename);
+    free(zip_filename);
+    return -1;
+  }
+
+  while ((ent = readdir(dir)) != NULL) {
+      char *full_file_path;
+      int retval;
+      size_t readval;
+
+      if (ent->d_name[0] == '.') { continue; }
+
+      retval = asprintf(&full_file_path, "%s%c%s", dirpath, FAUP_OS_DIRSEP_C, ent->d_name);
+      fp = fopen(full_file_path, "rb");
+      fseek(fp, 0, SEEK_END);
+      file_size = ftell(fp);
+      fseek(fp, 0, SEEK_SET);
+      
+      file_content = malloc(file_size + 1);
+      if (!file_content) {
+	fprintf(stderr, "Cannot allocate the file size content:%lu", file_size);
+      }
+
+      readval = fread(file_content, file_size, 1, fp);
+      status = mz_zip_add_mem_to_archive_file_in_place(zip_filename, full_file_path, file_content, file_size, NULL, 0, MZ_BEST_COMPRESSION);
+      if (!status) {
+      	fprintf(stderr, "Cannot create %s!\n", full_file_path);
+      	return -1;
+      }
+
+      /* printf("file name:%s\n", full_file_path); */
+      
+      fclose(fp);
+      free(file_content);
+      free(full_file_path);
+  }
+
+  free(zip_filename);
+  return 0;
+}
+
+int faup_snapshot_file_unzip(char *zipfile)
+{
+
   return 0;
 }
 

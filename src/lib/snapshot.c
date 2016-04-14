@@ -389,8 +389,11 @@ void faup_snapshot_output(faup_handler_t *fh, faup_snapshot_t *snapshot, FILE *f
 
   fprintf(fd, "{\n");
   fprintf(fd,"\t\"snapshot name\": \"%s\",\n", snapshot->name);
-  fprintf(fd,"\t\"snapshot length\": %ld,\n", snapshot->length);
-  fprintf(fd,"\t\"items\":[");
+  if (!snapshot->length) {
+    fprintf(fd,"\t\"snapshot length\": %ld\n", snapshot->length);
+  } else {
+    fprintf(fd,"\t\"snapshot length\": %ld,\n", snapshot->length);
+    fprintf(fd,"\t\"items\":[");
   for (counter = 0; counter < snapshot->length; counter++) {
     faup_snapshot_item_t *item = snapshot->items[counter];
     fprintf(fd,"\t\t{\n");
@@ -423,6 +426,7 @@ void faup_snapshot_output(faup_handler_t *fh, faup_snapshot_t *snapshot, FILE *f
     } else {
       fprintf(fd,",\n");
     }
+  }
   }
   fprintf(fd, "\n}\n");
 }
