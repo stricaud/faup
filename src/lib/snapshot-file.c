@@ -54,8 +54,21 @@ faup_snapshot_t *faup_snapshot_read(char *dirpath)
   DIR *dir;
   struct dirent *ent;
   FILE *fp;
-  
-  faup_snapshot_file_unzip(dirpath);
+  int retval;
+  size_t dirpath_len;
+
+  dirpath_len = strlen(dirpath);
+  if (dirpath_len > 5) {
+    if (!strcmp(&dirpath[dirpath_len - 5], ".urls")) {
+      dirpath[dirpath_len - 5] = '\0';
+    }
+  }
+
+  retval = faup_snapshot_file_unzip(dirpath);
+  if (retval < 0) {
+    fprintf(stderr, "Cannot read snapshot '%s'\n", dirpath);
+    return NULL;
+  }
 
   dir = opendir(dirpath);
   if (!dir) {
@@ -80,6 +93,10 @@ faup_snapshot_t *faup_snapshot_read(char *dirpath)
 
   closedir(dir);
 
+  retval = faup_utils_remove_dir(dirpath);
+  if (retval < 0) {
+    fprintf(stderr, "Cannot remove temporary directory '%s'\n", dirpath);
+  }
   /* faup_snapshot_debug(snapshot); */
   
   return snapshot;
@@ -187,7 +204,6 @@ int faup_snapshot_file_zip(char *dirpath)
   struct stat zipstats;
   int retval;
 
-
   dir = opendir(dirpath);
   if (!dir) {
     fprintf(stderr, "Error reading directory '%s': %s\n", dirpath, strerror(errno));
@@ -240,6 +256,39 @@ int faup_snapshot_file_zip(char *dirpath)
 
 int faup_snapshot_file_unzip(char *zipfile)
 {
+
+  char *url_snapshot_file = NULL;
+  size_t zipfile_len;
+  int retval;
+
+  mz_zip_archive zip_archive;
+  mz_bool status;
+  int i;
+
+  retval = asprintf(&url_snapshot_file, "%s.urls", zipfile);
+
+  memset(&zip_archive, 0, sizeof(zip_archive));
+  status = mz_zip_reader_init_file(&zip_archive, url_snapshot_file, 0);
+  for (i = 0; i < (int)mz_zip_reader_get_num_files(&zip_archive); i++) {
+    mz_zip_archive_file_stat file_stat;
+
+    if (!mz_zip_reader_file_stat(&zip_archive, i, &file_stat)) {
+      fprintf(stderr, "Cannot stat the zip file!\n");
+      mz_zip_reader_end(&zip_archive);
+      return -1;
+    }
+
+    faup_utils_recursive_mkdir(file_stat.m_filename);
+
+    status = mz_zip_reader_extract_to_file(&zip_archive, i, file_stat.m_filename, 0);
+    if (!status) {
+      fprintf(stderr, "Error extracting '%s': %s\n", file_stat.m_filename, strerror(errno));
+    }
+  }
+
+  mz_zip_reader_end(&zip_archive);
+
+  free(url_snapshot_file);
 
   return 0;
 }

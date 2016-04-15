@@ -22,6 +22,7 @@ extern "C" {
 #endif
 
 int faup_utils_remove_dir(char *dir);
+int faup_utils_recursive_mkdir(char *filepath);
 
 #ifdef __cplusplus
 }
