@@ -1,1 +1,0 @@
-http,foo:bar,www3.altavista,digital.com,digital,www3.altavista.digital.com,com,8080,/index.php1,?tada=da&fremo=genial,#anchor1234

@@ -4,7 +4,7 @@
 # Version 2, December 2004 
 #
 # Copyright (C) 2012 Adrien Guinet <adrien@guinet.me>
-# Copyright (C) 2013 Sebastien Tricaud <sebastien@honeynet.org>
+# Copyright (C) 2013-2016 Sebastien Tricaud <sebastien@honeynet.org>
 #
 # Everyone is permitted to copy and distribute verbatim or modified 
 # copies of this license document, and changing it is allowed as long 
@@ -31,6 +31,9 @@ FAUP_TOOL="${faup-project_BINARY_DIR}/src/tools/faup"
 
 URLS="$SRC_TEST_DIR/urls.txt"
 URLS_CMP="$BIN_TEST_DIR/urls.txt.cmp"
+
+. $SRC_TEST_DIR/ticktick.sh
+
 
 function test_generic
 {
@@ -61,76 +64,6 @@ function test_argument
     exit $RET
 }
 
-function test_vanilla
-{
-    test_generic "-o json" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla"
-}
-
-function test_vanilla_scheme
-{
-    test_generic "-f scheme" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla.scheme"
-}
-
-function test_vanilla_credential
-{
-    test_generic "-f credential" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla.credential"
-}
-
-function test_vanilla_subdomain
-{
-    test_generic "-f subdomain" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla.subdomain"
-}
-
-function test_vanilla_domain
-{
-    test_generic "-f domain" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla.domain"
-}
-
-function test_vanilla_host
-{
-    test_generic "-f host" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla.host"
-}
-
-function test_vanilla_tld
-{
-    test_generic "-f tld" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla.tld"
-}
-
-function test_vanilla_port
-{
-    test_generic "-f port" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla.port"
-}
-
-function test_vanilla_resource_path
-{
-    test_generic "-f resource_path" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla.resource_path"
-}
-
-function test_vanilla_query_string
-{
-    test_generic "-f query_string" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla.query_string"
-}
-
-function test_vanilla_fragment
-{
-    test_generic "-f fragment" "$SRC_TEST_DIR/ref-files/urls.txt.vanilla.fragment"
-}
-
-function test_tld_one_only
-{
-    test_generic "-t" "$SRC_TEST_DIR/ref-files/urls.txt.tld_one_only"
-}
-
-function test_json
-{
-    test_generic "-o json" "$SRC_TEST_DIR/ref-files/urls.txt.json"
-}
-
-
-function test_json_tld_one_only
-{
-    test_generic "-o json -t" "$SRC_TEST_DIR/ref-files/urls.txt.json_tld_one_only"
-}
 
 function test_issue
 {
@@ -177,28 +110,17 @@ function test_module
 if [ $# -lt 1 ]
 then
     echo "$0 test_type"
-    echo "Where test_type can be one of them: vanilla, tld_one_only, json, json_tld_one_only"
+    echo "Where test_type can be one of them: issue"
     exit 42
 fi
 
 case $1 in
-    Vanilla) test_vanilla;;
-    VanillaScheme) test_vanilla_scheme;;
-    VanillaCredential) test_vanilla_credential;;
-    VanillaSubdomain) test_vanilla_subdomain;;
-    VanillaDomain) test_vanilla_domain;;
-    VanillaHost) test_vanilla_host;;
-    VanillaTLD) test_vanilla_tld;;
-    VanillaPort) test_vanilla_port;;
-    VanillaResourcePath) test_vanilla_resource_path;;
-    VanillaQueryString) test_vanilla_query_string;;
-    VanillaFragment) test_vanilla_fragment;;
     TLD_One_Only) test_tld_one_only;;
     JSON) test_json;;
     JSON_TLD_One_Only) test_json_tld_one_only;;
     issue) test_issue $2;;
     Url_Argument) test_argument "http://foo:bar@www3.altavista.digital.com:8080/index.php1?tada=da&fremo=genial#anchor1234" "$SRC_TEST_DIR/ref-files/argument.txt";;
-    File_Argument) test_argument $URLS "$SRC_TEST_DIR/ref-files/urls.txt.vanilla";;
+    File_Argument) test_argument $URLS "$SRC_TEST_DIR/someurls.txt";;
     module) test_module $2;;
     *) echo "Unknown option '$1'"
     exit 42
