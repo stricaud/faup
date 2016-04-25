@@ -53,3 +53,8 @@ add_executable(hashtable hashtable.c)
 target_link_libraries(hashtable ${FAUP_LIBRARY} ${CMAKE_DL_LIBS})
 add_test(Hashtable hashtable)
 
+# JSON Urls test
+add_executable(json-tester json-tester.c)
+target_link_libraries(json-tester ${FAUP_LIBRARY} ${CMAKE_DL_LIBS})
+add_test(JsonURLsTester json-tester)
+
