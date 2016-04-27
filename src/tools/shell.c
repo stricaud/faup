@@ -11,6 +11,9 @@
 #include <faup/modules.h>
 #include <faup/snapshot-file.h>
 
+#ifdef FAUP_CACA
+#include "browse.h"
+#endif
 
 int shell_modules_list_cb(faup_modules_t *modules, char *modules_dir, char *module, void *user_data, int count)
 {
@@ -30,6 +33,9 @@ int faup_handle_shell_snapshot(int argc, char **argv)
     printf("\nWhere name is your snapshot name\n");
     printf("\nWhere action can be:\n");
     printf("print: Print content of snapshot\n");
+#ifdef FAUP_CACA
+    printf("browse: Graphical snapshot browser\n");
+#endif // FAUP_CACA
     return -1;
   }
   action = argv[3];
@@ -43,10 +49,18 @@ int faup_handle_shell_snapshot(int argc, char **argv)
     }
     faup_snapshot_output(NULL, snapshot, stdout);
     faup_snapshot_free(snapshot);
-  } else {
-    printf("Unknown action: '%s\'n", action);
+    return 0;
   }
+
+#ifdef FAUP_CACA
+  if (!strcmp(action, "browse")) {
+    faup_snapshot_browser(snapshot_name);
+    return 0;
+  }
+#endif
   
+  printf("Unknown action: '%s\'n", action);
+  return -1;
 }
 
 int faup_handle_shell_modules(int argc, char **argv)

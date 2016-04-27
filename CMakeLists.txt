@@ -75,6 +75,14 @@ if(${LUA51_FOUND})
   message("Lua 5.1 found. Faup will build with modules.")
 endif()
 
+pkg_check_modules(LIBCACA caca)
+if (${LIBCACA_FOUND})
+  add_definitions(-DFAUP_CACA=1)
+  message("Libcaca found, faup will enable snapshot browsing")
+else()
+  message("Libcaca was not found, faup won't offer snapshot browsing")
+endif()
+
 # Manage the version
 file(STRINGS VERSION VERSION)
 set(FAUP_VERSION ${VERSION})

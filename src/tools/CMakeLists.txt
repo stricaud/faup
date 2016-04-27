@@ -5,6 +5,15 @@ faup.c
 shell.c
 )
 
+if (${LIBCACA_FOUND})
+  set(FAUP_SRC_FILES
+    ${FAUP_SRC_FILES}
+    browse.c
+    browse-widgets.c
+    )
+endif()
+
+
 if(WIN32)
 set(WIN32_PORTABLE
 win32-getopt.c
@@ -25,6 +34,15 @@ if(${LUA51_FOUND})
 	set(FAUP_LINK_LIBRARIES
 		${FAUP_LINK_LIBRARIES}
 		${LUA_LIBRARIES}
+	)
+endif()
+if(${LIBCACA_FOUND})
+
+	include_directories(AFTER ${LUA_INCLUDE_DIRS})
+
+	set(FAUP_LINK_LIBRARIES
+		${FAUP_LINK_LIBRARIES}
+		${LIBCACA_LIBRARIES}
 	)
 
 endif()

@@ -1,0 +1,13 @@
+#ifndef _FAUP_BROWSE_COLORS_H_
+#define _FAUP_BROWSE_COLORS_H_
+
+#include <caca.h>
+
+#define WINDOW_CFG CACA_YELLOW
+#define WINDOW_CBG CACA_BLUE
+#define TEXT_CFG CACA_BLUE
+#define TEXT_CBG CACA_YELLOW
+
+
+#endif // _FAUP_BROWSE_COLORS_H_
+
