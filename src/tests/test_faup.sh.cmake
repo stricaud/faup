@@ -35,27 +35,12 @@ URLS_CMP="$BIN_TEST_DIR/urls.txt.cmp"
 . $SRC_TEST_DIR/ticktick.sh
 
 
-function test_generic
-{
-    FAUP_OPTS=$1
-    URLS_REF=$2
-
-    CMD="$FAUP_TOOL $FAUP_OPTS"
-
-    # Execute faup on urls.txt and compare to the reference output
-    $CMD < "$URLS" > "$URLS_CMP" ||exit $?
-    diff -u "$URLS_CMP" "$URLS_REF" >/dev/null
-    RET=$?
-    if [ $RET -eq 0 ]; then rm "$URLS_CMP"; fi
-
-    exit $RET
-}
-
 function test_argument
 {
     ARGV1=$1
     URLS_REF=$2
 
+    echo "$FAUP_TOOL $ARGV1 > $URLS_CMP"
     $FAUP_TOOL $ARGV1 > $URLS_CMP ||exit $?
     diff -u "$URLS_CMP" "$URLS_REF" >/dev/null
     RET=$?
@@ -117,7 +102,7 @@ fi
 case $1 in
     issue) test_issue $2;;
     Url_Argument) test_argument "http://foo:bar@www3.altavista.digital.com:8080/index.php1?tada=da&fremo=genial#anchor1234" "$SRC_TEST_DIR/ref-files/argument.txt";;
-    File_Argument) test_argument $URLS "$SRC_TEST_DIR/someurls.txt";;
+    File_Argument) test_argument $SRC_TEST_DIR/someurls.txt "$SRC_TEST_DIR/ref-files/fileargument.txt";;
     module) test_module $2;;
     *) echo "Unknown option '$1'"
     exit 42

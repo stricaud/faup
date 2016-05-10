@@ -1,0 +1,2 @@
+http,,,blah.com,blah,blah.com,com,,,,,mozilla_tld
+http,,foo.bar,camp.co.uk,camp,foo.bar.camp.co.uk,co.uk,,,?eheh,,mozilla_tld
