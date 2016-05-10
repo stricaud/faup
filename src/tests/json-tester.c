@@ -84,7 +84,7 @@ int main(int argc, char **argv)
       printf("OK\n");
     } else {
       printf("Error: from '%s' expected scheme '%s'!\n", url_origin, json_object_get_string(json_object, "expected_scheme"));
-      retval++;
+      retval += 1;;
     }
     /* credential */
     printf("\tcredential: ");
@@ -92,7 +92,7 @@ int main(int argc, char **argv)
       printf("OK\n");
     } else {
       printf("Error: from '%s' expected credential '%s'!\n", url_origin, json_object_get_string(json_object, "expected_credential"));
-      retval++;
+      retval += 1;;
     }
     /* subdomain */
     printf("\tsubdomain: ");
@@ -100,7 +100,7 @@ int main(int argc, char **argv)
       printf("OK\n");
     } else {
       printf("Error: from '%s' expected subdomain '%s'!\n", url_origin, json_object_get_string(json_object, "expected_subdomain"));
-      retval++;
+      retval += 1;;
     }
     /* domain */
     printf("\tdomain: ");
@@ -108,7 +108,7 @@ int main(int argc, char **argv)
       printf("OK\n");
     } else {
       printf("Error: from '%s' expected domain '%s'!\n", url_origin, json_object_get_string(json_object, "expected_domain"));
-      retval++;
+      retval += 1;;
     }
     /* domain without tld */
     printf("\tdomain without tld: ");
@@ -116,7 +116,7 @@ int main(int argc, char **argv)
       printf("OK\n");
     } else {
       printf("Error: from '%s' expected domain_without_tld '%s'!\n", url_origin, json_object_get_string(json_object, "expected_domain_without_tld"));
-      retval++;
+      retval += 1;;
     }
     /* host */
     printf("\thost: ");
@@ -124,7 +124,7 @@ int main(int argc, char **argv)
       printf("OK\n");
     } else {
       printf("Error: from '%s' expected host '%s'!\n", url_origin, json_object_get_string(json_object, "expected_host"));
-      retval++;
+      retval += 1;;
     }
     /* tld */
     printf("\ttld: ");
@@ -132,7 +132,7 @@ int main(int argc, char **argv)
       printf("OK\n");
     } else {
       printf("Error: from '%s' expected tld '%s'!\n", url_origin, json_object_get_string(json_object, "expected_tld"));
-      retval++;
+      retval += 1;;
     }
     /* port */
     printf("\tport: ");
@@ -140,7 +140,7 @@ int main(int argc, char **argv)
       printf("OK\n");
     } else {
       printf("Error: from '%s' expected port '%s'!\n", url_origin, json_object_get_string(json_object, "expected_port"));
-      retval++;
+      retval += 1;;
     }
     /* resource path */
     printf("\tresource path: ");
@@ -148,7 +148,7 @@ int main(int argc, char **argv)
       printf("OK\n");
     } else {
       printf("Error: from '%s' expected resource_path '%s'!\n", url_origin, json_object_get_string(json_object, "expected_resource_path"));
-      retval++;
+      retval += 1;;
     }
     /* query string */
     printf("\tquery string: ");
@@ -156,7 +156,7 @@ int main(int argc, char **argv)
       printf("OK\n");
     } else {
       printf("Error: from '%s' expected query_string '%s'!\n", url_origin, json_object_get_string(json_object, "expected_query_string"));
-      retval++;
+      retval += 1;;
     }
     /* fragment */
     printf("\tfragment: ");
@@ -164,7 +164,7 @@ int main(int argc, char **argv)
       printf("OK\n");
     } else {
       printf("Error: from '%s' expected fragment '%s'!\n", url_origin, json_object_get_string(json_object, "expected_fragment"));
-      retval++;
+      retval += 1;;
     }
     /* url type */
     printf("\turl type: ");
@@ -174,7 +174,7 @@ int main(int argc, char **argv)
       printf("OK\n");
     } else {
       printf("Error: from '%s' expected url_type '%s' but got '%s'!\n", url_origin, json_url_type, faup_url_type);
-      retval++;
+      retval += 1;;
     }
   }
 

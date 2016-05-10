@@ -254,21 +254,6 @@
     "expected_url_type": "mozilla_tld"
 },
 {
-    "url_origin": "//foo.local:80",
-    "expected_scheme": "",
-    "expected_credential": "",
-    "expected_subdomain": "",
-    "expected_domain": "",
-    "expected_domain_without_tld": "",
-    "expected_host": "",
-    "expected_tld": "",
-    "expected_port": "",
-    "expected_resource_path": "//foo.local:80",
-    "expected_query_string": "",
-    "expected_fragment": "",
-    "expected_url_type": "no_tld"
-},
-{
     "url_origin": "http://12344322345/blah.html",
     "expected_scheme": "http",
     "expected_credential": "",

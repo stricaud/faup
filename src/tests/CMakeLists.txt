@@ -3,22 +3,8 @@ enable_testing()
 configure_file("test_faup.sh.cmake" "test_faup.sh")
 
 set(TEST_FAUP_SCRIPT "${faup-project_BINARY_DIR}/src/tests/test_faup.sh")
+set(URLS_JSON "${faup-project_SOURCE_DIR}/src/tests/urls.json")
 
-add_test(Vanilla               ${TEST_FAUP_SCRIPT} Vanilla)
-add_test(VanillaScheme         ${TEST_FAUP_SCRIPT} VanillaScheme)
-add_test(VanillaCredential     ${TEST_FAUP_SCRIPT} VanillaCredential)
-add_test(VanillaSubdomain      ${TEST_FAUP_SCRIPT} VanillaSubdomain)
-add_test(VanillaDomain         ${TEST_FAUP_SCRIPT} VanillaDomain)
-add_test(VanillaHost           ${TEST_FAUP_SCRIPT} VanillaHost)
-add_test(VanillaTLD            ${TEST_FAUP_SCRIPT} VanillaTLD)
-add_test(VanillaPort           ${TEST_FAUP_SCRIPT} VanillaPort)
-add_test(VanillaResourcePath   ${TEST_FAUP_SCRIPT} VanillaResourcePath)
-add_test(VanillaQueryString    ${TEST_FAUP_SCRIPT} VanillaQueryString)
-add_test(VanillaFragment       ${TEST_FAUP_SCRIPT} VanillaFragment)
-
-add_test(TLD_One_Only      ${TEST_FAUP_SCRIPT} TLD_One_Only)
-add_test(JSON              ${TEST_FAUP_SCRIPT} JSON)
-add_test(JSON_TLD_One_Only ${TEST_FAUP_SCRIPT} JSON_TLD_One_Only)
 add_test(Url_Argument      ${TEST_FAUP_SCRIPT} Url_Argument)
 add_test(File_Argument     ${TEST_FAUP_SCRIPT} File_Argument)
 
@@ -56,5 +42,4 @@ add_test(Hashtable hashtable)
 # JSON Urls test
 add_executable(json-tester json-tester.c)
 target_link_libraries(json-tester ${FAUP_LIBRARY} ${CMAKE_DL_LIBS})
-add_test(JsonURLsTester json-tester)
-
+add_test(JsonURLsTester json-tester ${URLS_JSON})

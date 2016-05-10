@@ -115,9 +115,6 @@ then
 fi
 
 case $1 in
-    TLD_One_Only) test_tld_one_only;;
-    JSON) test_json;;
-    JSON_TLD_One_Only) test_json_tld_one_only;;
     issue) test_issue $2;;
     Url_Argument) test_argument "http://foo:bar@www3.altavista.digital.com:8080/index.php1?tada=da&fremo=genial#anchor1234" "$SRC_TEST_DIR/ref-files/argument.txt";;
     File_Argument) test_argument $URLS "$SRC_TEST_DIR/someurls.txt";;
