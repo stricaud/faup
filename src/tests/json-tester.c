@@ -1,9 +1,43 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <faup/faup.h>
+#include <faup/features.h>
 #include <faup/decode.h>
 #include <faup/output.h>
 #include <faup/parson.h>
+
+int compare_features(JSON_Object *json_object, faup_feature_t feature, const char *url_origin, char *json_obj_str)
+{
+  char *json_feature;
+  char *faup_feature;  
+  int ret;
+  
+  /* if (!faup_features_exist(feature)) { return -1; } */
+  
+  json_feature = json_object_get_string(json_object, json_obj_str);
+
+  if (!faup_features_exist(feature)) {
+    if (json_feature[0] == '\0') {
+      return 0;
+    }
+    return -1;
+  }
+
+  /* printf("size:%d, pos:%d\n", feature.size, feature.pos); */
+  /* printf("url origin:%s\n", url_origin); */
+  /* printf("at pos:%c\n", url_origin[feature.pos]); */
+  faup_feature = malloc(feature.size + 1);
+  memcpy((void *)faup_feature, (const void *)&url_origin[feature.pos], feature.size);
+  faup_feature[feature.size] = '\0';
+
+  ret = strcmp(json_feature, faup_feature);
+  
+  /* printf("feature:%s\n", faup_feature); */
+  free(faup_feature);
+  
+  return ret;
+}
 
 int main(int argc, char **argv)
 {
@@ -15,7 +49,11 @@ int main(int argc, char **argv)
   faup_handler_t *fh;
   faup_options_t *options;
 
-  char *url_origin;
+  const char *url_origin;
+  char *json_url_type;
+  char *faup_url_type;
+
+  int retval = 0;
   
   options = faup_options_new();
   if (!options) {
@@ -35,16 +73,113 @@ int main(int argc, char **argv)
     json_object = json_array_get_object(json_array, i);
 
     url_origin = json_object_get_string(json_object, "url_origin");
+    /* printf("url origin:%s\n", url_origin); */
     faup_decode(fh, url_origin, strlen(url_origin));
-    // requires an allocated buffer
-    /* char *faup_output_json_buffer_allocate(); */
-    /* void faup_output_json_buffer(faup_handler_t const* fh, faup_options_t *opts, char *buffer) */
 
-    /* printf("url origin:%s\n", json_object_get_string(json_object, "url_origin")); */
+    printf("testing url: '%s'\n", url_origin);
+    
+    /* scheme */
+    printf("\tscheme: ");
+    if (compare_features(json_object, fh->faup.features.scheme, url_origin, "expected_scheme") == 0) {
+      printf("OK\n");
+    } else {
+      printf("Error: from '%s' expected scheme '%s'!\n", url_origin, json_object_get_string(json_object, "expected_scheme"));
+      retval++;
+    }
+    /* credential */
+    printf("\tcredential: ");
+    if (compare_features(json_object, fh->faup.features.credential, url_origin, "expected_credential") == 0) {
+      printf("OK\n");
+    } else {
+      printf("Error: from '%s' expected credential '%s'!\n", url_origin, json_object_get_string(json_object, "expected_credential"));
+      retval++;
+    }
+    /* subdomain */
+    printf("\tsubdomain: ");
+    if (compare_features(json_object, fh->faup.features.subdomain, url_origin, "expected_subdomain") == 0) {
+      printf("OK\n");
+    } else {
+      printf("Error: from '%s' expected subdomain '%s'!\n", url_origin, json_object_get_string(json_object, "expected_subdomain"));
+      retval++;
+    }
+    /* domain */
+    printf("\tdomain: ");
+    if (compare_features(json_object, fh->faup.features.domain, url_origin, "expected_domain") == 0) {
+      printf("OK\n");
+    } else {
+      printf("Error: from '%s' expected domain '%s'!\n", url_origin, json_object_get_string(json_object, "expected_domain"));
+      retval++;
+    }
+    /* domain without tld */
+    printf("\tdomain without tld: ");
+    if (compare_features(json_object, fh->faup.features.domain_without_tld, url_origin, "expected_domain_without_tld") == 0) {
+      printf("OK\n");
+    } else {
+      printf("Error: from '%s' expected domain_without_tld '%s'!\n", url_origin, json_object_get_string(json_object, "expected_domain_without_tld"));
+      retval++;
+    }
+    /* host */
+    printf("\thost: ");
+    if (compare_features(json_object, fh->faup.features.host, url_origin, "expected_host") == 0) {
+      printf("OK\n");
+    } else {
+      printf("Error: from '%s' expected host '%s'!\n", url_origin, json_object_get_string(json_object, "expected_host"));
+      retval++;
+    }
+    /* tld */
+    printf("\ttld: ");
+    if (compare_features(json_object, fh->faup.features.tld, url_origin, "expected_tld") == 0) {
+      printf("OK\n");
+    } else {
+      printf("Error: from '%s' expected tld '%s'!\n", url_origin, json_object_get_string(json_object, "expected_tld"));
+      retval++;
+    }
+    /* port */
+    printf("\tport: ");
+    if (compare_features(json_object, fh->faup.features.port, url_origin, "expected_port") == 0) {
+      printf("OK\n");
+    } else {
+      printf("Error: from '%s' expected port '%s'!\n", url_origin, json_object_get_string(json_object, "expected_port"));
+      retval++;
+    }
+    /* resource path */
+    printf("\tresource path: ");
+    if (compare_features(json_object, fh->faup.features.resource_path, url_origin, "expected_resource_path") == 0) {
+      printf("OK\n");
+    } else {
+      printf("Error: from '%s' expected resource_path '%s'!\n", url_origin, json_object_get_string(json_object, "expected_resource_path"));
+      retval++;
+    }
+    /* query string */
+    printf("\tquery string: ");
+    if (compare_features(json_object, fh->faup.features.query_string, url_origin, "expected_query_string") == 0) {
+      printf("OK\n");
+    } else {
+      printf("Error: from '%s' expected query_string '%s'!\n", url_origin, json_object_get_string(json_object, "expected_query_string"));
+      retval++;
+    }
+    /* fragment */
+    printf("\tfragment: ");
+    if (compare_features(json_object, fh->faup.features.fragment, url_origin, "expected_fragment") == 0) {
+      printf("OK\n");
+    } else {
+      printf("Error: from '%s' expected fragment '%s'!\n", url_origin, json_object_get_string(json_object, "expected_fragment"));
+      retval++;
+    }
+    /* url type */
+    printf("\turl type: ");
+    faup_url_type = faup_output_get_string_from_url_type(fh);
+    json_url_type = json_object_get_string(json_object, "expected_url_type");
+    if (!strcmp(faup_url_type, json_url_type)) {
+      printf("OK\n");
+    } else {
+      printf("Error: from '%s' expected url_type '%s' but got '%s'!\n", url_origin, json_url_type, faup_url_type);
+      retval++;
+    }
   }
 
   json_value_free(root_value);
   faup_terminate(fh);
 
-  return 0;
+  return retval;
 }

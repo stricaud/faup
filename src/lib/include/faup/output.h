@@ -37,6 +37,7 @@ void faup_output_csv(faup_handler_t const* fh, faup_options_t *opts, FILE* out);
 void faup_output_json(faup_handler_t const* fh, faup_options_t *opts, FILE* out);
 char *faup_output_json_buffer_allocate(void);
 void faup_output_json_buffer(faup_handler_t const* fh, faup_options_t *opts, char *buffer);
+char *faup_output_get_string_from_url_type(faup_handler_t const* fh);
 
 #ifdef __cplusplus
 }
