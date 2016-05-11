@@ -13,6 +13,7 @@
 ## Documentation
 
 * [Command Line Tool][clidoc]
+* [Working with Snapshots][snapshots]
 * [Library API documentation][libdoc]
 
 * [Frequently Asked Questions][faq]
@@ -195,3 +196,4 @@ $ ldd /usr/local/bin/faup
 [libdoc]: doc/library.md
 [clidoc]: doc/cli.md
 [faq]: doc/faq.md
+[snapshots]: doc/snapshots.md
