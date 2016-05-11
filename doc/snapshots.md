@@ -22,6 +22,7 @@ It will create the snapshot, in a file named "mysnapshot.urls" (urls being the e
 
 You can now print that snapshot using faup using the builtin shell, like this:
 
+```
     $ faup $ snapshot read mysnapshot.urls 
     {
         "snapshot name": "mysnapshot",
@@ -47,7 +48,7 @@ You can now print that snapshot using faup using the builtin shell, like this:
                 ]
         },
 	...
-
+```
 
 ### Comparing a snapshot with another
 
@@ -66,6 +67,7 @@ We create the snapshot like this:
 
 To check the different between second and first and get only what exists in second which is not in first, run the following command:
 
+```
    $ faup -s mysnapshot -c secondsnap
    {
         "snapshot name": "secondsnap-mysnapshot",
@@ -97,6 +99,6 @@ To check the different between second and first and get only what exists in seco
         ]
 
 	}
-
+```
 
 Which displays the json of the differences.
