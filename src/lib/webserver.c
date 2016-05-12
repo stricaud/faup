@@ -13,6 +13,9 @@
 #include <faup/decode.h>
 #include <faup/b64/cdecode.h>
 #include <faup/output.h>
+#include <faup/snapshot.h>
+#include <faup/snapshot-file.h>
+#include <faup/utlist.h>
 
 #include <faup/webserver.h>
 
@@ -21,6 +24,14 @@ static struct mg_context *ctx;
 static faup_handler_t *_fh;
 static faup_options_t *_faup_opts;
 pthread_mutex_t lock;
+
+struct snapshots_list_t {
+  faup_snapshot_t *snapshot;
+  char *name;
+  struct snapshots_list_t *next;
+};
+struct snapshots_list_t open_snapshots = NULL;
+
 
 int log_message(const struct mg_connection *conn, const char *message)
 {
@@ -100,7 +111,6 @@ int json_output(struct mg_connection *conn, void *buffer)
 
 int snapshot_handler(struct mg_connection *conn, void *cbdata)
 {
-  
     pthread_mutex_lock(&lock);
     
     pthread_mutex_unlock(&lock);
