@@ -64,6 +64,20 @@ else()
   add_definitions(-DHAVE_BIG_ENDIAN=0)
 endif()
 
+#
+# Check if functions exists
+#
+include(CheckFunctionExists)
+check_function_exists(vsnprintf HAVE_VSNPRINTF)
+if (${HAVE_VSNPRINTF})
+  add_definitions(-DHAVE_VSNPRINTF=1)
+endif()
+check_function_exists(snprintf HAVE_SNPRINTF)
+if (${HAVE_SNPRINTF})
+  add_definitions(-DHAVE_SNPRINTF=1)
+endif()
+
+
 # Find LUA
 # If we don't have lua, then we have no modules, it still works, but is less cool :)
 if (NOT FAUP_NOLUA)
