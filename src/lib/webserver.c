@@ -30,7 +30,7 @@ struct snapshots_list_t {
   char *name;
   struct snapshots_list_t *next;
 };
-struct snapshots_list_t open_snapshots = NULL;
+struct snapshots_list_t *open_snapshots = NULL;
 
 
 int log_message(const struct mg_connection *conn, const char *message)
