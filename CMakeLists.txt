@@ -81,7 +81,7 @@ endif()
 # Find LUA
 # If we don't have lua, then we have no modules, it still works, but is less cool :)
 if (NOT FAUP_NOLUA)
-  pkg_check_modules(LUA lua>=5.1)
+  pkg_check_modules(LUA lua>=5.1 lua5.3>=5.1 lua5.2>=5.1 lua5.1>=5.1)
 endif()
 
 if(${LUA_FOUND})
