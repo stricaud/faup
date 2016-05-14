@@ -23,7 +23,7 @@ else()
 endif(WEBSERVER)
 
 
-if(${LUA51_FOUND})
+if(${LUA_FOUND})
 
 set(LUA_MODULES_SRC_FILES
 modules.c

@@ -215,6 +215,7 @@ int faup_snapshot_file_zip(char *dirpath)
   if (retval == 0) {
     fprintf(stderr, "The snapshot %s already exists!\n", zip_filename);
     free(zip_filename);
+    closedir(dir);
     return -1;
   }
 
@@ -251,6 +252,9 @@ int faup_snapshot_file_zip(char *dirpath)
   }
 
   free(zip_filename);
+
+  closedir(dir);
+  
   return 0;
 }
 

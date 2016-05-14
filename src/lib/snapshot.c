@@ -193,7 +193,6 @@ faup_snapshot_value_count_t *faup_snapshot_value_count_get(faup_snapshot_item_t 
   }
 
   return (faup_snapshot_value_count_t *)htable_get(&item->values, hash_string(value), streq, value);
-
 }
 
 int faup_snapshot_value_count_set_value(faup_snapshot_value_count_t *vc, char *value)

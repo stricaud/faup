@@ -81,12 +81,15 @@ endif()
 # Find LUA
 # If we don't have lua, then we have no modules, it still works, but is less cool :)
 if (NOT FAUP_NOLUA)
-   find_package(Lua51)
+  pkg_check_modules(LUA lua>=5.1)
 endif()
 
-if(${LUA51_FOUND})
+if(${LUA_FOUND})
   add_definitions(-DFAUP_LUA_MODULES=1)
-  message("Lua 5.1 found. Faup will build with modules.")
+  message("Lua found. Faup will build with modules.")
+  message("LUA version: ${LUA_VERSION}")
+  message("LUA libraries: ${LUA_LIBRARIES}")
+  message("LUA include dirs: ${LUA_INCLUDE_DIR}")
 endif()
 
 pkg_check_modules(LIBCACA caca)
