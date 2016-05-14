@@ -27,9 +27,9 @@ set(FAUP_LINK_LIBRARIES
 	${FAUP_LIBRARY}
 )
 
-if(${LUA51_FOUND})
+if(${LUA_FOUND})
 
-	include_directories(AFTER ${LUA_INCLUDE_DIRS})
+	include_directories(BEFORE ${LUA_INCLUDE_DIRS})
 
 	set(FAUP_LINK_LIBRARIES
 		${FAUP_LINK_LIBRARIES}
@@ -38,7 +38,7 @@ if(${LUA51_FOUND})
 endif()
 if(${LIBCACA_FOUND})
 
-	include_directories(AFTER ${LUA_INCLUDE_DIRS})
+	include_directories(BEFORE ${LUA_INCLUDE_DIRS})
 
 	set(FAUP_LINK_LIBRARIES
 		${FAUP_LINK_LIBRARIES}
