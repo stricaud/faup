@@ -32,7 +32,7 @@ set(LUA_MODULES_HDR_FILES
 include/faup/modules.h
 )
 
-include_directories(AFTER ${LUA_INCLUDE_DIR})
+include_directories(AFTER ${LUA_INCLUDE_DIRS})
 
 set(FAUP_LINK_LIBRARIES
 ${FAUP_LINK_LIBRARIES}
