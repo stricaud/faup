@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <time.h>
 
 #include <sys/errno.h>
 #include <sys/syscall.h>
@@ -27,12 +28,20 @@ int faup_handle_shell_snapshot(int argc, char **argv)
   char *snapshot_name;
   char *action;
   faup_snapshot_t *snapshot = NULL;
+  faup_snapshot_item_t *snapshot_item;
+  faup_snapshot_value_count_t *vc = NULL;
 
+  struct htable_iter iter;
+  char first_timebuf[200];
+  char last_timebuf[200];
+
+  
   if (argc < 5) {
     printf("Usage: %s $ snapshot action name\n", argv[0]);
     printf("\nWhere name is your snapshot name\n");
     printf("\nWhere action can be:\n");
     printf("print: Print content of snapshot\n");
+    printf("get: Grab an item key\n");
 #ifdef FAUP_CACA
     printf("browse: Graphical snapshot browser\n");
 #endif // FAUP_CACA
@@ -48,6 +57,41 @@ int faup_handle_shell_snapshot(int argc, char **argv)
       return -1;
     }
     faup_snapshot_output(NULL, snapshot, stdout);
+    faup_snapshot_free(snapshot);
+    return 0;
+  }
+
+  if (!strcmp(action, "get")) {
+    char *item, *key;
+    if (argc < 7) {
+      fprintf(stderr, "Not enough arguments. Syntax: %s $ snapshot get %s item key\n", argv[0], snapshot_name);
+      return -1;
+    }
+    item = argv[5];
+    key = argv[6];
+    
+    snapshot = faup_snapshot_read(snapshot_name);
+    if (!snapshot) {
+      fprintf(stderr, "Cannot read snapshot: %s\n", snapshot_name);
+      return -1;
+    }
+
+    snapshot_item = faup_snapshot_item_get(snapshot, item);
+    if (!snapshot_item) {
+      faup_snapshot_free(snapshot);
+      return -1;
+    }
+    vc = faup_snapshot_value_count_get(snapshot_item, key);
+    if (!vc) {
+      faup_snapshot_free(snapshot);
+      return -1;
+    }
+
+    strftime(first_timebuf, sizeof(first_timebuf), "%Y-%m-%d %H:%M:%S %z", localtime(&vc->first_time_seen));
+    strftime(last_timebuf, sizeof(last_timebuf), "%Y-%m-%d %H:%M:%S %z", localtime(&vc->last_time_seen));
+    fprintf(stdout, "{\"value\": \"%s\", \"count\": %ld, \"first seen\": \"%s\", \"last seen\": \"%s\"}\n", vc->value, vc->count, first_timebuf, last_timebuf);
+    
+  out:
     faup_snapshot_free(snapshot);
     return 0;
   }
@@ -161,6 +205,8 @@ int faup_handle_shell_modules(int argc, char **argv)
 
 int faup_handle_shell(int argc, char **argv)
 {
+  int ret;
+  
   if (argc <= 2) {
     printf("Usage: %s $ shell_command [parameters]\n", argv[0]);
     printf("\nAvailable shell comands: modules snapshot\n");
@@ -169,11 +215,11 @@ int faup_handle_shell(int argc, char **argv)
   }
 
   if (!strcmp(argv[2], "modules")) {
-    faup_handle_shell_modules(argc, argv);
+    ret = faup_handle_shell_modules(argc, argv);
   }
   if (!strcmp(argv[2], "snapshot")) {
-    faup_handle_shell_snapshot(argc, argv);
+    ret = faup_handle_shell_snapshot(argc, argv);
   }
 
-  return 0;
+  return ret;
 }
