@@ -552,4 +552,19 @@
     "expected_query_string": "",
     "expected_fragment": "",
     "expected_url_type": "ipv6"
+},
+{
+    "url_origin": "http://cache.google.com/?q=http://www.google.com/path/to/search.html?q=test&loc=ro%20Romania",
+    "expected_scheme": "http",
+    "expected_credential": "",
+    "expected_subdomain": "cache",
+    "expected_domain": "google.com",
+    "expected_domain_without_tld": "google",
+    "expected_host": "cache.google.com",
+    "expected_tld": "com",
+    "expected_port": "",
+    "expected_resource_path": "/?q=http://www.google.com/path/to/search.html",
+    "expected_query_string": "?q=test&loc=ro%20Romania",
+    "expected_fragment": "",
+    "expected_url_type": "mozilla_tld"
 }]
