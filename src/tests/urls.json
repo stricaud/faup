@@ -537,4 +537,19 @@
     "expected_query_string": "?foo=bar",
     "expected_fragment": "",
     "expected_url_type": "mozilla_tld"
+},
+{
+    "url_origin": "::1",
+    "expected_scheme": "",
+    "expected_credential": "",
+    "expected_subdomain": "",
+    "expected_domain": "::1",
+    "expected_domain_without_tld": "::1",
+    "expected_host": "::1",
+    "expected_tld": "",
+    "expected_port": "",
+    "expected_resource_path": "",
+    "expected_query_string": "",
+    "expected_fragment": "",
+    "expected_url_type": "ipv6"
 }]
