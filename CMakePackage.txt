@@ -27,8 +27,11 @@ endif()
 
 
 if(${LINUX_DIST} MATCHES "redhat")
+#	set(CPACK_PACKAGING_INSTALL_PREFIX "/usr")
+#        set(CPACK_PACKAGE_RELOCATABLE TRUE)
 	set(CPACK_GENERATOR "RPM")
 	set(CPACK_SET_DESTDIR OFF)
+	set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION /usr/share/man /usr/share/man/man1 /usr/local /usr/local/bin /usr/local/lib /usr/local/include /usr/local/lib64 /usr/local/share /usr/local/share/man /usr/local/share/man/man1)
 endif()
 
 set(CPACK_COMPONENTS_ALL Applications Libraries Headers)
