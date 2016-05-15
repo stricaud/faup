@@ -183,8 +183,12 @@ int snapshot_action_append_handler(char *snapshot_name, struct mg_connection *co
   char item[ITEM_MAXLEN];
   #define KEY_MAXLEN 4096
   char key[KEY_MAXLEN];
+  char key_unbase64[KEY_MAXLEN];
+  base64_decodestate s;
+  size_t key_outlen;
+  
   int ret;
-
+  
   mg_printf(conn, "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n");
 
   ret = mg_get_var(ri->query_string, strlen(ri->query_string), "item", item, ITEM_MAXLEN);
@@ -197,13 +201,15 @@ int snapshot_action_append_handler(char *snapshot_name, struct mg_connection *co
     mg_printf(conn, "Error, key 'key' not found\n");
     return -1;
   }
-
   
+  base64_init_decodestate(&s);
+  key_outlen = base64_decode_block(key, strlen(key), key_unbase64, &s);  
+
   CDL_FOREACH(open_snapshots, el) {
     if (!strcmp(el->name, snapshot_name)) {
       exists = 1;
-      faup_snapshot_append(el->snapshot, item, key);
-      mg_printf(conn, "Item %s appended to key %s with success\n", item, key);
+      faup_snapshot_append(el->snapshot, item, key_unbase64);
+      mg_printf(conn, "Item %s appended with success\n", item);
     }
   }
 
@@ -218,10 +224,14 @@ int snapshot_action_get_handler(char *snapshot_name, struct mg_connection *conn,
   char item[ITEM_MAXLEN];
   #define KEY_MAXLEN 4096
   char key[KEY_MAXLEN];
+  char key_unbase64[KEY_MAXLEN];
+  base64_decodestate s;
+  size_t key_outlen;
+
   int ret;
 
   faup_snapshot_item_t *snapshot_item;
-  faup_snapshot_value_count_t *vc;
+  faup_snapshot_value_count_t *vc = NULL;
 
   
   ret = mg_get_var(ri->query_string, strlen(ri->query_string), "item", item, ITEM_MAXLEN);
@@ -232,18 +242,27 @@ int snapshot_action_get_handler(char *snapshot_name, struct mg_connection *conn,
   if (ret < 0) {
     return -1;
   }
+
+  base64_init_decodestate(&s);
+  key_outlen = base64_decode_block(key, strlen(key), key_unbase64, &s);  
   
   CDL_FOREACH(open_snapshots, el) {
     if (!strcmp(el->name, snapshot_name)) {
       exists = 1;
       snapshot_item = faup_snapshot_item_get(el->snapshot, item);
-      vc = faup_snapshot_value_count_get(snapshot_item, key);      
+      if (snapshot_item) {
+	vc = faup_snapshot_value_count_get(snapshot_item, key_unbase64);
+      }
     }
   }
 
   if (exists) {
     mg_printf(conn, "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n");
-    mg_printf(conn, "%ld\n", vc->count);
+    if (vc) {
+      mg_printf(conn, "%ld\n", vc->count);
+    } else {
+      mg_printf(conn, "0\n");
+    }
   }
   
   return exists ? 0 : -1;
