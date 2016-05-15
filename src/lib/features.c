@@ -208,7 +208,17 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 							// Skip a special char that may come after a port. Thus, this would not be a port.
 							url_features->port.pos = current_pos + 1;
 						} else {
+						  if (next_c != ':') {
 							special_char_after_colons_pos = current_pos + 1;
+						  } else {
+						    /* In this case we discovered a dot after the other. It it most likely an IPv6 address */
+						    if (url_features->host.pos < 0) {
+						      url_features->host.pos = current_pos;
+						      host_is_ipv6 = 1;
+						      fh->faup.url_type = FAUP_URL_IPV6;
+						    }
+
+						  }
 						}
 					}
 				}
