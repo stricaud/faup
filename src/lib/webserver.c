@@ -144,6 +144,7 @@ int snapshot_action_open_handler(char *snapshot_name, struct mg_connection *conn
   struct snapshots_list_t *el = NULL;
   #define AS_MAXLEN 1024
   char as[AS_MAXLEN];
+  int open_as = 0;
   int ret;
   
   el = malloc(sizeof(struct snapshots_list_t));
@@ -156,16 +157,21 @@ int snapshot_action_open_handler(char *snapshot_name, struct mg_connection *conn
 
   ret = mg_get_var(ri->query_string, strlen(ri->query_string), "as", as, AS_MAXLEN);
   if (ret < 0) {
-    mg_printf(conn, "Error, key 'as' not found\n");
-    return -1;
+    open_as = 1;
   }
 
   
   el->snapshot = faup_snapshot_read(snapshot_name);
   free(el->snapshot->name);
-  el->snapshot->name = strdup(as);
+  if (open_as) {
+    el->snapshot->name = strdup(as);
+  }
   if (el->snapshot) {
-    el->name = strdup(as);
+    if (open_as) {
+      el->name = strdup(as);
+    } else {
+      el->name = strdup(snapshot_name);
+    }
     LL_APPEND(open_snapshots, el);
     mg_printf(conn, "Snapshot %s opened with success\n", snapshot_name);
   } else {
@@ -313,7 +319,7 @@ int snapshot_handler(struct mg_connection *conn, void *cbdata)
       mg_printf(conn, "Snapshot mode for the webserver can be used to:\n");
       mg_printf(conn, "<ul>\n");
       mg_printf(conn, "<li>create a new snapshot: /snapshot?action=create&snapshot=snapshotname</li>\n");
-      mg_printf(conn, "<li>open an exists snapshot: /snapshot?action=open&snapshot=snapshotname</li>\n");
+      mg_printf(conn, "<li>open an exists snapshot: /snapshot?action=open&snapshot=snapshotname&as=newname</li>\n");
       mg_printf(conn, "<li>add data to snapshot: /snapshot?action=append&snapshot=snapshotname&item=name&key=key</li>\n");
       mg_printf(conn, "<li>get data from snapshot: /snapshot?action=get&snapshot=snapshotname&item=name&key=key</li>\n");
       mg_printf(conn, "<li>close a snapshot: /snapshot?action=close&snapshot=snapshotname</li>\n");

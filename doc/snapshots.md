@@ -102,3 +102,37 @@ To check the different between second and first and get only what exists in seco
 ```
 
 Which displays the json of the differences.
+
+### Using the webserver to play with snapshots
+
+Start the webserver:
+```
+faup -w 0.0.0.0:9876
+```
+
+Now use curl to create a new snapshot in another terminal:
+```
+$ curl http://127.0.0.1:9876/snapshot?action=create\&snapshot=foobar
+Snapshot 'foobar' created with success
+```
+
+We can now start appending data which must be encoded in base64, for example here we add the "tld" "co.uk":
+```
+$ curl http://127.0.0.1:9876/snapshot?action=append\&snapshot=foobar\&item=tld\&key=$(echo co.uk |base64)
+Item tld appended with success
+```
+
+You can now check what exists and what does not in the database:
+```
+$ curl http://127.0.0.1:9876/snapshot?action=get\&snapshot=foobar\&item=tld\&key=$(echo co.uk |base64)
+1
+$ curl http://127.0.0.1:9876/snapshot?action=get\&snapshot=foobar\&item=tld\&key=$(echo com |base64)
+0
+```
+
+You can now close your snapshot:
+```
+$ curl http://127.0.0.1:9876/snapshot?action=close\&snapshot=foobar
+Snapshot 'foobar' closed with success
+```
+
