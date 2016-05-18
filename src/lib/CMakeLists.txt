@@ -36,7 +36,7 @@ include_directories(AFTER ${LUA_INCLUDE_DIRS})
 
 set(FAUP_LINK_LIBRARIES
 ${FAUP_LINK_LIBRARIES}
-${LUA_LIBRARIES}
+${LUA_LDFLAGS}
 )
 
 endif()
