@@ -31,7 +31,7 @@ class Faup(object):
         if sys.version.split('.')[0].split('.')[0]=='3':
             self._url = bytes(url,'utf-8')
         if sys.version.split('.')[0].split('.')[0]=='2':
-            self._url = bytes(url)
+            self._url = bytes(url.encode('utf-8'))
 
         self._url = faup_decode(self.fh, self._url, len(url))
         self.decoded = True
