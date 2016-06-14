@@ -5,11 +5,10 @@ faup.c
 shell.c
 )
 
-if (${LIBCACA_FOUND})
+if (${LIBGTCACA_FOUND})
   set(FAUP_SRC_FILES
     ${FAUP_SRC_FILES}
     browse.c
-    browse-widgets.c
     )
 endif()
 
@@ -28,7 +27,6 @@ set(FAUP_LINK_LIBRARIES
 )
 
 if(${LUA_FOUND})
-
 	include_directories(BEFORE ${LUA_INCLUDE_DIRS})
 
 	set(FAUP_LINK_LIBRARIES
@@ -36,13 +34,14 @@ if(${LUA_FOUND})
 		${LUA_LDFLAGS}
 	)
 endif()
-if(${LIBCACA_FOUND})
+if(${LIBGTCACA_FOUND})
 
 	include_directories(BEFORE ${LUA_INCLUDE_DIRS})
 
 	set(FAUP_LINK_LIBRARIES
 		${FAUP_LINK_LIBRARIES}
-		${LIBCACA_LIBRARIES}
+		${LIBCACA_LDFLAGS}
+		${LIBGTCACA_LDFLAGS}
 	)
 
 endif()

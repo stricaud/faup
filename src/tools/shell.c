@@ -12,7 +12,7 @@
 #include <faup/modules.h>
 #include <faup/snapshot-file.h>
 
-#ifdef FAUP_CACA
+#ifdef FAUP_GTCACA
 #include "browse.h"
 #endif
 
@@ -42,9 +42,9 @@ int faup_handle_shell_snapshot(int argc, char **argv)
     printf("\nWhere action can be:\n");
     printf("print: Print content of snapshot\n");
     printf("get: Grab an item key\n");
-#ifdef FAUP_CACA
+#ifdef FAUP_GTCACA
     printf("browse: Graphical snapshot browser\n");
-#endif // FAUP_CACA
+#endif // FAUP_GTCACA
     return -1;
   }
   action = argv[3];
@@ -96,7 +96,7 @@ int faup_handle_shell_snapshot(int argc, char **argv)
     return 0;
   }
 
-#ifdef FAUP_CACA
+#ifdef FAUP_GTCACA
   if (!strcmp(action, "browse")) {
     faup_snapshot_browser(snapshot_name);
     return 0;

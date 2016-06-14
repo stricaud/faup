@@ -1,76 +1,89 @@
-/* #include <string.h> */
-#include <caca.h>
-
 #include <faup/snapshot.h>
 #include <faup/snapshot-file.h>
 
-#include "browse-colors.h"
-#include "browse-widgets.h"
+#include <gtcaca/main.h>
+#include <gtcaca/window.h>
+#include <gtcaca/textlist.h>
+#include <gtcaca/button.h>
+#include <gtcaca/label.h>
+
+faup_snapshot_t *snapshot = NULL;
+gtcaca_window_widget_t *win_values = NULL;
+
+
+int item_textlist_key_press(gtcaca_textlist_widget_t *widget, int key, void *userdata)
+{
+  gtcaca_application_widget_t *app = (gtcaca_application_widget_t *)userdata;
+  struct htable_iter iter;
+  char *value;
+  int i;
+  gtcaca_textlist_widget_t *textlist;
+  faup_snapshot_value_count_t *vc;
+
+  
+  switch(key) {
+  case CACA_KEY_RETURN:
+    if (widget->parent->width > (app->width / 2)) {
+      widget->parent->width /= 2;
+      win_values = gtcaca_window_new((gtcaca_widget_t *)app, "Values", app->x + (app->width /2), app->y, app->width/2, app->height);
+    }
+
+    value = gtcaca_textlist_get_text_selected(widget);
+
+  /*   for (i = 0; i < snapshot->length; i++) { */
+  /*     faup_snapshot_item_t *item = snapshot->items[i]; */
+  /*     if (!strcmp(item->key, value)) { */
+  /* 	textlist = gtcaca_textlist_new((gtcaca_widget_t *)win_values, 2, 2); */
+
+  /* 	  vc = htable_first(&item->values, &iter); */
+  /* 	  while (vc) { */
+  /* 	    gtcaca_textlist_append(textlist, vc->value);	     */
+  /* 	    vc = htable_next(&item->values, &iter); */
+  /* 	  } */
+  /* /\* } *\/ */
+
+  /*     } */
+    }
+    
+    break;
+  }
+}
 
 int faup_snapshot_browser(char *snapshot_name)
 {
-  caca_canvas_t *cv; caca_display_t *dp;
-  faup_snapshot_t *snapshot = NULL;
+  gtcaca_application_widget_t *app;
+  gtcaca_window_widget_t *win;
+  gtcaca_textlist_widget_t *textlist;
+  gtcaca_button_widget_t *button;
+  gtcaca_label_widget_t *label;
 
   int i;
-  int quit = 0;
   
   snapshot = faup_snapshot_read(snapshot_name);
   if (!snapshot) {
     fprintf(stderr, "Cannot read snapshot:%s\n", snapshot_name);
     return -1;
   }
-  
-  dp = caca_create_display(NULL);
-  if(!dp) return 1;
-  cv = caca_get_canvas(dp);
-  caca_set_display_title(dp, snapshot->name);
-  /* caca_set_color_ansi(cv, CACA_BLUE, CACA_YELLOW); */
-  /* caca_printf(cv, 0, 0, "w:%d h:%d\n", caca_get_canvas_width(cv), caca_get_canvas_height(cv)); */
 
-  draw_window(cv, snapshot->name, 0, 1, 100, 50);
+  gtcaca_init(NULL, NULL);
+
+  app = gtcaca_application_new(snapshot->name);
+
+  win = gtcaca_window_new((gtcaca_widget_t *)app, "Items", app->x, app->y, app->width, app->height);
+
+  //  gtcaca_widget_printall();
+  
+  textlist = gtcaca_textlist_new((gtcaca_widget_t *)win, 2, 2);
 
   for (i = 0; i < snapshot->length; i++) {
     faup_snapshot_item_t *item = snapshot->items[i];
-
-    if (!i) {
-      caca_set_color_ansi(cv, TEXT_CFG, TEXT_CBG);
-    } else {
-      caca_set_color_ansi(cv, TEXT_CBG, TEXT_CFG);
-    }
-    caca_printf(cv, 2, 3+i, "%s", item->key);
+    gtcaca_textlist_append(textlist, item->key);
   }
 
-  caca_set_color_ansi(cv, TEXT_CFG, TEXT_CBG);
+  gtcaca_textlist_key_cb_register(textlist, item_textlist_key_press, (void *)app);
 
-  caca_refresh_display(dp);
-
-  while (!quit) {
-    caca_event_t ev;
-    
-    while(caca_get_event(dp, CACA_EVENT_ANY, &ev, 0)) {
-      if (caca_get_event_type(&ev) & CACA_EVENT_KEY_PRESS) {
-	switch(caca_get_event_key_ch(&ev)) {
-	case 'q':
-	case 'Q':
-	case CACA_KEY_ESCAPE:
-	  quit = 1;
-	  break;
-	case CACA_KEY_RETURN:
-	  break;
-	case CACA_KEY_UP:
-	  break;
-	case CACA_KEY_DOWN:
-	  break;
-	}
-      }
-      
-      caca_refresh_display(dp);
-    }
-  }
+  gtcaca_main();
   
-  caca_free_display(dp);
-
   faup_snapshot_free(snapshot);
   
   return 0;
