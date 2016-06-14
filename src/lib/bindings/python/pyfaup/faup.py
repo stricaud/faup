@@ -25,17 +25,21 @@ class Faup(object):
 
         :param url: The URL to normalize
         """
-        self.url = None
+        self._url = None
 
         # Alright, I assume no one is using python 1.x nor 4.x
         if sys.version.split('.')[0].split('.')[0]=='3':
-            self.url = bytes(url,'utf-8')
+            self._url = bytes(url,'utf-8')
         if sys.version.split('.')[0].split('.')[0]=='2':
-            self.url = bytes(url)
+            self._url = bytes(url.encode('utf-8'))
 
-        self.url = faup_decode(self.fh, self.url, len(url))
+        self._url = faup_decode(self.fh, self._url, len(url))
         self.decoded = True
         self.retval = {}
+    
+    @property    
+    def url(self):
+        return self._url
         
     def get_version(self):
         return faup_get_version()
@@ -45,7 +49,7 @@ class Faup(object):
             return None
 
         else:
-            return self.url[pos:(pos+size)]
+            return self._url[pos:(pos+size)]
 
     def get_scheme(self):
         """
@@ -162,4 +166,5 @@ class Faup(object):
         self.retval["resource_path"] = self.get_resource_path()
         self.retval["query_string"] = self.get_query_string()
         self.retval["fragment"] = self.get_fragment()
+        self.retval["url"] = self.url
         return self.retval
