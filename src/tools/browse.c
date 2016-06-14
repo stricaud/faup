@@ -45,8 +45,6 @@ int item_textlist_key_press(gtcaca_textlist_widget_t *widget, int key, void *use
   /*     } */
     }
     
-    break;
-  }
 }
 
 int faup_snapshot_browser(char *snapshot_name)
