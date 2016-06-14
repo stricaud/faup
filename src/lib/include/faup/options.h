@@ -83,6 +83,7 @@ struct _faup_options_t {
   int number_of_chars_to_remove;
   char *snapshot_name;
   int quiet;
+  int empty_lines_processed;
 };
 typedef struct _faup_options_t faup_options_t;
 

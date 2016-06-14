@@ -68,6 +68,7 @@ void faup_options_defaults(faup_options_t *opts)
 
 	opts->snapshot_name = NULL;
 	opts->quiet = 0;
+	opts->empty_lines_processed = 0;
 }
 
 void faup_options_enable_tld_above_one(faup_options_t *opts)

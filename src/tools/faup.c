@@ -91,12 +91,13 @@ static int run_from_stream(faup_handler_t *fh, FILE *stream)
 			if (!strbuf) {
 				break;
 			}
-			if (strbuf[0] == '\0') {
+			if (!fh->options->empty_lines_processed) {
+			  if (strbuf[0] == '\0') {
 			    free(strbuf);
 			    // We can have an empty line but other after (see #27)
-				continue;
+			    continue;
+			  }
 			}
-
 			faup_decode(fh, strbuf, strlen(strbuf));
 
 			if (fh->options->snapshot_name) {
@@ -182,6 +183,7 @@ void print_help(char **argv)
 	printf("-b\tRun the webserver in background\n");	
 	printf("-c <snapshot>\tcompare with snapshot selected with -s\n");
 	printf("-d {delimiter}\n\twill separate the fields with the wanted delimiter\n");
+	printf("-e\tempty lines are processed\n");	
 	printf("-f {scheme|credential|subdomain|domain|domain_without_tld|host|tld|port|resource_path|query_string|fragment|url_type}\n\tfield to extract\n");
 	printf("-l\tprefix with the line number (csv only)\n");
 #ifdef FAUP_LUA_MODULES
@@ -239,7 +241,7 @@ int main(int argc, char **argv)
 	  return faup_handle_shell(argc, argv);
 	}
 
-	while ((opt = getopt(argc, argv, "abpld:vo:utf:m:w:r:s:c:q")) != -1) {
+	while ((opt = getopt(argc, argv, "abepld:vo:utf:m:w:r:s:c:q")) != -1) {
 	  switch(opt) {
 	  case 'a':
 	  	skip_file_check = 1;
@@ -255,6 +257,9 @@ int main(int argc, char **argv)
 	    	faup_opts->sep_char = optarg[0];
 	    }
 	    break;	 
+	  case 'e':
+	    faup_opts->empty_lines_processed = 1;
+	    break;
 	  case 'p':
 	    faup_opts->print_header = 1;
 	    break;
