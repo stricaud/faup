@@ -93,7 +93,8 @@ int faup_tld_download_mozilla_list(char *store_to_file)
 		}
 	}
 
-	while ( (n=recv(sockfd, recvbuf, MAX_RECVBUF, 0)) > 0) {
+	// Issue #74 fixes a buffer overrun, MAX_RECVBUF must be with -1
+	while ( (n=recv(sockfd, recvbuf, MAX_RECVBUF - 1, 0)) > 0) {
 		recvbuf[n] = '\0';
 		if (fputs(recvbuf, fileptr) == EOF) {
 			fprintf(stderr, "(fputs) Cannot get data.\n");
