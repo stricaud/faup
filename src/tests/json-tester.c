@@ -64,7 +64,7 @@ int main(int argc, char **argv)
   
   root_value = json_parse_file(argv[1]);
   if (json_value_get_type(root_value) != JSONArray) {
-    printf("Invalid test file!\n");
+    printf("Invalid test file: root is not a json array!\n");
     return -1;
   }
 

@@ -257,7 +257,7 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 				break;
 			case '#':
 				if (special_char_after_colons_pos != current_pos) {
-					if (last_slash_meaning == FAUP_LAST_SLASH_AFTER_DOMAIN) {
+				  if ((last_slash_meaning == FAUP_LAST_SLASH_AFTER_DOMAIN) && (!faup_features_exist(url_features->fragment))) {					  
 						url_features->fragment.pos = current_pos;
 					}
 				}
