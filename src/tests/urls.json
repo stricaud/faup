@@ -563,8 +563,8 @@
     "expected_host": "cache.google.com",
     "expected_tld": "com",
     "expected_port": "",
-    "expected_resource_path": "/?q=http://www.google.com/path/to/search.html",
-    "expected_query_string": "?q=test&loc=ro%20Romania",
+    "expected_resource_path": "/",
+    "expected_query_string": "?q=http://www.google.com/path/to/search.html?q=test&loc=ro%20Romania",
     "expected_fragment": "",
     "expected_url_type": "mozilla_tld"
 },
@@ -581,5 +581,20 @@
     "expected_resource_path": "/the_personal_blog_of_tom_/",
     "expected_query_string": "",
     "expected_fragment": "#tp_blog_of_tom_/#tp",
+    "expected_url_type": "mozilla_tld"
+},
+{
+    "url_origin": "http://jiehun.cn/hunyan/jd.php?qy=a%C3%83???%C3%83",
+    "expected_scheme": "http",
+    "expected_credential": "",
+    "expected_subdomain": "",
+    "expected_domain": "jiehun.cn",
+    "expected_domain_without_tld": "jiehun",
+    "expected_host": "jiehun.cn",
+    "expected_tld": "cn",
+    "expected_port": "",
+    "expected_resource_path": "/hunyan/jd.php",
+    "expected_query_string": "?qy=a%C3%83???%C3%83",
+    "expected_fragment": "",
     "expected_url_type": "mozilla_tld"
 }]

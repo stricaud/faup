@@ -63,8 +63,12 @@ int main(int argc, char **argv)
   fh = faup_init(options);
   
   root_value = json_parse_file(argv[1]);
+  if (!root_value) {
+    printf("root_value is null, error parsing file %s\n", argv[1]);
+    return -1;
+  }
   if (json_value_get_type(root_value) != JSONArray) {
-    printf("Invalid test file: root is not a json array!\n");
+    printf("Invalid file '%s': root is not a json array!\n", argv[1]);
     return -1;
   }
 
