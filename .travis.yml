@@ -1,14 +1,8 @@
 language: c
 
 compiler:
-	- gcc
-	- clang
-
-addons:
-	apt:
-		packages:
-		- build-essentials
-		- cmake
+  - gcc
+  - clang
 
 script:
-	- cd build && cmake .. && make
+  - cd build && cmake .. && make
