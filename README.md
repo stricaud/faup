@@ -18,6 +18,11 @@
 
 * [Frequently Asked Questions][faq]
 
+## Badges
+
+<a href="https://scan.coverity.com/projects/faup">
+   <img alt="Coverity Scan Build Status" src="https://scan.coverity.com/projects/10609/badge.svg" />
+</a>
 
 ## Quick Start
 
