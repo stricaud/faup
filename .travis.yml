@@ -10,3 +10,5 @@ addons:
 		- build-essentials
 		- cmake
 
+script:
+	- cd build && cmake .. && make
