@@ -1,0 +1,12 @@
+language: c
+
+compiler:
+	- gcc
+	- clang
+
+addons:
+	apt:
+		packages:
+		- build-essentials
+		- cmake
+
