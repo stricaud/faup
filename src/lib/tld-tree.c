@@ -278,7 +278,7 @@ void faup_tld_tree_free(TLDNode *tld_tree, TLDNode *last_tld_tree, int pos)
 static bool faup_tld_tree_tld_exists(TLDNode *Tree, const char *tld, int tld_len)
 {
 	TLDNode *pNode = Tree;
-	const char *p;
+	const char *p = NULL;
 	bool wildcard;
 	int lenght = 0;
 
