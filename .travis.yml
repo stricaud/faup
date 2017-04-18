@@ -6,3 +6,4 @@ compiler:
 
 script:
   - cd build && cmake .. && make
+  - cd build && scan-build cmake .. && scan-build make
