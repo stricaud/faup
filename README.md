@@ -163,7 +163,19 @@ rm -rf cmake-2.8.12.2 cmake-2.8.12.2.tar.gz
 echo "PATH=/usr/local/bin/:\$PATH" > /etc/profile.d/cmake28.sh 
 source /etc/profile
 ```
-    
+
+Install PyFaup Python Module
+-------------------------------
+If you receive an error stating "ImportError: No module named 'pyfaup'", perform the following:
+
+1. Change to directory:
+```
+~/faup/src/lib/bindings/python
+```
+2. Run:
+```
+python setup.py install
+``` 
     
 FAQ
 ---
