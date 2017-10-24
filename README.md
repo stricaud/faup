@@ -166,10 +166,15 @@ source /etc/profile
 
 Install PyFaup Python Module
 -------------------------------
-If you receive an error stating "ImportError: No module named 'pyfaup'", run the following:
+If you receive an error stating "ImportError: No module named 'pyfaup'", perform the following:
 
+1. Change to directory:
 ```
-python ./src/lib/bindings/python/setup.py
+~/faup/src/lib/bindings/python
+```
+2. Run:
+```
+python setup.py install
 ``` 
     
 FAQ
