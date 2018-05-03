@@ -30,19 +30,21 @@
 #include <stddef.h>
 #include <sys/types.h>
 
-#ifdef WIN32
- 	#ifndef bool
- 		#define bool int
- 	#endif // bool
-	#ifndef true
-		#define true 1
-	#endif // true
-	#ifndef false
- 		#define false 0
- 	#endif // false
-#else
- 	#include <stdbool.h>
-#endif // WIN32
+#ifndef __cplusplus
+        #ifdef WIN32
+ 	        #ifndef bool
+ 		        #define bool int
+                #endif // bool
+	        #ifndef true
+		        #define true 1
+                #endif // true
+                #ifndef false
+ 		        #define false 0
+                #endif // false
+        #else
+ 	        #include <stdbool.h>
+        #endif // WIN32
+#endif // __cplusplus
 
 #ifdef WIN32
 	#include <windows.h>
