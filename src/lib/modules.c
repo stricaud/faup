@@ -27,6 +27,7 @@
 #include <faup/faup.h>
 #include <faup/datadir.h>
 #include <faup/modules.h>
+#include <faup/output.h>
 
 int faup_modules_new(faup_handler_t *fh)
 {
@@ -326,6 +327,15 @@ void _faup_add_keyval_dict(faup_modules_t *modules, int count, char *key, int va
 
 }
 
+void _faup_add_keyvalstr_dict(faup_modules_t *modules, int count, char *key, char *val)
+{
+	lua_pushstring(modules->module[count].lua_state, key); // -2
+	lua_pushstring(modules->module[count].lua_state, val); // -2
+	lua_settable(modules->module[count].lua_state, -3);
+
+}
+
+
 void _faup_add_feature(faup_modules_t *modules, int count, faup_feature_t feature, char *pos_key, char *size_key)
 {
 		if (faup_features_exist(feature)) {
@@ -376,6 +386,8 @@ bool faup_modules_url_output(faup_handler_t *fh, FILE* out)
 		_faup_add_feature(modules, count, fh->faup.features.query_string, "query_string.pos", "query_string.size");
 		_faup_add_feature(modules, count, fh->faup.features.fragment, "fragment.pos", "fragment.size");
 
+		_faup_add_keyvalstr_dict(modules, count, "url_type", faup_output_get_string_from_url_type(fh));
+		
 
 		// If the function does not exists, we just ignore it
 		retval = lua_pcall(modules->module[count].lua_state, 2, 2, 0);
