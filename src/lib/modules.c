@@ -141,11 +141,17 @@ faup_modules_t *faup_modules_load_from_arg(char **argv, int argc)
 			}
 		} else {
 			// The module was not discovered localy, so we get it from "modules_available"
-			char *load_path;
-			char *available_module;
-
-			load_path = malloc(17 /* modules_available */ + 1 /* FAUP_OS_DIRSEP */ + strlen(argv[count]));
-			retval = asprintf(&load_path, "modules_available%s%s", FAUP_OS_DIRSEP, argv[count]);
+			char *load_path = NULL;
+			char *available_module = NULL;
+			char *module_to_load = argv[count];
+			
+			load_path = malloc(17 /* modules_available */ + 1 /* FAUP_OS_DIRSEP */ + strlen(module_to_load));
+			if (!load_path) {
+			  fprintf(stderr, "Cannot Allocate Modules Loading Path!");
+			  return NULL;
+			}
+			/* retval = asprintf(&load_path, "modules_available%s%s", FAUP_OS_DIRSEP, argv[count]); */
+			retval = asprintf(&load_path, "modules_available");
 			available_module = faup_datadir_get_file(load_path, false);
 			free(load_path);
 
