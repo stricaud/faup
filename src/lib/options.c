@@ -35,7 +35,7 @@ faup_options_t *faup_options_new(void)
 
 void faup_options_free(faup_options_t *opts)
 {
-	int i;
+	int i = 0;
 	if (opts) {
 		faup_options_disable_tld_above_one(opts);		
 	}

@@ -37,11 +37,12 @@ int faup_handle_shell_snapshot(int argc, char **argv)
 
   
   if (argc < 5) {
-    printf("Usage: %s $ snapshot action name\n", argv[0]);
+    printf("Usage: %s $ snapshot action key <value>\n", argv[0]);
     printf("\nWhere name is your snapshot name\n");
     printf("\nWhere action can be:\n");
     printf("print: Print content of snapshot\n");
     printf("get: Grab an item key\n");
+    printf("\tExample: faup $ snapshot get sample.urls tld com\n");
 #ifdef FAUP_GTCACA
     printf("browse: Graphical snapshot browser\n");
 #endif // FAUP_GTCACA
