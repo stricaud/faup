@@ -51,7 +51,7 @@ int faup_handle_shell_snapshot(int argc, char **argv)
   action = argv[3];
   snapshot_name = argv[4];
 
-  if (!strcmp(action, "read")) { 
+  if (!strcmp(action, "print")) { 
     snapshot = faup_snapshot_read(snapshot_name);
     if (!snapshot) {
       fprintf(stderr, "Cannot read snapshot: %s\n", snapshot_name);
@@ -104,7 +104,7 @@ int faup_handle_shell_snapshot(int argc, char **argv)
   }
 #endif
   
-  printf("Unknown action: '%s\'n", action);
+  printf("Unknown action: '%s'\n", action);
   return -1;
 }
 
