@@ -13,7 +13,8 @@
 #include <faup/snapshot-file.h>
 #include <faup/utils.h>
 
-#include "miniz.c"
+#include <miniz.h>
+#include <miniz_zip.h>
 
 static int _read_item(faup_snapshot_t *snapshot, FILE *fp, char *item_name)
 {
@@ -57,6 +58,8 @@ faup_snapshot_t *faup_snapshot_read(char *dirpath)
   int retval;
   size_t dirpath_len;
 
+  if (!dirpath) { return NULL; }
+  
   dirpath_len = strlen(dirpath);
   if (dirpath_len > 5) {
     if (!strcmp(&dirpath[dirpath_len - 5], ".urls")) {

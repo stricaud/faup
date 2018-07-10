@@ -314,6 +314,10 @@ int faup_snapshot_item_append(faup_snapshot_t *snapshot, char *item_name)
 void faup_snapshot_free(faup_snapshot_t *snapshot)
 {
   size_t counter;
+  if (!snapshot) {
+    return;
+  }
+  
   free(snapshot->name);
   for (counter = 0; counter < snapshot->length; counter++) {
     faup_snapshot_item_free(snapshot->items[counter]);
@@ -386,6 +390,11 @@ void faup_snapshot_output(faup_handler_t *fh, faup_snapshot_t *snapshot, FILE *f
   char first_timebuf[200];
   char last_timebuf[200];
 
+  if (!snapshot) {
+    fprintf(stderr, "Error reading snapshot. Stopping.\n");
+    return NULL;
+  }
+  
   fprintf(fd, "{\n");
   fprintf(fd,"\t\"snapshot name\": \"%s\",\n", snapshot->name);
   if (!snapshot->length) {
