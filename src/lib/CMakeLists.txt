@@ -34,16 +34,15 @@ include/faup/modules.h
 
 include_directories(AFTER ${LUA_INCLUDE_DIRS})
 
-set(MINIZ_SOURCE miniz/miniz.c miniz/miniz_zip.c miniz/miniz_tinfl.c miniz/miniz_tdef.c)
-include_directories(AFTER "miniz/" ${FAUP_INCLUDE_DIRS})
-
-
 set(FAUP_LINK_LIBRARIES
 ${FAUP_LINK_LIBRARIES}
 ${LUA_LDFLAGS}
 )
 
 endif()
+
+set(MINIZ_SOURCE miniz/miniz.c miniz/miniz_zip.c miniz/miniz_tinfl.c miniz/miniz_tdef.c)
+include_directories(AFTER "miniz/" ${FAUP_INCLUDE_DIRS})
 
 set(FAUP_LIB_SRC_FILES
 ${WIN32_PORTABLE}
