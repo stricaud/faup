@@ -390,7 +390,11 @@ int faup_webserver_start(faup_handler_t *fh, faup_options_t *faup_opts, char *li
 	// callbacks.begin_request = &begin_request_handler;
 
 	ctx = mg_start(&callbacks, NULL, options);
-
+	if (!ctx) {
+	  fprintf(stderr, "Error: cannot start webserver!\n");
+	  return 1;
+	}
+	
 	mg_set_request_handler(ctx, "/json", json_output, buffer);
 	mg_set_request_handler(ctx, "/snapshot", snapshot_handler, NULL);
 	mg_set_request_handler(ctx, "/", root_handler, NULL);
