@@ -13,5 +13,6 @@ endif()
 
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/cmake-options/webserver)
         set(WEBSERVER 1)
+	add_definitions(-DFAUP_WEBSERVER=1)
         message(STATUS "Compile with Web Server")
 endif()

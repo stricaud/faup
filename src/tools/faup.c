@@ -285,6 +285,9 @@ int main(int argc, char **argv)
 #ifdef LINUX
 	    printf("linux ");
 #endif
+#ifdef FAUP_WEBSERVER
+	    printf("webserver ");
+#endif
 	    printf("\n");
 	  	break;
 	  case 'h':
