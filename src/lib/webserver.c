@@ -47,17 +47,25 @@ int root_handler(struct mg_connection *conn, void *cbdata)
 
 	mg_printf(conn, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n");
 	mg_printf(conn, " \
-		<html> \
-		<head><title>Faup webserver</title></head> \
-		<body> \
-		<h1>Faup webserver</h1> \
-		<p> \
-                Take an action: <br/> \
-		url: No URL given. Please use the uri such as /json?url=base64_of_your_url </br> \
-                snapshot:\n \
-		</p> \
-		</body> \
-		</html>");
+		<html> \n\
+		<head><title>Faup webserver</title></head> \n\
+		<body> \n\
+		<h1>Faup webserver</h1> \n\
+		<p> \n\
+                Take an action: <br/> \n\
+		url: No URL given. Please use the uri such as /json?url=base64_of_your_url <br/> \n\
+                <h3>Using Snapshots:</h3>\n\
+                <h4>Create</h4>\n\
+                   /snapshot?action=create&snapshot=foobar <br/>\n\
+                <h4>Append an element</h4>\n\
+                   /snapshot?action=append&snapshot=foobar&item=tld&key=$(echo com |base64) <br/>\n\
+                <h4>Get an element</h4>\n\
+                   /snapshot?action=get&snapshot=foobar&item=tld&key=$(echo com |base64) <br/>\n\
+                <h4>Close</h4>\n\
+                   /snapshot?action=close&snapshot=foobar <br/>\n\
+		</p> \n\
+		</body> \n\
+		</html>\n");
 
 	return 1;
 }
