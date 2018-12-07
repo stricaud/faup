@@ -185,6 +185,8 @@ void print_help(char **argv)
 	printf("-d {delimiter}\n\twill separate the fields with the wanted delimiter\n");
 	printf("-e\tempty lines are processed\n");	
 	printf("-f {scheme|credential|subdomain|domain|domain_without_tld|host|tld|port|resource_path|query_string|fragment|url_type}\n\tfield to extract\n");
+	printf("-g\tprint the compiled options\n");
+	printf("-h\tprint this help\n");
 	printf("-l\tprefix with the line number (csv only)\n");
 #ifdef FAUP_LUA_MODULES
 	printf("-m\t{module1 module2 module3}\n\tLoad the modules in the given order.\n\tIf empty, load no modules. If this option is not provided, modules in the shared data in modules_enabled will be loaded by default\n");
@@ -241,7 +243,7 @@ int main(int argc, char **argv)
 	  return faup_handle_shell(argc, argv);
 	}
 
-	while ((opt = getopt(argc, argv, "abepld:vo:utf:m:w:r:s:c:q")) != -1) {
+	while ((opt = getopt(argc, argv, "abeplgd:vo:utf:hm:w:r:s:c:q")) != -1) {
 	  switch(opt) {
 	  case 'a':
 	  	skip_file_check = 1;
@@ -260,9 +262,36 @@ int main(int argc, char **argv)
 	  case 'e':
 	    faup_opts->empty_lines_processed = 1;
 	    break;
-	  case 'p':
-	    faup_opts->print_header = 1;
-	    break;
+	  case 'f':
+	  	faup_opts->fields = faup_options_get_field_from_name(optarg);
+	  	break;
+	  case 'g':
+	    printf("faup v%s\n", faup_get_version());
+#ifdef FAUP_LUA_MODULES
+	    printf("lua ");
+#endif 	    
+#ifdef FAUP_DEBUG
+	    printf("debug ");
+#endif 	    
+#ifdef FAUP_GTCACA
+	    printf("gtcaca ");
+#endif 	    
+#ifdef MACOS
+	    printf("macos ");
+#endif 	    
+#ifdef WIN32
+	    printf("win32 ");
+#endif 	    
+#ifdef LINUX
+	    printf("linux ");
+#endif
+	    printf("\n");
+	  	break;
+	  case 'h':
+	    print_help(argv);
+	    faup_options_free(faup_opts);
+	    exit(1);	  	
+	  	break;
 	  case 'l':
 	    faup_opts->fields |= FAUP_URL_FIELD_LINE;
 	    faup_opts->print_line = 1;
@@ -304,9 +333,6 @@ int main(int argc, char **argv)
   			faup_opts->exec_modules = FAUP_MODULES_NOEXEC;
   		}
 	  	break;
-	  case 'f':
-	  	faup_opts->fields = faup_options_get_field_from_name(optarg);
-	  	break;
 	  case 'o':
 	  	faup_opts->output = faup_options_get_output_from_name(optarg);
 
@@ -317,6 +343,9 @@ int main(int argc, char **argv)
 	  	}
 	  	
 	  	break;
+	  case 'p':
+	    faup_opts->print_header = 1;
+	    break;
 	  case 'q':
 	    faup_opts->quiet = 1;
 	    break;
