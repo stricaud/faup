@@ -192,7 +192,18 @@ int faup_handle_shell_modules(int argc, char **argv)
 
       retval = symlink(available_filename, symlink_file);
       if (!retval) {
-        printf("Module '%s' enabled with success!\n", filebuf);
+	FILE *fp;
+	fp = fopen(symlink_file, "r");
+	if (fp) {
+	  printf("Module '%s' enabled with success!\n", filebuf);
+	  fclose(fp);
+	} else {
+	  printf("Module '%s' cannot ne emabled. %s does not exists or cannot be read!!\n", filebuf, available_filename);
+	  retval = unlink(symlink_file);
+	  if (retval) {
+	    printf("Cannot remove '%s' to make your life easier, do it by hand!\n", symlink_file);
+	  }
+	}
       } else {
         printf("Module '%s' cannot be enabled [symlink failed from %s to %s]: %s\n", filebuf, available_filename, symlink_file, strerror(errno));
       }
