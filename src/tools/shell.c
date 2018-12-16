@@ -34,7 +34,6 @@ int faup_handle_shell_snapshot(int argc, char **argv)
   struct htable_iter iter;
   char first_timebuf[200];
   char last_timebuf[200];
-
   
   if (argc < 5) {
     printf("Usage: %s $ snapshot action key <value>\n", argv[0]);
@@ -110,8 +109,14 @@ int faup_handle_shell_snapshot(int argc, char **argv)
 
 int faup_handle_shell_modules(int argc, char **argv)
 {
-
 #ifdef FAUP_LUA_MODULES
+
+  char filebuf[128];
+  size_t argv_4_len;
+  
+  memset(&filebuf, 0, 128);
+
+  
   if (argc < 5) {
     printf("Usage: %s $ modules action\n", argv[0]);
     printf("\nWhere action can be:\n");
@@ -157,7 +162,19 @@ int faup_handle_shell_modules(int argc, char **argv)
       char *origin_filename;
       char *available_filename;
 
-      retval = asprintf(&enabled_filename, "modules_enabled%s%s", FAUP_OS_DIRSEP, argv[4]);
+      argv_4_len = strlen(argv[4]);
+      if (!argv_4_len) {
+	fprintf(stderr, "Error processing argument 4\n");
+	exit(1);
+      }
+      if (argv_4_len < 128) {
+	memcpy(&filebuf, argv[4], 127);
+      } else {
+	fprintf(stderr, "Error, filename to long. Must be < 128 characters.\n");
+	exit(1);
+      }      
+
+      retval = asprintf(&enabled_filename, "modules_enabled%s%s", FAUP_OS_DIRSEP, filebuf);
       symlink_file = faup_datadir_file_to_write(enabled_filename, true);
       if (!symlink_file) {
 	// I have no symlink, because there is nowhere I can write. Let's create the homedir path and do it again
@@ -166,16 +183,16 @@ int faup_handle_shell_modules(int argc, char **argv)
       }
 
       free(enabled_filename);
-      retval = asprintf(&origin_filename, "modules_available%s%s", FAUP_OS_DIRSEP, argv[4]);
+      retval = asprintf(&origin_filename, "modules_available%s%s", FAUP_OS_DIRSEP, filebuf);
       available_filename = faup_datadir_get_global_file(origin_filename);
       free(origin_filename);
 
 
       retval = symlink(available_filename, symlink_file);
       if (!retval) {
-        printf("Module '%s' enabled with success!\n", argv[4]);
+        printf("Module '%s' enabled with success!\n", filebuf);
       } else {
-        printf("Module '%s' cannot be enabled [symlink failed from %s to %s]: %s\n", argv[4], available_filename, symlink_file, strerror(errno));
+        printf("Module '%s' cannot be enabled [symlink failed from %s to %s]: %s\n", filebuf, available_filename, symlink_file, strerror(errno));
       }
       free(available_filename);
       free(symlink_file);
@@ -186,15 +203,27 @@ int faup_handle_shell_modules(int argc, char **argv)
       char *enabled_filename;
       char *symlink_file;
 
-      retval = asprintf(&enabled_filename, "modules_enabled%s%s", FAUP_OS_DIRSEP, argv[4]);
+      argv_4_len = strlen(argv[4]);
+      if (!argv_4_len) {
+	fprintf(stderr, "Error processing argument 4\n");
+	exit(1);
+      }
+      if (argv_4_len < 128) {
+	memcpy(&filebuf, argv[4], 127);
+      } else {
+	fprintf(stderr, "Error, filename to long. Must be < 128 characters.\n");
+	exit(1);
+      }
+      
+      retval = asprintf(&enabled_filename, "modules_enabled%s%s", FAUP_OS_DIRSEP, filebuf);
       symlink_file = faup_datadir_get_file(enabled_filename, false);
       free(enabled_filename);
 
       retval = unlink(symlink_file);
       if (!retval) {
-        printf("Module '%s' disabled with success!\n", argv[4]);
+        printf("Module '%s' disabled with success!\n", filebuf);
       } else {
-        printf("Module '%s' cannot be deactivated: %s\n", argv[4], strerror(errno));
+        printf("Module '%s' cannot be deactivated: %s\n", filebuf, strerror(errno));
       }
       free(symlink_file);
   }
