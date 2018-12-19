@@ -53,6 +53,9 @@ include(CheckLibraryExists)
 include(GNUInstallDirs)
 
 include(FindPkgConfig)
+configure_file("${faup-project_SOURCE_DIR}/faup.pc.cmake" "${faup-project_BINARY_DIR}/faup.pc")
+install(FILES "${faup-project_BINARY_DIR}/faup.pc" DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}/pkgconfig" COMPONENT Headers)
+
 
 include(TestBigEndian)
 TEST_BIG_ENDIAN(BIGENDIAN)
@@ -162,6 +165,9 @@ string(REGEX MATCH "[0-9]+$" FAUP_VERSION_MINOR ${FAUP_VERSION})
 message("Version: ${FAUP_VERSION}")
 message("Version Major: ${FAUP_VERSION_MAJOR}")
 message("Version Minor: ${FAUP_VERSION_MINOR}")
+
+add_definitions(-DLIB_CFLAGS="-I${CMAKE_INSTALL_FULL_INCLUDEDIR}")
+add_definitions(-DLIB_LIBS="-L${CMAKE_INSTALL_FULL_LIBDIR} -lfaupl")
 
 add_subdirectory(doc)
 add_subdirectory(src)

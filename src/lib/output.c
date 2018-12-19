@@ -387,6 +387,7 @@ void faup_output(faup_handler_t *fh, FILE* out)
 	// faup_features_debug("output", &fh->faup.features);
 
 	switch(fh->options->output) {
+	        case 0: // if 0 means faup was initialized without options, and yet one want to output something, we default to CSV then
 		case FAUP_OUTPUT_CSV:
 		  if (fh->options->quiet) break;
 			faup_output_csv_header(fh, fh->options, out);

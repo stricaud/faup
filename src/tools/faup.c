@@ -185,7 +185,6 @@ void print_help(char **argv)
 	printf("-d {delimiter}\n\twill separate the fields with the wanted delimiter\n");
 	printf("-e\tempty lines are processed\n");	
 	printf("-f {scheme|credential|subdomain|domain|domain_without_tld|host|tld|port|resource_path|query_string|fragment|url_type}\n\tfield to extract\n");
-	printf("-g\tprint the compiled options\n");
 	printf("-h\tprint this help\n");
 	printf("-l\tprefix with the line number (csv only)\n");
 #ifdef FAUP_LUA_MODULES
@@ -198,6 +197,7 @@ void print_help(char **argv)
 	printf("-s <snapshot_name>\tcreate a snapshot\n");
 	printf("-t\tdo not extract TLD > 1 (eg. only get 'uk' instead of 'co.uk')\n");
 	printf("-u\tupdate the mozilla list\n");
+	printf("-v\tprint the program version, data dirs and compiled options\n");
 	printf("-w listen_ip:port\n\tstarts webserver on the wanted ip:port\n");
 	printf("\n");
 }
@@ -227,6 +227,24 @@ int main(int argc, char **argv)
   	bool has_module = false;
 
 	char *snapshot_compare = NULL;
+
+	if ((argc > 1) && (!strcmp(argv[1],"--cflags"))) {
+	  printf(LIB_CFLAGS);
+	  if ((argc > 2) && (!strcmp(argv[2],"--libs"))) {
+	    printf(" "LIB_LIBS);	    
+	  }
+	  printf("\n");
+	  exit(0);
+	}
+	if ((argc > 1) && (!strcmp(argv[1],"--libs"))) {
+	  printf(LIB_LIBS);
+	  if ((argc > 2) && (!strcmp(argv[2],"--cflags"))) {
+	    printf(" "LIB_CFLAGS);	    
+	  }
+	  printf("\n");
+	  exit(0);
+	}
+
 	
 	faup_opts = faup_options_new();
 	if (!faup_opts) {
@@ -243,7 +261,7 @@ int main(int argc, char **argv)
 	  return faup_handle_shell(argc, argv);
 	}
 
-	while ((opt = getopt(argc, argv, "abeplgd:vo:utf:hm:w:r:s:c:q")) != -1) {
+	while ((opt = getopt(argc, argv, "abepld:vo:utf:hm:w:r:s:c:q")) != -1) {
 	  switch(opt) {
 	  case 'a':
 	  	skip_file_check = 1;
@@ -264,31 +282,6 @@ int main(int argc, char **argv)
 	    break;
 	  case 'f':
 	  	faup_opts->fields = faup_options_get_field_from_name(optarg);
-	  	break;
-	  case 'g':
-	    printf("faup v%s\n", faup_get_version());
-#ifdef FAUP_LUA_MODULES
-	    printf("lua ");
-#endif 	    
-#ifdef FAUP_DEBUG
-	    printf("debug ");
-#endif 	    
-#ifdef FAUP_GTCACA
-	    printf("gtcaca ");
-#endif 	    
-#ifdef MACOS
-	    printf("macos ");
-#endif 	    
-#ifdef WIN32
-	    printf("win32 ");
-#endif 	    
-#ifdef LINUX
-	    printf("linux ");
-#endif
-#ifdef FAUP_WEBSERVER
-	    printf("webserver ");
-#endif
-	    printf("\n");
 	  	break;
 	  case 'h':
 	    print_help(argv);
@@ -373,6 +366,29 @@ int main(int argc, char **argv)
 	  case 'v':
 	    printf("faup v%s\n", faup_get_version());
 	    faup_tld_datadir_print();
+	    printf("compiled with: ");
+#ifdef FAUP_LUA_MODULES
+	    printf("lua ");
+#endif 	    
+#ifdef FAUP_DEBUG
+	    printf("debug ");
+#endif 	    
+#ifdef FAUP_GTCACA
+	    printf("gtcaca ");
+#endif 	    
+#ifdef MACOS
+	    printf("macos ");
+#endif 	    
+#ifdef WIN32
+	    printf("win32 ");
+#endif 	    
+#ifdef LINUX
+	    printf("linux ");
+#endif
+#ifdef FAUP_WEBSERVER
+	    printf("webserver ");
+#endif
+	    printf("\n");	    
 	    faup_options_free(faup_opts);
 	    exit(0);
 	    break;
