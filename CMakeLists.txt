@@ -142,6 +142,10 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   message("Discovered distribution type: ${LINUX_DIST}")
 endif()
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+  set(FAUP_LINK_LIBRARIES pthread)
+endif()
+
 set(FAUP_INCLUDE_DIRS "${faup-project_SOURCE_DIR}/src/lib/include/" "${faup-project_BINARY_DIR}/src/lib/include")
 
 set(FAUP_LIBRARY faupl)
