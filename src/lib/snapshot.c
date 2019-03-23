@@ -392,7 +392,7 @@ void faup_snapshot_output(faup_handler_t *fh, faup_snapshot_t *snapshot, FILE *f
 
   if (!snapshot) {
     fprintf(stderr, "Error reading snapshot. Stopping.\n");
-    return NULL;
+    return;
   }
   
   fprintf(fd, "{\n");
