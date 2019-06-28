@@ -189,6 +189,7 @@ void faup_tld_array_destroy(void)
 {
     if (_tlds) {
 	utarray_free(_tlds);
+	_tlds = NULL;
     }
 }
 

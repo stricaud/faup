@@ -106,6 +106,8 @@ faup_handler_t *faup_init(faup_options_t *options);
 char *faup_get_version(void);
 void faup_terminate(faup_handler_t *fh);
 
+void faup_reload_tld_mozilla_list(faup_handler_t *fh);
+
 int32_t faup_get_scheme_pos(faup_handler_t *fh);
 uint32_t faup_get_scheme_size(faup_handler_t *fh);
 int32_t faup_get_credential_pos(faup_handler_t *fh);
