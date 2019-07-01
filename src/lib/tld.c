@@ -120,7 +120,7 @@ int faup_tld_update(void)
 {
 	char *tld_file;
 
-	tld_file = faup_datadir_file_to_write("mozilla.tlds", false);
+	tld_file = faup_datadir_file_to_write(faup_tld_get_filename(), false);
 	if (tld_file) {
 		faup_tld_download_mozilla_list(tld_file);
 		free(tld_file);
@@ -135,7 +135,7 @@ int faup_tld_array_populate(void)
 {
 
 	FILE *fp;
-	char *tld_file = faup_datadir_get_file("mozilla.tlds", false);
+	char *tld_file = faup_datadir_get_file(faup_tld_get_filename(), false);
 	bool begin_icann_domains = 0;
 
 	if (_tlds) {
@@ -215,6 +215,16 @@ void faup_tld_array_foreach(void (*cb_tld_array)(char *tld, void *user_data), vo
 void faup_tld_datadir_print(void) 
 {
 	printf("FAUP_DATA_DIR=%s\n", FAUP_DATA_DIR);
-	printf("TLD file being used:%s\n", faup_datadir_get_file("mozilla.tlds", false));
+	printf("TLD file being used:%s\n", faup_datadir_get_file(faup_tld_get_filename(), false));
 }
 
+char *faup_tld_get_filename(void)
+{   
+	char *tld_filename;
+
+    if ((tld_filename = getenv("FAUP_TLD_FILE")) != NULL) {
+        return tld_filename;
+    } else {
+        return "mozilla.tlds";
+    }
+}
