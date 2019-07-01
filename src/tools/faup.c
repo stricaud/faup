@@ -204,10 +204,14 @@ void print_help(char **argv)
 
 void sighandler_webserver(int signal)
 {
+#ifdef FAUP_WEBSERVER
   faup_webserver_stop();
+#endif
   faup_options_free(faup_opts);
   faup_terminate(fh);
+#ifdef FAUP_WEBSERVER
   free(faup_webserver_buffer);
+#endif
   printf("Exiting faup webserver\n");
   exit(0);
 }
@@ -393,6 +397,7 @@ int main(int argc, char **argv)
 	    exit(0);
 	    break;
 	  case 'w': // This should always be the last options, since we init faup and need previous options
+#ifdef FAUP_WEBSERVER	    
 		fh = faup_init(faup_opts);
 		if (run_in_background) {
 			ret = daemon(1,1);
@@ -405,6 +410,7 @@ int main(int argc, char **argv)
 		signal(SIGINT, sighandler_webserver);
 		faup_webserver_buffer = faup_output_json_buffer_allocate();
 	  	faup_webserver_start(fh, faup_opts, optarg, faup_webserver_buffer);
+#endif
 	  	break;
 	  default:
 	    print_help(argv);
