@@ -44,6 +44,16 @@ faup_handler_t *faup_init(faup_options_t *options)
 	return fh;
 }
 
+// reload the TLD tree from the file on disk
+// useful if you have an external process fetching new copies from
+// https://publicsuffix.org/ and need faup to notice
+void faup_reload_tld_mozilla_list(faup_handler_t *fh)
+{
+
+	faup_tld_tree_free(fh->options->tld_tree, NULL, 0);
+	fh->options->tld_tree = faup_tld_tree_new();
+}
+
 char *faup_get_version(void)
 {
   return FAUP_VERSION;
