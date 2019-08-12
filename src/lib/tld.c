@@ -221,10 +221,10 @@ void faup_tld_datadir_print(void)
 char *faup_tld_get_filename(void)
 {   
 	char *tld_filename;
-
-    if ((tld_filename = getenv("FAUP_TLD_FILE")) != NULL) {
-        return tld_filename;
-    } else {
-        return "mozilla.tlds";
-    }
+	
+	if ((tld_filename = getenv("FAUP_TLD_FILE")) != NULL) {
+		return tld_filename;
+	} else {
+		return "mozilla.tlds";
+	}
 }
