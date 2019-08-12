@@ -80,7 +80,7 @@ faup_snapshot_t *faup_snapshot_read(char *dirpath)
   }
   snapshot = faup_snapshot_open(dirpath);
   while ((ent = readdir(dir)) != NULL) {
-    if ((ent->d_name) && (ent->d_name[0] != '.') && (ent->d_name[0] != '_')) {
+    if ((ent->d_name[0] != '\0') && (ent->d_name[0] != '.') && (ent->d_name[0] != '_')) {
       char *full_file_path;
       int retval;
       retval = asprintf(&full_file_path, "%s%c%s", dirpath, FAUP_OS_DIRSEP_C, ent->d_name);
