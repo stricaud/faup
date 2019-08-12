@@ -49,6 +49,7 @@ void faup_tld_array_destroy(void);
 void faup_tld_array_cb_to_stdout(char *tld, void *user_data);
 void faup_tld_array_foreach(void (*cb_tld_array)(char *tld, void *user_data), void *user_data);
 void faup_tld_datadir_print(void);
+char *faup_tld_get_filename(void);
 
 #ifdef __cplusplus
 }
