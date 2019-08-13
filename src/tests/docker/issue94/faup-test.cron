@@ -1,0 +1,1 @@
+*/1 * * * * /root/runfaup.sh > /tmp/faup.out
