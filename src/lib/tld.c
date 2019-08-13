@@ -32,6 +32,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #ifndef WIN32
 #include <unistd.h>
@@ -50,68 +51,28 @@ static UT_array *_tlds = NULL;
 // FIXME: We should make this code work for native Windows API
 int faup_tld_download_mozilla_list(char *store_to_file) 
 {
-	int sockfd, n;
-	char recvbuf[MAX_RECVBUF];
-	struct sockaddr_in sin;
+	char *download_program;
+	char *newargv[] = { NULL, MOZILLA_TLD_LIST_URL, "--output", store_to_file, NULL };
+	char *newenviron[] = { NULL };
+	int retval = -1;
+	
+	fprintf(stdout, "Downloading new TLD list to %s\n", store_to_file);
 
-	FILE *fileptr;
-
-#ifdef WIN32
-	WSADATA wsaData;
-	WSAStartup(0x0202, &wsaData);
-#endif
-
-	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-		fprintf(stderr, "(socket) Cannot connect outside.\n");
-		return -1;
-	}
-
-	memset(&sin, 0, sizeof(sin));
-	sin.sin_family = AF_INET;
-	sin.sin_port = htons(MOZILLA_TLD_LIST_PORT);
-
-	if (inet_pton(AF_INET, MOZILLA_TLD_LIST_IP, &sin.sin_addr) <= 0) {
-		fprintf(stderr, "(inet_pton) Cannot connect outside.\n");
-		return -1;
-	}
-
-	if (connect(sockfd, (const struct sockaddr *) &sin, sizeof(sin)) < 0) {
-		fprintf(stderr, "(connect) Cannot connect outside.\n");
-		return -1;
-	}
-
-
-	n = send(sockfd, MOZILLA_TLD_LIST_GET, strlen(MOZILLA_TLD_LIST_GET), 0);
-	if (n < 0) {
-		fprintf(stderr, "(send) Cannot send data.\n");
-		return -1;
+	download_program = getenv("FAUP_DOWNLOAD_PROGRAM");
+	if (!download_program) {
+		newargv[0] = "/usr/bin/curl";
 	} else {
-		fileptr = fopen(store_to_file, "w");
-		if (!fileptr) {
-			fprintf(stderr, "Cannot open file %s to store the TLD list!\n", store_to_file);
-			return -1;
-		}
+		newargv[0] = download_program;
 	}
 
-	// Issue #74 fixes a buffer overrun, MAX_RECVBUF must be with -1
-	while ( (n=recv(sockfd, recvbuf, MAX_RECVBUF - 1, 0)) > 0) {
-		recvbuf[n] = '\0';
-		if (fputs(recvbuf, fileptr) == EOF) {
-			fprintf(stderr, "(fputs) Cannot get data.\n");
-		}
+	if (!newargv[0]) {
+		return -1;
 	}
-	if (n < 0) {
-		fprintf(stderr, "(read) Cannot read data.\n");
+	retval = execve(newargv[0], newargv, newenviron);
+	if (retval == -1) {
+		fprintf(stderr, "execve on %s failed. Reason: %s\n", newargv[0], strerror(errno));
+		return -1;
 	}
-
-#ifdef WIN32
-	closesocket(sockfd);
-	WSACleanup();
-#else
-	close(sockfd);
-#endif
-
-	fclose(fileptr);
 
 	return 0;
 }

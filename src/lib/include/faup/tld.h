@@ -32,7 +32,7 @@ extern "C" {
 #define MOZILLA_TLD_LIST_DOMAIN "io.libio.so"
 #define MOZILLA_TLD_LIST_IP "37.187.73.159"
 #define MOZILLA_TLD_LIST_PORT 80
-#define MOZILLA_TLD_LIST_URL "http://io.libio.so/effective_tld_names.dat"
+#define MOZILLA_TLD_LIST_URL "https://publicsuffix.org/list/public_suffix_list.dat"
 
 #define MOZILLA_TLD_LIST_GET "GET " MOZILLA_TLD_LIST_URL " HTTP/1.0\n\n"
 
