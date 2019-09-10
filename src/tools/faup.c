@@ -436,17 +436,17 @@ int main(int argc, char **argv)
 
 	if (isatty(fileno(stdin))) {
 		faup_opts->input_source = FAUP_INPUT_SOURCE_ARGUMENT;
-
+		
 		if (argc < 2) {
 			print_help(argv);
 			faup_options_free(faup_opts);
 			faup_terminate(fh);
 			exit(1);
-	}	
+		}	
 
 		if (!argv[optind]) {
-		  faup_options_free(faup_opts);
-		  exit(1);
+			faup_options_free(faup_opts);
+			exit(1);
 		}
 
 		if (!skip_file_check) {
