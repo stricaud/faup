@@ -1,0 +1,4 @@
+#!/bin/bash
+CMD=$(basename $0)
+echo "$CMD $@" > /tmp/command.tutoprompt
+eval /opt/faup/$CMD "$@"
