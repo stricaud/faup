@@ -198,21 +198,29 @@ faup_snapshot_value_count_t *faup_snapshot_value_count_get(faup_snapshot_item_t 
 int faup_snapshot_value_count_set_value(faup_snapshot_value_count_t *vc, char *value)
 {
   vc->value = strdup(value);
+
+  return 0;
 }
 
 int faup_snapshot_value_count_set_first_time_seen(faup_snapshot_value_count_t *vc, time_t first_time_seen)
 {
   vc->first_time_seen = first_time_seen;
+
+  return 0;
 }
 
 int faup_snapshot_value_count_set_last_time_seen(faup_snapshot_value_count_t *vc, time_t last_time_seen)
 {
   vc->last_time_seen = last_time_seen;
+
+  return 0;
 }
 
 int faup_snapshot_value_count_set_count(faup_snapshot_value_count_t *vc, size_t count)
 {
   vc->count = count;
+
+  return 0;
 }
 
 int faup_snapshot_value_count_append(faup_snapshot_item_t *item, char *value)
@@ -249,6 +257,8 @@ int faup_snapshot_value_count_append_object(faup_snapshot_item_t *item, faup_sna
   htable_add(&item->values, hash_string(vc->value), vc);
 
   item->length++;
+
+  return 0;
 }
 
 void faup_snapshot_item_free(faup_snapshot_item_t *item)
