@@ -14,7 +14,7 @@ setup(
     name='pyfaup',
     version = about["__version__"],
     description= about["__description__"],
-    author= about["__author__"]
+    author= about["__author__"],
     author_email= about["__author_email__"],
     long_description=textwrap.dedent(open("README.rst", "r").read()),
     long_description_content_type="text/x-rst",
