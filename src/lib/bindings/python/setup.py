@@ -1,11 +1,26 @@
-from setuptools import setup
+#!/usr/bin/python
+import setuptools
+from distutils.core import setup
+import os
+import textwrap
+
+current_dir = os.path.abspath(os.path.dirname(__file__))
+
+about = {}
+with open(os.path.join(current_dir, "pyfaup", "__version__.py"), "r") as fp:
+          exec(fp.read(), about)
 
 setup(
     name='pyfaup',
-    version = '1.0',
-    description='Python bindings for the faup library',
-    author='Sebastien Tricaud',
-    author_email='sebastien@honeynet.org',
-    packages = ['pyfaup'],
-    use_2to3 = True,
+    version = about["__version__"],
+    description= about["__description__"],
+    author= about["__author__"]
+    author_email= about["__author_email__"],
+    long_description=textwrap.dedent(open("README.rst", "r").read()),
+    long_description_content_type="text/x-rst",
+    maintainer=about["__maintainer__"],
+    maintainer_email=about["__maintainer_email__"],
+    url=about["__url__"],
+    license=about["__license__"],
+    packages = ['pyfaup']
 )
