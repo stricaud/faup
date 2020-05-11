@@ -1,6 +1,6 @@
 #!/usr/bin/python
-import setuptools
-from distutils.core import setup
+from setuptools import setup, find_packages
+#from distutils.core import setup
 import os
 import textwrap
 
@@ -22,5 +22,7 @@ setup(
     maintainer_email=about["__maintainer_email__"],
     url=about["__url__"],
     license=about["__license__"],
-    packages = ['pyfaup']
+    packages = ["pyfaup"],
+    package_dir = {"pyfaup": "pyfaup/"},
+    package_data = {'pyfaup': ['Linux/x86_64/libfaupl.so','Darwin/x86_64/libfaupl.dylib','mozilla.tlds']},
 )
