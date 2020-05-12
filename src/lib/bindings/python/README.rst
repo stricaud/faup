@@ -50,7 +50,7 @@ Reading from a file one url per line in multiple threads (example contributed by
 			list_url.append(line)
 
 		f=Faup()
-		for i in range(0,int(nbr_thread)):
+		for i in range(0,NUM_THREADS):
 		    t=ThreadFaup(list_url,f)
 		    t.start()
 
