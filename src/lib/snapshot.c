@@ -350,6 +350,9 @@ faup_snapshot_t  *faup_snapshot_open(char *name)
   int retval;
 
   snapshot = faup_snapshot_new();
+  if (!snapshot) {
+    return NULL;
+  }
   snapshot->name = strdup(name);
 
   return snapshot;
