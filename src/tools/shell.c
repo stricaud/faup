@@ -248,7 +248,7 @@ int faup_handle_shell_modules(int argc, char **argv)
 
 int faup_handle_shell(int argc, char **argv)
 {
-  int ret;
+  int ret = 0;
   
   if (argc <= 2) {
     printf("Usage: %s $ shell_command [parameters]\n", argv[0]);
