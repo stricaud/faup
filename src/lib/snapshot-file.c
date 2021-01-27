@@ -288,6 +288,7 @@ int faup_snapshot_file_zip(char *dirpath)
       fp = fopen(full_file_path, "rb");
       if (!fp) {
 	fprintf(stderr, "Cannot open file %s for reading!\n", full_file_path);
+	free(full_file_path);
 	return -1;
       }
       fseek(fp, 0, SEEK_END);
@@ -297,17 +298,21 @@ int faup_snapshot_file_zip(char *dirpath)
       file_content = malloc(file_size + 1);
       if (!file_content) {
 	fprintf(stderr, "Cannot allocate the file size content:%lu", file_size);
+	free(full_file_path);
+	goto err;
       }
 
       readval = fread(file_content, file_size, 1, fp);
       if (readval == 0) {
 	fprintf(stderr, "Error reading file %s\n", full_file_path);
-	return -1;
+	free(full_file_path);
+	goto err;
       }
       status = mz_zip_add_mem_to_archive_file_in_place(zip_filename, full_file_path, file_content, file_size, NULL, 0, MZ_BEST_COMPRESSION);
       if (!status) {
       	fprintf(stderr, "Cannot create %s!\n", full_file_path);
-      	return -1;
+	free(full_file_path);
+	goto err;
       }
 
       /* printf("file name:%s\n", full_file_path); */
@@ -322,6 +327,11 @@ int faup_snapshot_file_zip(char *dirpath)
   closedir(dir);
   
   return 0;
+
+ err:
+  fclose(fp);
+  free(file_content);
+  return -1;
 }
 
 int faup_snapshot_file_unzip(char *zipfile)
