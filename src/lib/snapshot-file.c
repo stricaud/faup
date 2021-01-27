@@ -27,13 +27,13 @@ static int _read_item(faup_snapshot_t *snapshot, FILE *fp, char *item_name)
     vc = faup_snapshot_value_count_new();
     readsize = fread(&value_len, sizeof(size_t), 1, fp);
     if (readsize <= 0) {
-      faup_snapshot_value_count_free(vc);
+      free(vc);
       break;
     }
     vc->value = malloc(value_len + 1);
     if (!vc->value) {      
       fprintf(stderr, "Could not allocate a value\n");
-      faup_snapshot_value_count_free(vc);
+      free(vc);
       return -1;
     }
     readsize = fread(vc->value, value_len, 1, fp);
