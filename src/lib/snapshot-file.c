@@ -31,29 +31,34 @@ static int _read_item(faup_snapshot_t *snapshot, FILE *fp, char *item_name)
       break;
     }
     vc->value = malloc(value_len + 1);
-    if (!vc->value) {
+    if (!vc->value) {      
       fprintf(stderr, "Could not allocate a value\n");
+      faup_snapshot_value_count_free(vc);
       return -1;
     }
     readsize = fread(vc->value, value_len, 1, fp);
     if (!readsize) {
       fprintf(stderr, "Error reading value length!\n");
+      faup_snapshot_value_count_free(vc);
       return -1;
     }
     vc->value[value_len] = '\0';
     readsize = fread(&vc->count, sizeof(size_t), 1, fp);
     if (!readsize) {
       fprintf(stderr, "Error reading value!\n");
+      faup_snapshot_value_count_free(vc);
       return -1;
     }
     readsize = fread(&vc->first_time_seen, sizeof(time_t), 1, fp);
     if (!readsize) {
       fprintf(stderr, "Error reading first time seen!\n");
+      faup_snapshot_value_count_free(vc);
       return -1;
     }
     readsize = fread(&vc->last_time_seen, sizeof(time_t), 1, fp);
     if (!readsize) {
       fprintf(stderr, "Error reading last time seen!\n");
+      faup_snapshot_value_count_free(vc);
       return -1;
     }
     /* faup_snapshot_value_count_debug(vc); */
