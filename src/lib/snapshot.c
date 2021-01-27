@@ -114,7 +114,10 @@ faup_snapshot_value_count_t *faup_snapshot_value_count_new(void)
   faup_snapshot_value_count_t *vc;
 
   vc = malloc(sizeof(faup_snapshot_value_count_t));
-
+  if (!vc) {
+    fprintf(stderr, "Error: cannot allocate faup_snapshot_value_count_t\n");
+    return NULL;
+  }
   vc->value = NULL;
   vc->first_time_seen = 0;
   vc->last_time_seen = 0;

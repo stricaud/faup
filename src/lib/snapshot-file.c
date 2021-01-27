@@ -104,6 +104,10 @@ faup_snapshot_t *faup_snapshot_read(char *dirpath)
       char *full_file_path;
       int retval;
       retval = asprintf(&full_file_path, "%s%c%s", dirpath, FAUP_OS_DIRSEP_C, ent->d_name);
+      if (retval < 0) {
+	fprintf(stderr, "Error: cannot concatenate full snapshot file path!\n");
+	continue;
+      }
       fp = fopen(full_file_path, "rb");
       fseek(fp, 0, SEEK_SET);
       
@@ -158,6 +162,10 @@ void faup_snapshot_info_write(char *snapshot_dir)
   current = time(NULL);
 
   retval = asprintf(&info_file, "%s%c%s", snapshot_dir, FAUP_OS_DIRSEP_C, "_info");
+  if (retval < 0) {
+    fprintf(stderr, "Error: cannot concatenate _info part!\n");
+    return;
+  }
   fp = fopen(info_file, "wb+");
   fwrite(&current, sizeof(time_t), 1, fp);  
   fclose(fp);
@@ -175,6 +183,10 @@ int faup_snapshot_write(faup_snapshot_t *snapshot, char *workdir)
   
   if (workdir) {
     retval = asprintf(&full_dir_path, "%s%c%s", workdir, FAUP_OS_DIRSEP_C, snapshot->name);
+    if (retval < 0) {
+      fprintf(stderr, "Error: cannot concatenate snapshot name with workdir!\n");
+      return -1;
+    }
   } else {
     full_dir_path = snapshot->name;
   }
@@ -189,7 +201,15 @@ int faup_snapshot_write(faup_snapshot_t *snapshot, char *workdir)
   
   for (counter = 0; counter < snapshot->length; counter++) {
     retval = asprintf(&item_file, "%s%c%s", full_dir_path, FAUP_OS_DIRSEP_C, snapshot->items[counter]->key);
+    if (retval < 0) {
+      fprintf(stderr, "Error: cannot concatenate snapshot key with workdir!\n");
+      return -1;
+    }    
     fp = fopen(item_file, "wb+");
+    if (!fp) {
+      fprintf(stderr, "Error: cannot open file %s for writing", item_file);
+      return -1;
+    }
     faup_snapshot_item_write(snapshot->items[counter], fp);
     fclose(fp);
     free(item_file);
@@ -234,6 +254,11 @@ int faup_snapshot_file_zip(char *dirpath)
   }
 
   retval = asprintf(&zip_filename, "%s.urls", dirpath);
+  if (retval < 0) {
+    fprintf(stderr, "Error: cannot concatenate snapshot urls with dirpath!\n");
+    return -1;
+  }
+  
   retval = stat(zip_filename, &zipstats);
   if (retval == 0) {
     fprintf(stderr, "The snapshot %s already exists!\n", zip_filename);
@@ -250,7 +275,16 @@ int faup_snapshot_file_zip(char *dirpath)
       if (ent->d_name[0] == '.') { continue; }
 
       retval = asprintf(&full_file_path, "%s%c%s", dirpath, FAUP_OS_DIRSEP_C, ent->d_name);
+      if (retval < 0) {
+	fprintf(stderr, "Error: cannot concatenate filename with dirpath!\n");
+	continue;
+      }
+      
       fp = fopen(full_file_path, "rb");
+      if (!fp) {
+	fprintf(stderr, "Cannot open file %s for reading!\n", full_file_path);
+	return -1;
+      }
       fseek(fp, 0, SEEK_END);
       file_size = ftell(fp);
       fseek(fp, 0, SEEK_SET);
@@ -261,6 +295,10 @@ int faup_snapshot_file_zip(char *dirpath)
       }
 
       readval = fread(file_content, file_size, 1, fp);
+      if (readval == 0) {
+	fprintf(stderr, "Error reading file %s\n", full_file_path);
+	return -1;
+      }
       status = mz_zip_add_mem_to_archive_file_in_place(zip_filename, full_file_path, file_content, file_size, NULL, 0, MZ_BEST_COMPRESSION);
       if (!status) {
       	fprintf(stderr, "Cannot create %s!\n", full_file_path);
@@ -293,6 +331,10 @@ int faup_snapshot_file_unzip(char *zipfile)
   int i;
 
   retval = asprintf(&url_snapshot_file, "%s.urls", zipfile);
+  if (retval < 0) {
+    fprintf(stderr, "Error: cannot concatenate snapshot file with zip file!\n");
+    return -1;
+  }
 
   memset(&zip_archive, 0, sizeof(zip_archive));
   status = mz_zip_reader_init_file(&zip_archive, url_snapshot_file, 0);
@@ -368,6 +410,11 @@ faup_snapshot_t *faup_snapshot_compare(char *snapshot_dir_a, char *snapshot_dir_
   }
   
   retval = asprintf(&result->name, "%s-%s", snapshot_b->name, snapshot_a->name);
+  if (retval < 0) {
+    fprintf(stderr, "Error: cannot concatenate snapshot A with snapshot B!\n");
+    return NULL;
+  }
+  
   for (counter = 0; counter < snapshot_b->length; counter++) {
     item = faup_snapshot_item_get(snapshot_a, snapshot_b->items[counter]->key);
     item_b = faup_snapshot_item_get(snapshot_b, snapshot_b->items[counter]->key);
