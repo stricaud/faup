@@ -25,6 +25,10 @@ faup_snapshot_t *faup_snapshot_new(void)
 {
   faup_snapshot_t *snapshot;
   snapshot = malloc(sizeof(*snapshot));
+  if (!snapshot) {
+    fprintf(stderr, "Could not allocate a snapshot structure!\n");
+    return NULL;
+  }
   snapshot->length = 0;
   snapshot->items = NULL;
 

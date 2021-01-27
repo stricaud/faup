@@ -28,6 +28,10 @@ int compare_features(JSON_Object *json_object, faup_feature_t feature, const cha
   /* printf("url origin:%s\n", url_origin); */
   /* printf("at pos:%c\n", url_origin[feature.pos]); */
   faup_feature = malloc(feature.size + 1);
+  if (!faup_feature) {
+    fprintf(stderr, "Error: Could not allocate faup_feature!");
+    return -1;
+  }
   memcpy((void *)faup_feature, (const void *)&url_origin[feature.pos], feature.size);
   faup_feature[feature.size] = '\0';
 

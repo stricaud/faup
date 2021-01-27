@@ -28,6 +28,10 @@ faup_handler_t *faup_init(faup_options_t *options)
     int retval;
 
     fh = malloc(sizeof(faup_handler_t));
+    if (!fh) {
+      fprintf(stderr, "Could not allocate a faup_handler_t\n");
+      return NULL;
+    }
     fh->faup.decoded = false;
     fh->faup.url_type = FAUP_URL_HAS_NO_TLD;
     memset(&fh->faup.features, 0, sizeof(fh->faup.features));
