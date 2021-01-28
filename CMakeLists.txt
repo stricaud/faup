@@ -104,6 +104,13 @@ if("${LUA_FOUND}")
   message("LUA include dirs: ${LUA_INCLUDE_DIRS}")
 endif()
 
+pkg_check_modules(CJSON libcjson)
+if("${CJSON_FOUND}")
+  message("Found cJSON: ${CJSON_VERSION}")
+else()
+  message("cJSON not found, json tests will not be enabled")  
+endif()
+
 # pkg_check_modules(LIBCACA caca)
 # if (${LIBCACA_FOUND})
 #   pkg_check_modules(LIBGTCACA gtcaca)

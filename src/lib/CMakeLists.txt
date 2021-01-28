@@ -59,7 +59,6 @@ features.c
 faup.c
 options.c
 output.c
-parson.c
 portable.c
 snapshot.c
 snapshot-file.c
@@ -79,7 +78,6 @@ include/faup/features.h
 include/faup/handler.h
 include/faup/options.h
 include/faup/output.h
-include/faup/parson.h
 include/faup/portable.h
 include/faup/return-codes.h
 include/faup/scheme-codes.h
