@@ -20,11 +20,7 @@
 
 ## Badges
 
-<img alt="Travis Continuous Build" src="https://travis-ci.org/stricaud/faup.svg?branch=master" />
-<br/>
-<a href="https://scan.coverity.com/projects/faup">
-   <img alt="Coverity Scan Build Status" src="https://scan.coverity.com/projects/10609/badge.svg" />
-</a>
+[![CodeFactor](https://www.codefactor.io/repository/github/stricaud/faup/badge)](https://www.codefactor.io/repository/github/stricaud/faup)
 
 ## Quick Start
 
