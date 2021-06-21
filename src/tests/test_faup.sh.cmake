@@ -44,7 +44,14 @@ function test_argument
     $FAUP_TOOL $ARGV1 > $URLS_CMP ||exit $?
     diff -u "$URLS_CMP" "$URLS_REF" >/dev/null
     RET=$?
-    if [ $RET -eq 0 ]; then rm "$URLS_CMP"; fi
+    if [ $RET -eq 0 ]; then
+        rm "$URLS_CMP"
+    else
+        echo "Generated"
+        cat "$URLS_CMP"
+        echo "Reference"
+        cat "$URLS_REF"
+    fi
 
     exit $RET
 }
