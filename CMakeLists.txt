@@ -111,6 +111,15 @@ else()
   message("cJSON not found, json tests will not be enabled")  
 endif()
 
+#
+# Find civetweb
+#
+find_package(CIVETWEB)
+if ("${CIVETWEB_FOUND}")
+  message("CivetWeb found. Version ${CIVETWEB_VERSION}")
+endif()
+
+
 # pkg_check_modules(LIBCACA caca)
 # if (${LIBCACA_FOUND})
 #   pkg_check_modules(LIBGTCACA gtcaca)
