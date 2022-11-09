@@ -17,13 +17,17 @@ if is_32bits:
         raise ImportError("32 bits architectures not supported")
 
 system = platform.system()
+arch = platform.machine()
 
 LOAD_LIB=""
 
 if system == "Linux":
         LOAD_LIB=rundir + "/Linux/x86_64/libfaupl.so"
 if system == "Darwin":
-        LOAD_LIB=rundir + "/Darwin/x86_64/libfaupl.dylib"
+        if arch == "arm64":
+                LOAD_LIB=rundir + "/Darwin/arm64/libfaupl.dylib"
+        else:
+                LOAD_LIB=rundir + "/Darwin/x86_64/libfaupl.dylib"
 
 #print(LOAD_LIB)
         
