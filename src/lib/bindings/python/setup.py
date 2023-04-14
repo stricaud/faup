@@ -23,7 +23,7 @@ setup(
     url=about["__url__"],
     license=about["__license__"],
     packages = ["pyfaup"],
-    install_requires= ["chardet"],
+    install_requires= [],
     package_dir = {"pyfaup": "pyfaup/"},
     package_data = {'pyfaup': [
         'Linux/x86_64/libfaupl.so',
