@@ -398,7 +398,7 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 
 	// We want to retrieve the size of the tld without the useless chars the come afterwards
 	// www.foo.siemens.om/tagada != www.foo.siemens.om
-	last_len = counter;
+	last_len = strlen(last);
 	last_len_just_for_host = last_len - (fh->faup.org_str_len - (fh->faup.features.host.pos + fh->faup.features.host.size));
 
 	counter = 0;
