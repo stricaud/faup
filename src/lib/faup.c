@@ -32,10 +32,11 @@ faup_handler_t *faup_init(faup_options_t *options)
       fprintf(stderr, "Could not allocate a faup_handler_t\n");
       return NULL;
     }
+    fh->options_handled_externally = options?1:0;
     fh->faup.decoded = false;
     fh->faup.url_type = FAUP_URL_HAS_NO_TLD;
     memset(&fh->faup.features, 0, sizeof(fh->faup.features));
-    
+
     if (options) {
         fh->options = options;
     } else {
@@ -68,7 +69,12 @@ void faup_terminate(faup_handler_t *fh)
 #ifdef FAUP_LUA_MODULES
     faup_modules_terminate(fh->modules);
 #endif
-	free(fh);
+    if (!fh->options_handled_externally) {
+	    if (fh->options) {
+		    faup_options_free(fh->options);
+	    }
+    }
+    free(fh);
 }
 
 int32_t faup_get_scheme_pos(faup_handler_t *fh)

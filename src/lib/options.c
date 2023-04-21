@@ -37,7 +37,7 @@ void faup_options_free(faup_options_t *opts)
 {
 	int i = 0;
 	if (opts) {
-		faup_options_disable_tld_above_one(opts);		
+		faup_options_disable_tld_above_one(opts);
 	}
 
 	// Clear modules arguments
@@ -46,7 +46,7 @@ void faup_options_free(faup_options_t *opts)
 	}
 
 	free(opts->snapshot_name);
-	
+
 	free(opts);
 }
 void faup_options_defaults(faup_options_t *opts)

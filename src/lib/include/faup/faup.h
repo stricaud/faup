@@ -86,6 +86,7 @@ typedef struct _faup_t faup_t;
 
 struct _faup_handler_t {
 	faup_t faup;
+	int options_handled_externally;
 	faup_options_t *options;
 #ifdef FAUP_LUA_MODULES
 	void *modules;	// faup_modules_t
