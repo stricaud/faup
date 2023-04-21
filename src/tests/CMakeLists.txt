@@ -49,3 +49,8 @@ add_test(Hashtable hashtable)
 # target_link_libraries(json-tester ${FAUP_LIBRARY} ${CMAKE_DL_LIBS})
 # add_test(JsonURLsTester json-tester ${URLS_JSON})
 #endif()
+
+# URL Split test
+add_executable(urlsplit urlsplit.c)
+target_link_libraries(urlsplit ${FAUP_LIBRARY} ${CMAKE_DL_LIBS})
+add_test(Urlsplit urlsplit)
