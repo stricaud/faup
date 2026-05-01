@@ -1,0 +1,86 @@
+name: Build and publish prebuilt libraries
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. faup-prebuilt-28c08d0)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  linux-x86_64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build faup
+        run: |
+          sed -i 's/cmake_minimum_required(VERSION 2.8)/cmake_minimum_required(VERSION 3.5)/' CMakeLists.txt
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/tmp/faup-install -B /tmp/faup-build .
+          make -C /tmp/faup-build -j$(nproc)
+          make -C /tmp/faup-build install
+          rm -rf /tmp/faup-install/bin /tmp/faup-install/share
+          tar -czf faup-linux-x86_64.tar.gz -C /tmp/faup-install .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: faup-linux-x86_64
+          path: faup-linux-x86_64.tar.gz
+
+  linux-aarch64:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build faup
+        run: |
+          sed -i 's/cmake_minimum_required(VERSION 2.8)/cmake_minimum_required(VERSION 3.5)/' CMakeLists.txt
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/tmp/faup-install -B /tmp/faup-build .
+          make -C /tmp/faup-build -j$(nproc)
+          make -C /tmp/faup-build install
+          rm -rf /tmp/faup-install/bin /tmp/faup-install/share
+          tar -czf faup-linux-aarch64.tar.gz -C /tmp/faup-install .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: faup-linux-aarch64
+          path: faup-linux-aarch64.tar.gz
+
+  macos-arm64:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build faup
+        run: |
+          sed -i '' 's/cmake_minimum_required(VERSION 2.8)/cmake_minimum_required(VERSION 3.5)/' CMakeLists.txt
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/tmp/faup-install -B /tmp/faup-build .
+          make -C /tmp/faup-build -j$(sysctl -n hw.ncpu)
+          make -C /tmp/faup-build install
+          rm -rf /tmp/faup-install/bin /tmp/faup-install/share
+          tar -czf faup-macos-arm64.tar.gz -C /tmp/faup-install .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: faup-macos-arm64
+          path: faup-macos-arm64.tar.gz
+
+  publish:
+    needs: [linux-x86_64, linux-aarch64, macos-arm64]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: faup-linux-*
+          merge-multiple: true
+          path: dist/
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          name: ${{ github.event.inputs.tag }}
+          files: dist/*.tar.gz
+          fail_on_unmatched_files: true
