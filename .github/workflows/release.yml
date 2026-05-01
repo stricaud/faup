@@ -69,7 +69,7 @@ jobs:
   #         path: faup-macos-arm64.tar.gz
 
   publish:
-    needs: [linux-x86_64, linux-aarch64, macos-arm64]
+    needs: [linux-x86_64, linux-aarch64]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
