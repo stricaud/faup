@@ -1,5 +1,4 @@
 import sys
-import chardet
 
 from .functions import *
 
