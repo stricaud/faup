@@ -135,7 +135,7 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 						last_slash_meaning = FAUP_LAST_SLASH_HIERARCHICAL;
 						url_features->hierarchical.pos = current_pos -1;
 						c = get_last_c(url_o, current_pos - 1);
-						if (isalpha(c)) {
+						if (isalnum(c)) {
 							url_features->scheme.pos = 0;
 						}
 						url_features->host.pos = -1; /* So finally we don't start with a host */

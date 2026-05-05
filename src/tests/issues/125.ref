@@ -1,0 +1,3 @@
+socks4,,proxy,example.com,example,proxy.example.com,com,9000,,,,mozilla_tld
+socks4,user1,proxy,example.com,example,proxy.example.com,com,9000,,,,mozilla_tld
+socks5,user1:sup3r53cr3t,proxy,example.com,example,proxy.example.com,com,9000,,,,mozilla_tld
