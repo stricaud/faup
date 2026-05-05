@@ -19,7 +19,7 @@ if is_32bits:
 system = platform.system()
 arch = platform.machine()
 
-LOAD_LIB=""
+LOAD_LIB="libfaupl.so"
 
 if system == "Linux":
         LOAD_LIB=rundir + "/Linux/x86_64/libfaupl.so"
@@ -30,5 +30,8 @@ if system == "Darwin":
                 LOAD_LIB=rundir + "/Darwin/x86_64/libfaupl.dylib"
 
 #print(LOAD_LIB)
-        
-bind.library = cdll.LoadLibrary(LOAD_LIB)
+
+try:
+        bind.library = cdll.LoadLibrary(LOAD_LIB)
+except OSError:
+        raise ImportError("Could not find faup system library, please install it with your package manager")
