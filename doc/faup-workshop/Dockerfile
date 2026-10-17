@@ -27,4 +27,4 @@ COPY faup-wrapper /usr/local/bin/faup
 
 USER faupuser
 WORKDIR /home/faupuser/
-RUN wget http://s3.amazonaws.com/alexa-static/top-1m.csv.zip
+RUN wget -O top-1m.csv https://netapi.com/netapi_top1mln.csv
