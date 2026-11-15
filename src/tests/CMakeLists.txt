@@ -21,7 +21,7 @@ include_directories(AFTER ${FAUP_INCLUDE_DIRS})
 if(LINUX)
 	add_executable(multithreads multithreads.c)
 	target_link_libraries(multithreads ${FAUP_LIBRARY} "pthread" ${CMAKE_DL_LIBS})
-	add_test(MultiThreads ${TEST_FAUP_SCRIPT} multithreads)
+	add_test(MultiThreads multithreads)
 endif(LINUX)
 
 # C API/ABI issues

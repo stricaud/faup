@@ -434,20 +434,11 @@ int main(int argc, char **argv)
 	  goto terminate;
 	}
 
-	if (isatty(fileno(stdin))) {
+	if (optind < argc) {
+		/* A URL or a file name was given as argument. It takes precedence
+		 * over stdin, so faup behaves the same in a terminal, in a pipe
+		 * and under a test runner. */
 		faup_opts->input_source = FAUP_INPUT_SOURCE_ARGUMENT;
-		
-		if (argc < 2) {
-			print_help(argv);
-			faup_options_free(faup_opts);
-			faup_terminate(fh);
-			exit(1);
-		}	
-
-		if (!argv[optind]) {
-			faup_options_free(faup_opts);
-			exit(1);
-		}
 
 		if (!skip_file_check) {
 			if (strlen(argv[optind]) < FAUP_MAXPATHLEN) {
@@ -464,9 +455,16 @@ int main(int argc, char **argv)
 		faup_decode(fh, argv[optind], strlen(argv[optind]));
 		
 		faup_output(fh, stdout);
-	} else {       	/* We read from stdin */
+	} else if (!isatty(fileno(stdin))) {
+		/* No argument: we read from stdin */
 		faup_opts->input_source = FAUP_INPUT_SOURCE_PIPE;
 		run_from_stream(fh, stdin);
+	} else {
+		/* Nothing to parse */
+		print_help(argv);
+		faup_options_free(faup_opts);
+		faup_terminate(fh);
+		exit(1);
 	}
 
 terminate:
