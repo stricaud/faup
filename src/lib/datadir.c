@@ -32,15 +32,32 @@
 #include <faup/faup.h>
 #include <faup/datadir.h>
 
+#ifndef WIN32
+#include <fcntl.h>
+
+/* Home directory of the current user, or NULL. getpwuid() has no entry for
+ * the uid in many containers, so fall back on $HOME. */
+static const char *faup_datadir_homedir(void)
+{
+	struct passwd *pw = getpwuid(getuid());
+	if (pw && pw->pw_dir && pw->pw_dir[0]) {
+		return pw->pw_dir;
+	}
+	return getenv("HOME");
+}
+#endif
+
 char *faup_datadir_home_file_or_dir_exists(char *append)
 {
 #ifndef WIN32
 	int retval;
 	char *retbuf;
-	struct passwd *pw = getpwuid(getuid());
-	const char *homedir = pw->pw_dir;
+	const char *homedir = faup_datadir_homedir();
 	struct stat append_stat;
 
+	if (!homedir) {
+		return NULL;
+	}
 	retval = asprintf(&retbuf, "%s%s.faup%s%s", homedir, FAUP_OS_DIRSEP, FAUP_OS_DIRSEP, append);
 	if (retval < 0) {
 		fprintf(stderr, "Cannot allocate in %s with parameter '%s'\n", __FUNCTION__, append);
@@ -66,24 +83,47 @@ char *faup_datadir_get_file_from_home(char *append, bool to_symlink)
 #ifndef WIN32
 	int retval;
 	char *retbuf;
-	struct passwd *pw = getpwuid(getuid());
-	const char *homedir = pw->pw_dir;
-	FILE *fp;
+	const char *homedir = faup_datadir_homedir();
+	int fd;
 
+	if (!homedir) {
+		return NULL;
+	}
 	retval = asprintf(&retbuf, "%s%s.faup", homedir, FAUP_OS_DIRSEP);
+	if (retval < 0) {
+		return NULL;
+	}
 	retval = mkdir(retbuf, 0700);
 	free(retbuf);
 
 	retval = asprintf(&retbuf, "%s%s.faup%s%s", homedir, FAUP_OS_DIRSEP, FAUP_OS_DIRSEP, append);
+	if (retval < 0) {
+		return NULL;
+	}
 
-	fp = fopen(retbuf, "w");
-	if (fp) {
+	/* Check that we can create the file there without truncating or
+	 * removing anything that already exists at that path. */
+	fd = open(retbuf, O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW, 0600);
+	if (fd >= 0) {
+		close(fd);
 		if (to_symlink) {
+			/* Only a placeholder we just created; the caller symlinks over it */
 			unlink(retbuf);
 		}
-		fclose(fp);
 		return retbuf;
 	}
+	if (errno == EEXIST) {
+		struct stat st;
+		if (to_symlink) {
+			/* Replace an existing module symlink, never a real file */
+			if ((lstat(retbuf, &st) == 0) && S_ISLNK(st.st_mode) && (unlink(retbuf) == 0)) {
+				return retbuf;
+			}
+		} else if (access(retbuf, W_OK) == 0) {
+			return retbuf;
+		}
+	}
+	free(retbuf);
 #endif
 	return NULL;
 }
@@ -93,11 +133,15 @@ bool faup_datadir_make_dir_from_home(char *append)
 #ifndef WIN32
 	int retval;
 	char *retbuf;
-	struct passwd *pw = getpwuid(getuid());
-	const char *homedir = pw->pw_dir;
-	FILE *fp;
+	const char *homedir = faup_datadir_homedir();
 
+	if (!homedir) {
+		return false;
+	}
 	retval = asprintf(&retbuf, "%s%s.faup", homedir, FAUP_OS_DIRSEP);
+	if (retval < 0) {
+		return false;
+	}
 	retval = mkdir(retbuf, 0700);
 	if (retval) {
 	  if (errno != EEXIST) {
@@ -108,6 +152,9 @@ bool faup_datadir_make_dir_from_home(char *append)
 	free(retbuf);
 
 	retval = asprintf(&retbuf, "%s%s.faup%s%s", homedir, FAUP_OS_DIRSEP, FAUP_OS_DIRSEP, append);
+	if (retval < 0) {
+		return false;
+	}
 	retval = mkdir(retbuf, 0700);
 	if (retval) {
 	  if (errno != EEXIST) {
@@ -115,6 +162,7 @@ bool faup_datadir_make_dir_from_home(char *append)
 	    return false;
 	  }
 	}
+	free(retbuf);
 #endif
 	return true;
 }

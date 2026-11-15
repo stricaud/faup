@@ -15,6 +15,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
+#include <limits.h>
+#include <sys/stat.h>
 
 #ifdef WIN32
 	#include "win32-getopt.h"
@@ -54,7 +56,9 @@ static char *readline(FILE *fp)
 
 	while (1) {
 		ch = fgetc(fp);
-		if (feof(fp)) {
+		if (ch == EOF) {
+			/* End of file, or a read error (e.g. the "file" is a directory):
+			 * feof() alone would spin forever on the latter. */
 			str[i] = '\0';
 			break;
 		}
@@ -64,12 +68,14 @@ static char *readline(FILE *fp)
 		}
 		str[i++] = ch;
 		if (i == len - 2) {
+			char *newstr;
 			len += step;
-			str = (char *)realloc(str, len);
-			if (str == NULL) {
-				fclose(fp);
-				return str;
+			newstr = (char *)realloc(str, len);
+			if (newstr == NULL) {
+				free(str);
+				return NULL;
 			}
+			str = newstr;
 		}
 	}
 
@@ -84,9 +90,13 @@ static int run_from_stream(faup_handler_t *fh, FILE *stream)
 		
 		if (fh->options->snapshot_name) {
 		  snapshot = faup_snapshot_open(fh->options->snapshot_name);
+		  if (!snapshot) {
+		    fprintf(stderr, "Cannot open the snapshot '%s'\n", fh->options->snapshot_name);
+		    return -1;
+		  }
 		}
 		
-		while (!feof(stream)) {
+		while (!feof(stream) && !ferror(stream)) {
 			strbuf = readline(stream);
 			if (!strbuf) {
 				break;
@@ -173,6 +183,29 @@ static int run_from_stream(faup_handler_t *fh, FILE *stream)
 		return 0;
 }
 
+
+/* Append a module name to the -m list. The list is an array of pointers. */
+static int push_module_arg(faup_options_t *opts, const char *name)
+{
+	char **newargv;
+	char *copy;
+
+	newargv = realloc(opts->modules_argv, sizeof(char *) * (opts->modules_argc + 1));
+	if (!newargv) {
+		fprintf(stderr, "Error: cannot allocate the modules list\n");
+		return -1;
+	}
+	opts->modules_argv = newargv;
+	copy = strdup(name);
+	if (!copy) {
+		fprintf(stderr, "Error: cannot allocate the module name\n");
+		return -1;
+	}
+	opts->modules_argv[opts->modules_argc] = copy;
+	opts->modules_argc++;
+
+	return 0;
+}
 
 void print_help(char **argv)
 {
@@ -308,10 +341,9 @@ int main(int argc, char **argv)
 	  		if (!has_module) {
 	  			// This is our first argument
 	  			// we push our first arg: 'optarg'
-	  			faup_opts->modules_argv = realloc(faup_opts->modules_argv, faup_opts->modules_argc + 1);
-	  			faup_opts->modules_argv[faup_opts->modules_argc] = strdup(optarg);
-
-	  			faup_opts->modules_argc++;
+	  			if (push_module_arg(faup_opts, optarg) < 0) {
+	  				exit(1);
+	  			}
 	  			has_module = 1;
 	  		}
 	  		
@@ -322,9 +354,9 @@ int main(int argc, char **argv)
 	  			break;
 	  		}
 
-	  		faup_opts->modules_argv = realloc(faup_opts->modules_argv, faup_opts->modules_argc + 1);
-	  		faup_opts->modules_argv[faup_opts->modules_argc] = strdup(argv[optind]);
-	  		faup_opts->modules_argc++;
+	  		if (push_module_arg(faup_opts, argv[optind]) < 0) {
+	  			exit(1);
+	  		}
 	  	}
 
 	  	if (has_module) {
@@ -351,7 +383,14 @@ int main(int argc, char **argv)
 	    break;
 	  case 'r':
 	  	if (optarg) {
-		  faup_opts->number_of_chars_to_remove = strtod(optarg, NULL);
+		  char *endptr = NULL;
+		  long n = strtol(optarg, &endptr, 10);
+		  if ((endptr == optarg) || (*endptr != '\0') || (n < 0) || (n > INT_MAX)) {
+		    fprintf(stderr, "Invalid number of chars to remove: '%s'\n", optarg);
+		    faup_options_free(faup_opts);
+		    exit(1);
+		  }
+		  faup_opts->number_of_chars_to_remove = (int)n;
 		}
 		break;
 	  case 's':
@@ -444,6 +483,13 @@ int main(int argc, char **argv)
 			if (strlen(argv[optind]) < FAUP_MAXPATHLEN) {
 				FILE *fp = fopen(argv[optind], "r");
 				if (fp) {
+					struct stat st;
+					if ((fstat(fileno(fp), &st) == 0) && S_ISDIR(st.st_mode)) {
+						fprintf(stderr, "Error: '%s' is a directory\n", argv[optind]);
+						fclose(fp);
+						ret = 1;
+						goto terminate;
+					}
 					faup_opts->input_source = FAUP_INPUT_SOURCE_FILE;
 					ret = run_from_stream(fh, fp);
 					fclose(fp);

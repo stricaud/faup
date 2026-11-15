@@ -104,6 +104,10 @@ int faup_tld_array_populate(void)
 		free(tld_file);
 		return -1;
 	}
+	if (!tld_file) {
+		fprintf(stderr, "Cannot locate the TLD file\n");
+		return -1;
+	}
 	utarray_new(_tlds, &ut_str_icd);
 
 	fp = fopen(tld_file, "r");
@@ -115,8 +119,12 @@ int faup_tld_array_populate(void)
 			size_t line_len = strlen(line);
 			char *allocated_line = NULL;
 
+			/* Strip the end of line only. A last line without a newline
+			 * or a line filling the buffer must not lose its last char. */
+			while ((line_len > 0) && ((line[line_len - 1] == '\n') || (line[line_len - 1] == '\r'))) {
+				line[--line_len] = '\0';
+			}
 			if (line_len > 0) {
-				line[line_len - 1] = '\0';
 				allocated_line = strdup((const char *)line);
 
 				switch(line[0]) {
@@ -177,7 +185,9 @@ void faup_tld_array_foreach(void (*cb_tld_array)(char *tld, void *user_data), vo
 void faup_tld_datadir_print(void) 
 {
 	printf("FAUP_DATA_DIR=%s\n", FAUP_DATA_DIR);
-	printf("TLD file being used:%s\n", faup_datadir_get_file(faup_tld_get_filename(), false));
+	char *tld_file = faup_datadir_get_file(faup_tld_get_filename(), false);
+	printf("TLD file being used:%s\n", tld_file ? tld_file : "(not found)");
+	free(tld_file);
 }
 
 char *faup_tld_get_filename(void)

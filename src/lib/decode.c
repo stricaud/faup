@@ -175,9 +175,16 @@ const char *faup_decode(faup_handler_t *fh, const char *url, size_t url_len)
 			url_features->scheme.size = total_size;
 		}
 
-		if (faup_features_exist(url_features->credential)) { 
+		/* The credential ends right before the host. Without a host after it
+		 * (e.g. "git@github.com:/repo") there is no credential to extract:
+		 * host.pos is -1 and the subtraction would underflow the size. */
+		if ((faup_features_exist(url_features->credential)) && (faup_features_exist(url_features->host))
+		    && (url_features->host.pos > url_features->credential.pos)) {
 			total_size = url_features->host.pos - url_features->credential.pos - 1; 
 			url_features->credential.size = total_size;
+		} else {
+			url_features->credential.pos = -1;
+			url_features->credential.size = 0;
 		}
 
 		if (faup_features_exist(url_features->host)) { 

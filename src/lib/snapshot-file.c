@@ -16,6 +16,27 @@
 #include <miniz.h>
 #include <miniz_zip.h>
 
+/* A snapshot value is a URL field; anything bigger than this in a snapshot
+ * file is corrupt or hostile and must not drive an allocation. */
+#define FAUP_SNAPSHOT_MAX_VALUE_LEN (1024 * 1024)
+
+/* Snapshot archives may be shared, so entry names are untrusted. Refuse
+ * anything that could escape the extraction directory (zip-slip). */
+static bool faup_snapshot_entry_name_is_safe(const char *name)
+{
+  const char *p = name;
+
+  if (!name || !*name) return false;
+  if (*name == '/' || *name == '\\') return false;
+  while (*p) {
+    size_t seg = strcspn(p, "/\\");
+    if (seg == 2 && p[0] == '.' && p[1] == '.') return false;
+    p += seg;
+    if (*p) p++;
+  }
+  return true;
+}
+
 static int _read_item(faup_snapshot_t *snapshot, FILE *fp, char *item_name)
 {
   size_t value_len;
@@ -29,6 +50,11 @@ static int _read_item(faup_snapshot_t *snapshot, FILE *fp, char *item_name)
     if (readsize <= 0) {
       free(vc);
       break;
+    }
+    if (value_len > FAUP_SNAPSHOT_MAX_VALUE_LEN) {
+      fprintf(stderr, "Error: snapshot value length %zu is not credible, corrupt snapshot?\n", value_len);
+      free(vc);
+      return -1;
     }
     vc->value = malloc(value_len + 1);
     if (!vc->value) {      
@@ -66,6 +92,11 @@ static int _read_item(faup_snapshot_t *snapshot, FILE *fp, char *item_name)
 
     faup_snapshot_item_append(snapshot, item_name);
     item = faup_snapshot_item_get(snapshot, item_name);
+    if (!item) {
+      fprintf(stderr, "Error: cannot create snapshot item '%s'\n", item_name);
+      faup_snapshot_value_count_free(vc);
+      return -1;
+    }
     faup_snapshot_value_count_append_object(item, vc);
   }
   
@@ -114,7 +145,11 @@ faup_snapshot_t *faup_snapshot_read(char *dirpath)
 	continue;
       }
       fp = fopen(full_file_path, "rb");
-      fseek(fp, 0, SEEK_SET);
+      if (!fp) {
+	fprintf(stderr, "Error: cannot open snapshot file '%s': %s\n", full_file_path, strerror(errno));
+	free(full_file_path);
+	continue;
+      }
       
       _read_item(snapshot, fp, ent->d_name);
       
@@ -172,8 +207,12 @@ void faup_snapshot_info_write(char *snapshot_dir)
     return;
   }
   fp = fopen(info_file, "wb+");
-  fwrite(&current, sizeof(time_t), 1, fp);  
-  fclose(fp);
+  if (fp) {
+    fwrite(&current, sizeof(time_t), 1, fp);  
+    fclose(fp);
+  } else {
+    fprintf(stderr, "Error: cannot write '%s': %s\n", info_file, strerror(errno));
+  }
 
   free(info_file);
 }
@@ -199,6 +238,9 @@ int faup_snapshot_write(faup_snapshot_t *snapshot, char *workdir)
   retval = mkdir(full_dir_path, 0700);
   if (retval < 0) {
     fprintf(stderr, "Error making directory %s: %s\n", full_dir_path, strerror(errno));
+    if (workdir) {
+      free(full_dir_path);
+    }
     return -1;
   }
 
@@ -208,11 +250,18 @@ int faup_snapshot_write(faup_snapshot_t *snapshot, char *workdir)
     retval = asprintf(&item_file, "%s%c%s", full_dir_path, FAUP_OS_DIRSEP_C, snapshot->items[counter]->key);
     if (retval < 0) {
       fprintf(stderr, "Error: cannot concatenate snapshot key with workdir!\n");
+      if (workdir) {
+        free(full_dir_path);
+      }
       return -1;
     }    
     fp = fopen(item_file, "wb+");
     if (!fp) {
-      fprintf(stderr, "Error: cannot open file %s for writing", item_file);
+      fprintf(stderr, "Error: cannot open file %s for writing: %s\n", item_file, strerror(errno));
+      free(item_file);
+      if (workdir) {
+        free(full_dir_path);
+      }
       return -1;
     }
     faup_snapshot_item_write(snapshot->items[counter], fp);
@@ -252,6 +301,9 @@ int faup_snapshot_file_zip(char *dirpath)
   struct stat zipstats;
   int retval;
 
+  fp = NULL;
+  file_content = NULL;
+
   dir = opendir(dirpath);
   if (!dir) {
     fprintf(stderr, "Error reading directory '%s': %s\n", dirpath, strerror(errno));
@@ -261,6 +313,7 @@ int faup_snapshot_file_zip(char *dirpath)
   retval = asprintf(&zip_filename, "%s.urls", dirpath);
   if (retval < 0) {
     fprintf(stderr, "Error: cannot concatenate snapshot urls with dirpath!\n");
+    closedir(dir);
     return -1;
   }
   
@@ -289,7 +342,7 @@ int faup_snapshot_file_zip(char *dirpath)
       if (!fp) {
 	fprintf(stderr, "Cannot open file %s for reading!\n", full_file_path);
 	free(full_file_path);
-	return -1;
+	goto err;
       }
       fseek(fp, 0, SEEK_END);
       file_size = ftell(fp);
@@ -318,7 +371,9 @@ int faup_snapshot_file_zip(char *dirpath)
       /* printf("file name:%s\n", full_file_path); */
       
       fclose(fp);
+      fp = NULL;
       free(file_content);
+      file_content = NULL;
       free(full_file_path);
   }
 
@@ -329,8 +384,10 @@ int faup_snapshot_file_zip(char *dirpath)
   return 0;
 
  err:
-  fclose(fp);
+  if (fp) fclose(fp);
   free(file_content);
+  free(zip_filename);
+  closedir(dir);
   return -1;
 }
 
@@ -353,12 +410,25 @@ int faup_snapshot_file_unzip(char *zipfile)
 
   memset(&zip_archive, 0, sizeof(zip_archive));
   status = mz_zip_reader_init_file(&zip_archive, url_snapshot_file, 0);
+  if (!status) {
+    fprintf(stderr, "Cannot open snapshot archive '%s'\n", url_snapshot_file);
+    free(url_snapshot_file);
+    return -1;
+  }
   for (i = 0; i < (int)mz_zip_reader_get_num_files(&zip_archive); i++) {
     mz_zip_archive_file_stat file_stat;
 
     if (!mz_zip_reader_file_stat(&zip_archive, i, &file_stat)) {
       fprintf(stderr, "Cannot stat the zip file!\n");
       mz_zip_reader_end(&zip_archive);
+      free(url_snapshot_file);
+      return -1;
+    }
+
+    if (!faup_snapshot_entry_name_is_safe(file_stat.m_filename)) {
+      fprintf(stderr, "Refusing to extract '%s' from '%s': unsafe path\n", file_stat.m_filename, url_snapshot_file);
+      mz_zip_reader_end(&zip_archive);
+      free(url_snapshot_file);
       return -1;
     }
 
@@ -409,6 +479,9 @@ faup_snapshot_t *faup_snapshot_compare(char *snapshot_dir_a, char *snapshot_dir_
   int retval;
   
   result = faup_snapshot_new();
+  if (!result) {
+    return NULL;
+  }
   
   snapshot_a = faup_snapshot_read(snapshot_dir_a);
   if (!snapshot_a) {
@@ -420,6 +493,7 @@ faup_snapshot_t *faup_snapshot_compare(char *snapshot_dir_a, char *snapshot_dir_
   snapshot_b = faup_snapshot_read(snapshot_dir_b);
   if (!snapshot_b) {
     fprintf(stderr, "Error: cannot build snapshot from dir '%s'\n", snapshot_dir_b);
+    faup_snapshot_free(snapshot_a);
     faup_snapshot_free(result);
     return NULL;
   }
@@ -427,6 +501,10 @@ faup_snapshot_t *faup_snapshot_compare(char *snapshot_dir_a, char *snapshot_dir_
   retval = asprintf(&result->name, "%s-%s", snapshot_b->name, snapshot_a->name);
   if (retval < 0) {
     fprintf(stderr, "Error: cannot concatenate snapshot A with snapshot B!\n");
+    result->name = NULL;
+    faup_snapshot_free(snapshot_a);
+    faup_snapshot_free(snapshot_b);
+    faup_snapshot_free(result);
     return NULL;
   }
   

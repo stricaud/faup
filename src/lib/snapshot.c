@@ -22,6 +22,17 @@ static bool streq(const void *e, void *string)
   return strcmp(((faup_snapshot_value_count_t *)e)->value, string) == 0;
 }
 
+/* Format a timestamp read from a snapshot file. The value is untrusted:
+ * localtime() returns NULL when it is out of range, which strftime() would
+ * dereference. */
+void faup_snapshot_format_time(char *buf, size_t buflen, time_t t)
+{
+  struct tm *tm = localtime(&t);
+  if (!tm || !strftime(buf, buflen, "%Y-%m-%d %H:%M:%S %z", tm)) {
+    snprintf(buf, buflen, "%lld", (long long)t);
+  }
+}
+
 faup_snapshot_t *faup_snapshot_new(void)
 {
   faup_snapshot_t *snapshot;
@@ -30,6 +41,7 @@ faup_snapshot_t *faup_snapshot_new(void)
     fprintf(stderr, "Could not allocate a snapshot structure!\n");
     return NULL;
   }
+  snapshot->name = NULL;
   snapshot->length = 0;
   snapshot->items = NULL;
 
@@ -176,17 +188,23 @@ faup_snapshot_item_t *faup_snapshot_item_copy(faup_snapshot_item_t *item)
   /* faup_snapshot_value_count_t *vc; */
   /* faup_snapshot_value_count_t *vc_copy; */
   
+  faup_snapshot_value_count_t *vc;
+  faup_snapshot_value_count_t *vc_copy;
+
   copy = faup_snapshot_item_new(item->key);
-  memcpy(&copy->values, &item->values, sizeof(item->values));
-  /* vc = htable_first(&copy->values, &iter); */
-  /* while (vc) { */
-  /* /\*   vc_copy = faup_snapshot_value_count_copy(vc); *\/ */
-  /* /\*   faup_snapshot_value_count_append_object(item, vc_copy); *\/ */
-  /*   printf("vc->value:%s\n", vc->value); */
-    
-  /*   vc = htable_next(&copy->values, &iter); */
-  /* } */
-  copy->length = item->length;
+  if (!copy) {
+    return NULL;
+  }
+  /* Deep copy: the hash table and its values must not be shared with the
+   * source item, otherwise freeing both is a double free. */
+  vc = htable_first(&item->values, &iter);
+  while (vc) {
+    vc_copy = faup_snapshot_value_count_copy(vc);
+    if (vc_copy) {
+      faup_snapshot_value_count_append_object(copy, vc_copy);
+    }
+    vc = htable_next(&item->values, &iter);
+  }
   
   return copy;
 }
@@ -205,7 +223,12 @@ faup_snapshot_value_count_t *faup_snapshot_value_count_get(faup_snapshot_item_t 
 
 int faup_snapshot_value_count_set_value(faup_snapshot_value_count_t *vc, char *value)
 {
-  vc->value = strdup(value);
+  char *newvalue = strdup(value);
+  if (!newvalue) {
+    return -1;
+  }
+  free(vc->value);
+  vc->value = newvalue;
 
   return 0;
 }
@@ -245,7 +268,14 @@ int faup_snapshot_value_count_append(faup_snapshot_item_t *item, char *value)
   vc = faup_snapshot_value_count_get(item, value);
   if (!vc) {
     vc = faup_snapshot_value_count_new();
+    if (!vc) {
+      return -1;
+    }
     vc->value = strdup(value);
+    if (!vc->value) {
+      free(vc);
+      return -1;
+    }
     vc->first_time_seen = vc->last_time_seen = time(NULL);
     vc->count++;
     
@@ -380,7 +410,7 @@ int faup_snapshot_append(faup_snapshot_t *snapshot, char *key, char *value)
   return 0;
 }
 
-// FIXME: Remove this useless function
+// Takes ownership of 'item': the snapshot frees it with faup_snapshot_free()
 int faup_snapshot_append_item(faup_snapshot_t *snapshot, char *item_name, faup_snapshot_item_t *item)
 {
   if (!snapshot) {
@@ -394,7 +424,7 @@ int faup_snapshot_append_item(faup_snapshot_t *snapshot, char *item_name, faup_s
     return -1;
   }
 
-  snapshot->items[snapshot->length] = faup_snapshot_item_copy(item);
+  snapshot->items[snapshot->length] = item;
   
   snapshot->length++;
   
@@ -434,8 +464,8 @@ void faup_snapshot_output(faup_handler_t *fh, faup_snapshot_t *snapshot, FILE *f
       values_count = 1;
       vc = htable_first(&item->values, &iter);
       while (vc) {
-	strftime(first_timebuf, sizeof(first_timebuf), "%Y-%m-%d %H:%M:%S %z", localtime(&vc->first_time_seen));
-	strftime(last_timebuf, sizeof(last_timebuf), "%Y-%m-%d %H:%M:%S %z", localtime(&vc->last_time_seen));
+	faup_snapshot_format_time(first_timebuf, sizeof(first_timebuf), vc->first_time_seen);
+	faup_snapshot_format_time(last_timebuf, sizeof(last_timebuf), vc->last_time_seen);
 	fprintf(fd,"\t\t\t{\"value\": \"%s\", \"count\": %ld, \"first seen\": \"%s\", \"last seen\": \"%s\"}", vc->value, vc->count, first_timebuf, last_timebuf);
 
 	if (values_count == item->length) {

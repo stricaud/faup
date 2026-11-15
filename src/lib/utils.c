@@ -32,12 +32,15 @@ int faup_utils_recursive_mkdir(char *filepath)
   size_t len;
 
   len = strlen(filepath);
-  strncpy(tmp, filepath, len);
-  
   if (len <= 1) {
     fprintf(stderr, "Error: there is no directory to create from '%s'\n", filepath);
     return -1;
   }
+  if (len >= sizeof(tmp)) {
+    fprintf(stderr, "Error: path too long to create directories from '%s'\n", filepath);
+    return -1;
+  }
+  memcpy(tmp, filepath, len + 1);
 
   for (p = tmp; *p; p++) {
     if (*p == FAUP_OS_DIRSEP_C) {

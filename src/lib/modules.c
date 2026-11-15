@@ -93,7 +93,9 @@ faup_modules_t *faup_modules_load_from_datadir(void)
 		free(modules);
 		return NULL;
 	}
-	modules->module = malloc(sizeof(faup_module_t) * modules->nb_modules);
+	/* Zeroed: a slot whose registration fails (or is skipped) must be
+	 * safe to hand to faup_modules_terminate() */
+	modules->module = calloc(modules->nb_modules, sizeof(faup_module_t));
 	if (!modules->module) {
 		fprintf(stderr, "Cannot allocate modules->module!\n");
 		free(modules);
@@ -120,7 +122,7 @@ faup_modules_t *faup_modules_load_from_arg(char **argv, int argc)
 		fprintf(stderr, "Cannot allocate modules in %s\n", __FUNCTION__);
 		return NULL;
 	}
-	modules->module = malloc(sizeof(faup_module_t) * argc);
+	modules->module = calloc(argc, sizeof(faup_module_t));
 	modules->nb_modules = 0;
 	if (!modules->module) {
 		fprintf(stderr, "Cannot allocate modules->module in %s\n", __FUNCTION__);
@@ -145,17 +147,16 @@ faup_modules_t *faup_modules_load_from_arg(char **argv, int argc)
 			char *available_module = NULL;
 			char *module_to_load = argv[count];
 			
-			load_path = malloc(17 /* modules_available */ + 1 /* FAUP_OS_DIRSEP */ + strlen(module_to_load));
-			if (!load_path) {
-			  fprintf(stderr, "Cannot Allocate Modules Loading Path!");
+			retval = asprintf(&load_path, "modules_available%s%s", FAUP_OS_DIRSEP, module_to_load);
+			if (retval < 0) {
+			  fprintf(stderr, "Cannot Allocate Modules Loading Path!\n");
+			  faup_modules_terminate(modules);
 			  return NULL;
 			}
-			/* retval = asprintf(&load_path, "modules_available%s%s", FAUP_OS_DIRSEP, argv[count]); */
-			retval = asprintf(&load_path, "modules_available");
 			available_module = faup_datadir_get_file(load_path, false);
 			free(load_path);
 
-			fp = fopen(available_module, "r");
+			fp = available_module ? fopen(available_module, "r") : NULL;
 			if (fp) {
 				retval = faup_module_register(modules, NULL, available_module, NULL, count - modules_that_do_not_count);
 				if (retval == 0) {
@@ -167,6 +168,7 @@ faup_modules_t *faup_modules_load_from_arg(char **argv, int argc)
 			} else {
 				fprintf(stderr, "Cannot register the module '%s': Not found in modules_available nor local path!\n", argv[count]);
 			}
+			free(available_module);
 
 		}
 
@@ -216,7 +218,13 @@ int faup_module_register(faup_modules_t *modules, char *modules_dir, char *modul
 
 err:
 	fprintf(stderr, "*** Error(%s): %s\n", __FUNCTION__, lua_tostring(modules->module[count].lua_state, -1));
+	/* Leave the slot empty and consistent: faup_modules_terminate() walks every slot */
+	lua_close(modules->module[count].lua_state);
+	modules->module[count].lua_state = NULL;
 	free(modules->module[count].module_path);
+	modules->module[count].module_path = NULL;
+	free(modules->module[count].module_name);
+	modules->module[count].module_name = NULL;
 	return -1;
 }
 
@@ -233,14 +241,15 @@ int faup_modules_foreach_filelist(faup_modules_t *modules, char *force_path, int
 	} else {
 		modules_dir = force_path;
 	}
-	modules_dir_fp = opendir(modules_dir);
+	modules_dir_fp = modules_dir ? opendir(modules_dir) : NULL;
 	if (!modules_dir_fp) {
-		free(modules_dir);
+		if (!force_path) {
+			free(modules_dir);
+		}
 		return -1;
 	}
 
-	modules_dir_file = readdir(modules_dir_fp);
-	while (modules_dir_file) {
+	while ((modules_dir_file = readdir(modules_dir_fp)) != NULL) {
 		if (modules_dir_file->d_name[0] != '.') {
 			size_t filelen = strlen(modules_dir_file->d_name);
 			if (filelen > FAUP_MODULE_NAME_MAXLEN) {
@@ -252,7 +261,6 @@ int faup_modules_foreach_filelist(faup_modules_t *modules, char *force_path, int
 			if (cb_modules_foreach) cb_modules_foreach(modules, modules_dir, modules_dir_file->d_name, user_data, count);
 			count++;
 		}
-		modules_dir_file = readdir(modules_dir_fp);
 	}
 	closedir(modules_dir_fp);
 

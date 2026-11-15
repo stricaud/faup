@@ -33,9 +33,10 @@ void faup_output_show(faup_handler_t const* fh, faup_options_t *opts, const faup
 		const char *tmpbuf = NULL;
 		tmpbuf = &fh->faup.org_str[feature.pos];
 
-		if (feature.size > FAUP_MAXLEN) {
-			fprintf(stderr, "Error: field(%s) with size(%d) is greater than the maximum default FAUP URL MAXLEN (%d). Cannot process the given url (%s).\n",
-					faup_features_get_field_name(feature), feature.size, FAUP_MAXLEN, fh->faup.org_str);
+		if ((feature.size > FAUP_MAXLEN) || ((size_t)feature.pos + feature.size > fh->faup.org_str_len)) {
+			/* %.*s: the URL buffer is not guaranteed to be NUL-terminated */
+			fprintf(stderr, "Error: field(%s) with size(%d) is greater than the maximum default FAUP URL MAXLEN (%d) or outside the url. Cannot process the given url (%.*s).\n",
+					faup_features_get_field_name(feature), feature.size, FAUP_MAXLEN, (int)fh->faup.org_str_len, fh->faup.org_str);
 			return;
 		}
 
@@ -193,9 +194,10 @@ void faup_output_show_buffer(faup_handler_t const* fh, faup_options_t *opts, con
 		const char *tmpbuf = NULL;
 		tmpbuf = &fh->faup.org_str[feature.pos];
 
-		if (feature.size > FAUP_MAXLEN) {
-			fprintf(stderr, "Error: field(%s) with size(%d) is greater than the maximum default FAUP URL MAXLEN (%d). Cannot process the given url (%s).\n",
-				faup_features_get_field_name(feature), feature.size, FAUP_MAXLEN, fh->faup.org_str);
+		if ((feature.size > FAUP_MAXLEN) || ((size_t)feature.pos + feature.size > fh->faup.org_str_len)) {
+			/* %.*s: the URL buffer is not guaranteed to be NUL-terminated */
+			fprintf(stderr, "Error: field(%s) with size(%d) is greater than the maximum default FAUP URL MAXLEN (%d) or outside the url. Cannot process the given url (%.*s).\n",
+				faup_features_get_field_name(feature), feature.size, FAUP_MAXLEN, (int)fh->faup.org_str_len, fh->faup.org_str);
 			return;
 		}
 

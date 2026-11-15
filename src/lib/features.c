@@ -36,6 +36,22 @@ void faup_features_init(faup_features_t* features)
 	features->fragment.pos           = -1;
 	features->tld.pos                = -1;
 
+	/* Sizes must be reset too: a field whose pos is set but whose size is not
+	 * recomputed on this decode would otherwise keep the size of the previous
+	 * URL and output would read past the current buffer. */
+	features->scheme.size             = 0;
+	features->hierarchical.size       = 0;
+	features->credential.size         = 0;
+	features->host.size               = 0;
+	features->subdomain.size          = 0;
+	features->domain.size             = 0;
+	features->domain_without_tld.size = 0;
+	features->port.size               = 0;
+	features->resource_path.size      = 0;
+	features->query_string.size       = 0;
+	features->fragment.size           = 0;
+	features->tld.size                = 0;
+
 	features->scheme.field             = FAUP_FEATURES_FIELD_SCHEME;
 	features->hierarchical.field       = FAUP_FEATURES_FIELD_HIERARCHICAL;
 	features->credential.field         = FAUP_FEATURES_FIELD_CREDENTIAL;
@@ -378,8 +394,11 @@ char *_get_feature_string(faup_handler_t *fh, faup_feature_t feature)
   char *retstring = NULL;
   if (feature.pos < 0) return NULL;
   if (feature.size <= 0) return NULL;
+  /* Never read outside of the URL buffer, whatever the decoder computed */
+  if ((size_t)feature.pos + feature.size > fh->faup.org_str_len) return NULL;
   
   retstring = malloc(feature.size + 1);
+  if (!retstring) return NULL;
   retstring[feature.size] = '\0';
   return memcpy(retstring, fh->faup.org_str + feature.pos, feature.size);
 }

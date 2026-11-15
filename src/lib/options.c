@@ -36,14 +36,16 @@ faup_options_t *faup_options_new(void)
 void faup_options_free(faup_options_t *opts)
 {
 	int i = 0;
-	if (opts) {
-		faup_options_disable_tld_above_one(opts);
+	if (!opts) {
+		return;
 	}
+	faup_options_disable_tld_above_one(opts);
 
 	// Clear modules arguments
 	for (i = 0; i < opts->modules_argc; i++) {
 		free(opts->modules_argv[i]);
 	}
+	free(opts->modules_argv);
 
 	free(opts->snapshot_name);
 

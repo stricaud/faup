@@ -87,8 +87,8 @@ int faup_handle_shell_snapshot(int argc, char **argv)
       return -1;
     }
 
-    strftime(first_timebuf, sizeof(first_timebuf), "%Y-%m-%d %H:%M:%S %z", localtime(&vc->first_time_seen));
-    strftime(last_timebuf, sizeof(last_timebuf), "%Y-%m-%d %H:%M:%S %z", localtime(&vc->last_time_seen));
+    faup_snapshot_format_time(first_timebuf, sizeof(first_timebuf), vc->first_time_seen);
+    faup_snapshot_format_time(last_timebuf, sizeof(last_timebuf), vc->last_time_seen);
     fprintf(stdout, "{\"value\": \"%s\", \"count\": %ld, \"first seen\": \"%s\", \"last seen\": \"%s\"}\n", vc->value, vc->count, first_timebuf, last_timebuf);
     
   out:
@@ -167,27 +167,48 @@ int faup_handle_shell_modules(int argc, char **argv)
 	fprintf(stderr, "Error processing argument 4\n");
 	exit(1);
       }
+      /* The module name becomes a file name under modules_enabled: it must
+       * not be able to escape that directory. */
+      if (strchr(argv[4], '/') || strchr(argv[4], '\\') || !strcmp(argv[4], ".") || !strcmp(argv[4], "..")) {
+	fprintf(stderr, "Error, invalid module name '%s': must be a plain file name.\n", argv[4]);
+	exit(1);
+      }
       if (argv_4_len < 128) {
-	memcpy(&filebuf, argv[4], 127);
+	memcpy(filebuf, argv[4], argv_4_len + 1);
       } else {
 	fprintf(stderr, "Error, filename to long. Must be < 128 characters.\n");
 	exit(1);
       }      
 
       retval = asprintf(&enabled_filename, "modules_enabled%s%s", FAUP_OS_DIRSEP, filebuf);
+      if (retval < 0) {
+	fprintf(stderr, "Error: cannot allocate the module path\n");
+	exit(1);
+      }
       symlink_file = faup_datadir_get_file_from_home(enabled_filename, true);
-      /* symlink_file = faup_datadir_file_to_write(enabled_filename, true); */
       if (!symlink_file) {
 	// I have no symlink, because there is nowhere I can write. Let's create the homedir path and do it again
 	retval = faup_datadir_make_dir_from_home("modules_enabled");
 	symlink_file = faup_datadir_get_file_from_home(enabled_filename, true);
-	/* symlink_file = faup_datadir_file_to_write(enabled_filename, true); */
+      }
+      free(enabled_filename);
+      if (!symlink_file) {
+	fprintf(stderr, "Error: no writable modules_enabled directory in your home\n");
+	exit(1);
       }
 
-      free(enabled_filename);
       retval = asprintf(&origin_filename, "modules_available%s%s", FAUP_OS_DIRSEP, filebuf);
+      if (retval < 0) {
+	fprintf(stderr, "Error: cannot allocate the module path\n");
+	exit(1);
+      }
       available_filename = faup_datadir_get_global_file(origin_filename);
       free(origin_filename);
+      if (!available_filename) {
+	fprintf(stderr, "Error: cannot locate the modules_available directory\n");
+	free(symlink_file);
+	exit(1);
+      }
 
 
       retval = symlink(available_filename, symlink_file);
@@ -221,16 +242,30 @@ int faup_handle_shell_modules(int argc, char **argv)
 	fprintf(stderr, "Error processing argument 4\n");
 	exit(1);
       }
+      /* The module name becomes a file name under modules_enabled: it must
+       * not be able to escape that directory. */
+      if (strchr(argv[4], '/') || strchr(argv[4], '\\') || !strcmp(argv[4], ".") || !strcmp(argv[4], "..")) {
+	fprintf(stderr, "Error, invalid module name '%s': must be a plain file name.\n", argv[4]);
+	exit(1);
+      }
       if (argv_4_len < 128) {
-	memcpy(&filebuf, argv[4], 127);
+	memcpy(filebuf, argv[4], argv_4_len + 1);
       } else {
 	fprintf(stderr, "Error, filename to long. Must be < 128 characters.\n");
 	exit(1);
       }
       
       retval = asprintf(&enabled_filename, "modules_enabled%s%s", FAUP_OS_DIRSEP, filebuf);
+      if (retval < 0) {
+	fprintf(stderr, "Error: cannot allocate the module path\n");
+	exit(1);
+      }
       symlink_file = faup_datadir_get_file(enabled_filename, false);
       free(enabled_filename);
+      if (!symlink_file) {
+	fprintf(stderr, "Error: cannot locate the enabled module '%s'\n", filebuf);
+	exit(1);
+      }
 
       retval = unlink(symlink_file);
       if (!retval) {

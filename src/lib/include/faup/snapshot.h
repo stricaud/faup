@@ -54,6 +54,7 @@ struct _faup_snapshot_t {
 typedef struct _faup_snapshot_t faup_snapshot_t;
 
 
+void faup_snapshot_format_time(char *buf, size_t buflen, time_t t);
 faup_snapshot_t *faup_snapshot_new(void);
 void faup_snapshot_value_count_debug(faup_snapshot_value_count_t *vc);
 void faup_snapshot_item_debug(faup_snapshot_item_t *item);

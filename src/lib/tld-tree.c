@@ -246,6 +246,7 @@ TLDNode *faup_tld_tree_new(void)
 	ret = faup_tld_array_populate();
 	if (ret < 0) {
 	  fprintf(stderr, "Error with faup_tld_array_populate from %s; Symptom: double initialization?\n", __FUNCTION__);
+	  free(Tree);
 	  return NULL;
 	}
 	faup_tld_array_foreach(faup_tld_tree_add_tld, Tree);
@@ -333,6 +334,7 @@ static bool faup_tld_tree_tld_exists(TLDNode *Tree, const char *tld, int tld_len
 faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld_tree)
 {
 	const char *p;
+	const char *host_start;
 	int32_t host_last_pos;
 	char *last;
 	bool found;
@@ -340,7 +342,6 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 	uint32_t tld_len = 0;
 	uint32_t tld_exception_len = 0;
 	uint32_t last_len_just_for_host = 0;
-	size_t last_len;
 	size_t org_str_len;
 
 	faup_tld_tree_extracted_t tld_extracted;
@@ -363,17 +364,23 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 
 	last = NULL;
 
+	if ((fh->faup.features.host.pos < 0) || (fh->faup.features.host.size == 0)) {
+		return tld_extracted;
+	}
+
+	host_start = fh->faup.org_str + fh->faup.features.host.pos;
 	host_last_pos = fh->faup.features.host.pos + fh->faup.features.host.size;
 
 	p = fh->faup.org_str + host_last_pos - 1; 
 
+	// Walk the host backwards, one label at a time. 'counter' is always p - host_start,
+	// so the host start (not a NUL byte before it, which may not exist) bounds the walk.
 	counter = fh->faup.features.host.size - 1;
-	while( counter )
+	while( counter > 0 )
 	{
-		while( *(p-1) && (*p != '.') ) {
+		while( (p > host_start) && (*p != '.') ) {
 			p--;
 			counter--;
-			if (counter <= 0) break;
 		}
 
 		step = ( *p == '.' ) ? 1 : 0;
@@ -387,6 +394,10 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 
 		last = (char *) p + step;
 
+		if (counter == 0) {
+			// We reached the first char of the host (a leading dot): nothing left on the left
+			break;
+		}
 		p--;
 		counter--;
 	}
@@ -398,8 +409,9 @@ faup_tld_tree_extracted_t faup_tld_tree_extract(faup_handler_t *fh, TLDNode *tld
 
 	// We want to retrieve the size of the tld without the useless chars the come afterwards
 	// www.foo.siemens.om/tagada != www.foo.siemens.om
-	last_len = strlen(last);
-	last_len_just_for_host = last_len - (fh->faup.org_str_len - (fh->faup.features.host.pos + fh->faup.features.host.size));
+	// The host ends at host.pos + host.size and 'last' points inside it. Never strlen()
+	// the URL: faup_decode() takes an explicit length and the buffer may not be NUL-terminated.
+	last_len_just_for_host = (uint32_t)((fh->faup.org_str + fh->faup.features.host.pos + fh->faup.features.host.size) - last);
 
 	counter = 0;
 	if (tld_tree->sibling) {
