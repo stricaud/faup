@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.10)
 
 project(faup-project)
 
@@ -26,8 +26,7 @@ if(APPLE)
 endif()
 
 
-#set(CMAKE_BUILD_TYPE "Release")
-set(CMAKE_BUILD_TYPE "Debug")
+# Build type is chosen in CMakeOptions.txt (Release unless -DDEBUG=ON)
 set(USE_ASAN "False")
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
@@ -173,9 +172,7 @@ set(FAUP_LIBRARY faupl)
 if(WIN32)
 	set(FAUP_LIBRARY "${faup-project_BINARY_DIR}/src/lib/${CMAKE_BUILD_TYPE}/faup_static.lib")
 endif(WIN32)
-if(APPLE)
-	set(FAUP_LIBRARY "${faup-project_BINARY_DIR}/src/lib/libfaupl.dylib")
-endif(APPLE)
+# On Apple (as on Linux) link against the faupl target so dependencies are tracked.
 
 # Set our env variables
 set(FAUP_DATA_DIR "${CMAKE_INSTALL_PREFIX}/share/faup/")

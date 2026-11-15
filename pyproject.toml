@@ -1,0 +1,76 @@
+[build-system]
+requires = ["scikit-build-core>=0.10"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "pyfaup"
+description = "Python bindings for the faup URL parsing library"
+readme = "src/lib/bindings/python/README.rst"
+license = { text = "MIT" }
+authors = [{ name = "Sebastien Tricaud", email = "sebastien@honeynet.org" }]
+requires-python = ">=3.8"
+dependencies = ["chardet"]
+dynamic = ["version"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: C",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: MacOS",
+  "Topic :: Internet :: WWW/HTTP",
+]
+
+[project.urls]
+Homepage = "https://github.com/stricaud/faup"
+Source = "https://github.com/stricaud/faup"
+Issues = "https://github.com/stricaud/faup/issues"
+
+[tool.scikit-build]
+# The version of the Python package is the version of the C library (VERSION file).
+metadata.version.provider = "scikit_build_core.metadata.regex"
+metadata.version.input = "VERSION"
+metadata.version.regex = "^(?P<value>\\d+(\\.\\d+)*)\\s*$"
+
+minimum-version = "build-system.requires"
+cmake.version = ">=3.10"
+cmake.build-type = "Release"
+# Only build and install the shared library, not the faup CLI, tests or data files.
+build.targets = ["faupl"]
+install.components = ["Libraries"]
+
+# Everything CMake installs lands inside the pyfaup package: pyfaup/lib/libfaupl.*
+wheel.install-dir = "pyfaup"
+wheel.packages = ["src/lib/bindings/python/pyfaup"]
+# The bindings use ctypes only, so one wheel per platform works for every Python 3.
+wheel.py-api = "py3"
+# Drop the unversioned symlink duplicate (libfaupl.so / libfaupl.dylib); the loader
+# finds the versioned file.
+wheel.exclude = ["pyfaup/lib/libfaupl.so", "pyfaup/lib/libfaupl.dylib"]
+
+sdist.exclude = [
+  "build/",
+  "packages/",
+  ".github/",
+  ".travis.yml",
+  "src/lib/bindings/python/debian/",
+  "src/lib/bindings/python/examples/",
+  "**/*.so",
+  "**/*.dylib",
+]
+
+[tool.scikit-build.cmake.define]
+CMAKE_INSTALL_LIBDIR = "lib"
+LUA = "OFF"
+WEBSERVER = "OFF"
+
+[tool.cibuildwheel]
+# ctypes bindings: build once per platform (py3-none-<platform> wheels), not once per CPython.
+build = "cp312-*"
+skip = "*-win32 *-manylinux_i686 *-musllinux_i686"
+build-verbosity = 1
+test-command = "python {project}/src/lib/bindings/python/tests/smoke_test.py"
+
+[tool.cibuildwheel.linux]
+archs = ["auto64"]
+
+[tool.cibuildwheel.macos]
+archs = ["x86_64", "arm64"]

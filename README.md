@@ -162,17 +162,21 @@ source /etc/profile
 
 Install PyFaup Python Module
 -------------------------------
-If you receive an error stating "ImportError: No module named 'pyfaup'", perform the following:
+Prebuilt wheels for Linux (x86_64, aarch64) and macOS (x86_64, arm64) are published on PyPI:
+```
+pip install pyfaup
+```
 
-1. Change to directory:
+To build the module from a source checkout instead (requires CMake and a C compiler; the
+`pyproject.toml` at the repository root builds libfaupl and bundles it into the wheel):
 ```
-~/faup/src/lib/bindings/python
+cd ~/faup
+pip install .
 ```
-2. Run:
-```
-python setup.py install
-``` 
-    
+
+Releasing: bump the `VERSION` file, commit, then push a matching tag (e.g. `v1.6`). The
+`pypi.yml` GitHub Actions workflow builds every wheel and uploads them to PyPI.
+
 FAQ
 ---
 
