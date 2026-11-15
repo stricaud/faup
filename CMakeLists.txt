@@ -45,7 +45,7 @@ else()
   endif()
 endif()
 if (NOT WIN32)
-  add_definitions(-std=c99 -fPIC)
+  add_definitions(-std=gnu99 -fPIC)
 endif()
 
 include(CTest)

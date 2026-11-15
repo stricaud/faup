@@ -1,11 +1,12 @@
+#ifdef LINUX
+#define _GNU_SOURCE // strdup(), qsort_r() on glibc and musl
+#endif
+
 #include <stdio.h>
 #include <sys/stat.h>
 #include <errno.h>
-#define __USE_XOPEN_EXTENDED // for strdup() BS glibc now needs
 #include <string.h>
-#define __USE_GNU // qsort_r()
 #include <stdlib.h>
-#define _POSIX_SOURCE
 #include <time.h>
 
 #include <faup/faup.h>
