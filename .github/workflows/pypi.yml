@@ -94,3 +94,7 @@ jobs:
       - name: Show what will be uploaded
         run: ls -l dist/
       - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          # PyPI never accepts a file twice. If a tag is moved and rebuilt after a
+          # successful upload, skip the files already published instead of failing.
+          skip-existing: true
