@@ -19,6 +19,8 @@
 
 #ifndef HAVE_VASPRINTF
 
+#include <stdio.h>
+#include <stdarg.h>
 #include <errno.h>
 #include <stdarg.h>
 #include <stdlib.h>

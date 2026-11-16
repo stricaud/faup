@@ -48,6 +48,8 @@ jobs:
           - os: ubuntu-latest        # Linux x86_64 (manylinux + musllinux)
           - os: ubuntu-24.04-arm     # Linux aarch64 (manylinux + musllinux)
           - os: macos-latest         # macOS arm64 natively + x86_64 cross-built
+          - os: windows-latest       # Windows x86_64 (MSVC)
+          - os: windows-11-arm       # Windows arm64 (MSVC, native runner)
     steps:
       - uses: actions/checkout@v7
 

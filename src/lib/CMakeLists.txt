@@ -2,14 +2,22 @@ include_directories(AFTER "include/" ${FAUP_INCLUDE_DIRS})
 
 
 if(WIN32)
+	# asprintf/vasprintf, inet_pton and memrchr are missing from the Windows C runtimes;
+	# snprintf/vsnprintf exist in every toolchain we support, so bsd-snprintf.c is not built.
 	set(WIN32_PORTABLE
 	compat/bsd-asprintf.c
-	compat/bsd-snprintf.c
 	compat/inet_pton.c
 	compat/memrchr.c
 	)
+	# Snapshot files need POSIX directory APIs (dirent, nftw): not available on Windows yet.
+	# The URL parsing library itself is complete.
+	set(POSIX_ONLY_SRC)
 else()
 	set(WIN32_PORTABLE)
+	set(POSIX_ONLY_SRC
+	snapshot-file.c
+	utils.c
+	)
 endif(WIN32)
 
 if(WEBSERVER)
@@ -49,6 +57,7 @@ ${WIN32_PORTABLE}
 ${WEBSERVER_SRC}
 ${LUA_MODULES_SRC_FILES}
 ${MINIZ_SOURCE}
+${POSIX_ONLY_SRC}
 b64/cencode.c
 b64/cdecode.c
 hash/hash.c
@@ -61,10 +70,8 @@ options.c
 output.c
 portable.c
 snapshot.c
-snapshot-file.c
 tld.c
 tld-tree.c
-utils.c
 )
 
 set(FAUP_LIB_HDR_FILES
@@ -100,10 +107,12 @@ add_library(faupl SHARED ${FAUP_LIB_SRC_FILES})
 set_target_properties(faupl PROPERTIES SOVERSION 1)
 target_link_libraries(faupl ${FAUP_LINK_LIBRARIES})
 
-if(NOT WIN32)
-install(TARGETS faupl LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Libraries)
+# On Windows the DLL is a RUNTIME artifact: keep it next to the Unix libraries (lib/)
+install(TARGETS faupl
+	RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Libraries
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Libraries
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Libraries)
 install(FILES ${FAUP_LIB_HDR_FILES} DESTINATION include/faup COMPONENT Headers)
-endif()
 
 add_subdirectory(modules)
 

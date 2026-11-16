@@ -62,6 +62,6 @@ Installation
 
 		pip install pyfaup
 
-Wheels bundle the faup C library (libfaupl) for Linux x86_64/aarch64 and macOS
-x86_64/arm64, and work with any Python 3.8+. Building from source requires CMake
+Wheels bundle the faup C library (libfaupl) for Linux x86_64/aarch64, macOS
+x86_64/arm64 and Windows x86_64/arm64, and work with any Python 3.8+. Building from source requires CMake
 and a C compiler: run ``pip install .`` from the root of the faup repository.

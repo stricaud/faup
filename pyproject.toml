@@ -16,6 +16,7 @@ classifiers = [
   "Programming Language :: C",
   "Operating System :: POSIX :: Linux",
   "Operating System :: MacOS",
+  "Operating System :: Microsoft :: Windows",
   "Topic :: Internet :: WWW/HTTP",
 ]
 
@@ -44,7 +45,7 @@ wheel.packages = ["src/lib/bindings/python/pyfaup"]
 wheel.py-api = "py3"
 # Drop the unversioned symlink duplicate (libfaupl.so / libfaupl.dylib); the loader
 # finds the versioned file.
-wheel.exclude = ["pyfaup/lib/libfaupl.so", "pyfaup/lib/libfaupl.dylib"]
+wheel.exclude = ["pyfaup/lib/libfaupl.so", "pyfaup/lib/libfaupl.dylib", "pyfaup/lib/*.lib", "pyfaup/lib/*.exp", "pyfaup/lib/*.pdb"]
 
 sdist.exclude = [
   "build/",
@@ -74,3 +75,7 @@ archs = ["auto64"]
 
 [tool.cibuildwheel.macos]
 archs = ["x86_64", "arm64"]
+
+[tool.cibuildwheel.windows]
+# AMD64 on windows-latest, ARM64 natively on windows-11-arm
+archs = ["auto64"]

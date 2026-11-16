@@ -56,7 +56,7 @@ void faup_snapshot_value_count_debug(faup_snapshot_value_count_t *vc)
   printf("**\t\tvalue:->%s<-\n", vc->value);
   printf("**\t\tfirst time seen: %s", ctime(&vc->first_time_seen));
   printf("**\t\tlast time seen: %s", ctime(&vc->last_time_seen));
-  printf("**\t\tcount:%ld\n", vc->count);
+  printf("**\t\tcount:%zu\n", vc->count);
 }
 
 void faup_snapshot_item_debug(faup_snapshot_item_t *item)
@@ -71,7 +71,7 @@ void faup_snapshot_item_debug(faup_snapshot_item_t *item)
   
   printf("** \titem\n");
   printf("** \tkey:%s\n", item->key);
-  printf("** \tlength:%ld\n", item->length);
+  printf("** \tlength:%zu\n", item->length);
 
   if (item->length) {
     vc = htable_first(&item->values, &iter);
@@ -88,7 +88,7 @@ void faup_snapshot_debug(faup_snapshot_t *snapshot)
 
   printf("** Snapshot debug:\n");
   printf("** Name: %s\n", snapshot->name);
-  printf("** items length: %ld\n", snapshot->length);
+  printf("** items length: %zu\n", snapshot->length);
   for (counter = 0; counter < snapshot->length; counter++) {
     faup_snapshot_item_debug(snapshot->items[counter]);
   }
@@ -449,15 +449,15 @@ void faup_snapshot_output(faup_handler_t *fh, faup_snapshot_t *snapshot, FILE *f
   fprintf(fd, "{\n");
   fprintf(fd,"\t\"snapshot name\": \"%s\",\n", snapshot->name);
   if (!snapshot->length) {
-    fprintf(fd,"\t\"snapshot length\": %ld\n", snapshot->length);
+    fprintf(fd,"\t\"snapshot length\": %zu\n", snapshot->length);
   } else {
-    fprintf(fd,"\t\"snapshot length\": %ld,\n", snapshot->length);
+    fprintf(fd,"\t\"snapshot length\": %zu,\n", snapshot->length);
     fprintf(fd,"\t\"items\":[");
   for (counter = 0; counter < snapshot->length; counter++) {
     faup_snapshot_item_t *item = snapshot->items[counter];
     fprintf(fd,"\t\t{\n");
     fprintf(fd,"\t\t\"key\": \"%s\",\n", item->key);
-    fprintf(fd,"\t\t\"length\": %ld,\n", item->length);
+    fprintf(fd,"\t\t\"length\": %zu,\n", item->length);
     fprintf(fd,"\t\t\"values\": [\n");
 
     if (item->length) {
@@ -466,7 +466,7 @@ void faup_snapshot_output(faup_handler_t *fh, faup_snapshot_t *snapshot, FILE *f
       while (vc) {
 	faup_snapshot_format_time(first_timebuf, sizeof(first_timebuf), vc->first_time_seen);
 	faup_snapshot_format_time(last_timebuf, sizeof(last_timebuf), vc->last_time_seen);
-	fprintf(fd,"\t\t\t{\"value\": \"%s\", \"count\": %ld, \"first seen\": \"%s\", \"last seen\": \"%s\"}", vc->value, vc->count, first_timebuf, last_timebuf);
+	fprintf(fd,"\t\t\t{\"value\": \"%s\", \"count\": %zu, \"first seen\": \"%s\", \"last seen\": \"%s\"}", vc->value, vc->count, first_timebuf, last_timebuf);
 
 	if (values_count == item->length) {
 	  fprintf(fd,"\n");

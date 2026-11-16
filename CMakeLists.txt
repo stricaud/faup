@@ -154,6 +154,14 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "WIN32")
 endif()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   add_definitions(-DWIN32=1)
+  # Every supported Windows toolchain (MSVC >= 2015, MinGW-w64, clang) has the C99 printf family
+  add_definitions(-DHAVE_SNPRINTF=1 -DHAVE_VSNPRINTF=1)
+  # miniz headers use GCC visibility attributes unless told the library is static
+  add_definitions(-DMINIZ_STATIC_DEFINE=1 -DMINIZ_DEPRECATED=)
+  # Let MSVC accept the POSIX names (strdup, access, unlink, fileno...) without noise
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE)
+  # The DLL exports every symbol, like the ELF/Mach-O builds do
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -169,9 +177,6 @@ endif()
 set(FAUP_INCLUDE_DIRS "${faup-project_SOURCE_DIR}/src/lib/include/" "${faup-project_BINARY_DIR}/src/lib/include")
 
 set(FAUP_LIBRARY faupl)
-if(WIN32)
-	set(FAUP_LIBRARY "${faup-project_BINARY_DIR}/src/lib/${CMAKE_BUILD_TYPE}/faup_static.lib")
-endif(WIN32)
 # On Apple (as on Linux) link against the faupl target so dependencies are tracked.
 
 # Set our env variables
@@ -188,8 +193,11 @@ message("Version: ${FAUP_VERSION}")
 message("Version Major: ${FAUP_VERSION_MAJOR}")
 message("Version Minor: ${FAUP_VERSION_MINOR}")
 
-add_definitions(-DLIB_CFLAGS="-I${CMAKE_INSTALL_FULL_INCLUDEDIR}")
-add_definitions(-DLIB_LIBS="-L${CMAKE_INSTALL_FULL_LIBDIR} -lfaupl")
+if(NOT WIN32)
+  # Only used by "faup --cflags/--libs" (the CLI is not built on Windows)
+  add_definitions(-DLIB_CFLAGS="-I${CMAKE_INSTALL_FULL_INCLUDEDIR}")
+  add_definitions(-DLIB_LIBS="-L${CMAKE_INSTALL_FULL_LIBDIR} -lfaupl")
+endif()
 
 add_subdirectory(doc)
 add_subdirectory(src)

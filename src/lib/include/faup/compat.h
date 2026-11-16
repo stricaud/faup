@@ -15,6 +15,19 @@ extern "C" {
 
 #ifndef HAVE_VASPRINTF
 int vasprintf(char **, const char *, va_list);
+int asprintf(char **, const char *, ...);
+#endif
+
+/* POSIX file access checks: MSVC spells them _access/_W_OK-less, MinGW has both */
+#include <io.h>
+#ifndef W_OK
+#define W_OK 2
+#endif
+#ifndef R_OK
+#define R_OK 4
+#endif
+#ifndef F_OK
+#define F_OK 0
 #endif
 
 //#ifndef HAVE_VSNPRINTF

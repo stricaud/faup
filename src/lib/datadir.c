@@ -31,6 +31,7 @@
 
 #include <faup/faup.h>
 #include <faup/datadir.h>
+#include <faup/compat.h>
 
 #ifndef WIN32
 #include <fcntl.h>

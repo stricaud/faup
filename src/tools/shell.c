@@ -89,7 +89,7 @@ int faup_handle_shell_snapshot(int argc, char **argv)
 
     faup_snapshot_format_time(first_timebuf, sizeof(first_timebuf), vc->first_time_seen);
     faup_snapshot_format_time(last_timebuf, sizeof(last_timebuf), vc->last_time_seen);
-    fprintf(stdout, "{\"value\": \"%s\", \"count\": %ld, \"first seen\": \"%s\", \"last seen\": \"%s\"}\n", vc->value, vc->count, first_timebuf, last_timebuf);
+    fprintf(stdout, "{\"value\": \"%s\", \"count\": %zu, \"first seen\": \"%s\", \"last seen\": \"%s\"}\n", vc->value, vc->count, first_timebuf, last_timebuf);
     
   out:
     faup_snapshot_free(snapshot);
