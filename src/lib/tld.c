@@ -25,7 +25,7 @@
 #endif
 
 #ifdef LINUX
-#define __USE_BSD
+#define _GNU_SOURCE // asprintf() and friends on glibc and musl
 #endif
 
 #include <stdio.h>
