@@ -103,17 +103,156 @@ bool is_ipv4(const char* str, const size_t n)
 	return ndots == 3;
 }
 
+/*
+ * Numeric IPv4 hosts as browsers parse them (WHATWG URL "IPv4 parser", issue #104):
+ * 1 to 4 dot-separated numbers, each decimal, hexadecimal ("0x7f") or octal
+ * ("0177"); the last number fills the remaining bytes. So 2130706433, 0x7f000001,
+ * 0177.0.0.1, 0x7f.1 and 127.1 are all 127.0.0.1. A trailing dot is ignored.
+ */
+static bool is_ipv4_numeric(const char *str, const size_t n)
+{
+	size_t len = n;
+	size_t i = 0;
+	int parts = 0;
+	uint64_t value[4];
+
+	if (len == 0) {
+		return false;
+	}
+	if (str[len - 1] == '.') {
+		len--;
+		if (len == 0) {
+			return false;
+		}
+	}
+
+	while (i <= len) {
+		size_t j = i;
+		int base = 10;
+		uint64_t v = 0;
+
+		if (parts == 4) {
+			return false;
+		}
+		while ((j < len) && (str[j] != '.')) {
+			j++;
+		}
+		if (j == i) {
+			return false; /* empty number */
+		}
+		if ((j - i >= 2) && (str[i] == '0') && ((str[i+1] == 'x') || (str[i+1] == 'X'))) {
+			base = 16;
+			i += 2;
+		} else if ((j - i >= 2) && (str[i] == '0')) {
+			base = 8;
+			i += 1;
+		}
+		for (; i < j; i++) {
+			int d;
+			char c = str[i];
+			if ((c >= '0') && (c <= '9')) {
+				d = c - '0';
+			} else if ((base == 16) && (c >= 'a') && (c <= 'f')) {
+				d = c - 'a' + 10;
+			} else if ((base == 16) && (c >= 'A') && (c <= 'F')) {
+				d = c - 'A' + 10;
+			} else {
+				return false;
+			}
+			if (d >= base) {
+				return false;
+			}
+			v = v * (uint64_t)base + (uint64_t)d;
+			if (v > 0xFFFFFFFFULL) {
+				return false;
+			}
+		}
+		value[parts++] = v;
+		i = j + 1;
+	}
+
+	/* every number but the last is one byte; the last one fills what is left */
+	for (i = 0; i + 1 < (size_t)parts; i++) {
+		if (value[i] > 255) {
+			return false;
+		}
+	}
+	return value[parts - 1] < (1ULL << (8 * (5 - parts)));
+}
+
+/* Validate an IPv6 literal, with or without brackets: up to 8 groups of 1-4 hex digits,
+ * a single "::" allowed, an optional embedded IPv4 as last group (issue #105). */
 bool is_ipv6(const char* str, const size_t n)
 {
-        if (n < 3) {
-                return false;
+	const char *s = str;
+	size_t len = n;
+	size_t i = 0;
+	int groups = 0;
+	bool double_colon = false;
+
+	if ((len >= 2) && (s[0] == '[')) {
+		if (s[len-1] != ']') {
+			return false;
+		}
+		s++;
+		len -= 2;
+	}
+	if (len < 2) {
+		return false;
 	}
 
-	if ((str[0] == '[') && (str[n-1] == ']')) {
-                return true;
+	while (i < len) {
+		if (s[i] == ':') {
+			if ((i + 1 < len) && (s[i+1] == ':')) {
+				if (double_colon) {
+					return false; /* only one "::" */
+				}
+				double_colon = true;
+				i += 2;
+				continue;
+			}
+			if (i == 0) {
+				return false; /* leading single ':' */
+			}
+			i++;
+			if (i == len) {
+				return false; /* trailing single ':' */
+			}
+			continue;
+		}
+		{
+			size_t j = i;
+			size_t glen;
+			while ((j < len) && (s[j] != ':')) {
+				j++;
+			}
+			glen = j - i;
+			if (memchr(s + i, '.', glen)) {
+				/* embedded IPv4 ("::ffff:1.2.3.4") must be the last group */
+				if ((j != len) || !is_ipv4(s + i, glen)) {
+					return false;
+				}
+				groups += 2;
+			} else {
+				size_t k;
+				if (glen > 4) {
+					return false;
+				}
+				for (k = i; k < j; k++) {
+					if (!isxdigit((unsigned char)s[k])) {
+						return false;
+					}
+				}
+				groups++;
+			}
+			if (groups > 8) {
+				return false;
+			}
+			i = j;
+		}
 	}
 
-	return false;
+	return double_colon ? (groups < 8) : (groups == 8);
 }
 
 const char *faup_decode(faup_handler_t *fh, const char *url, size_t url_len)
@@ -212,6 +351,9 @@ const char *faup_decode(faup_handler_t *fh, const char *url, size_t url_len)
 
 				bool ipv4_host = is_ipv4(host, total_size);
 				bool ipv6_host = is_ipv6(host, total_size);
+				if (!ipv4_host && !ipv6_host && is_ipv4_numeric(host, total_size)) {
+					ipv4_host = true;
+				}
 				if (!ipv4_host && !ipv6_host) {
 					uint32_t tld_pos;
 					uintptr_t tld_len;

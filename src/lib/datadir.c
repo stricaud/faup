@@ -209,15 +209,19 @@ char *faup_datadir_file_to_write(char *file, bool to_symlink)
 	char *datadir_file = NULL;
 	datadir_file = faup_datadir_get_file(file, to_symlink);
 	if (datadir_file) {
-		FILE *fp;
-		fp = fopen(datadir_file, "w");
-		if (!fp) {
-		    free(datadir_file);
-			return faup_datadir_get_file_from_home(file, to_symlink);
-		} else {
-			return datadir_file;
-			fclose(fp);
+		/* Check that we could replace the file, without truncating it: a failed
+		 * download later must leave the current file intact (issue #81) */
+		char *slash = strrchr(datadir_file, FAUP_OS_DIRSEP_C);
+		bool writable = false;
+		if (slash) {
+			*slash = '\0';
+			writable = (access(datadir_file, W_OK) == 0);
+			*slash = FAUP_OS_DIRSEP_C;
 		}
+		if (writable) {
+			return datadir_file;
+		}
+		free(datadir_file);
 	}
 
 	return faup_datadir_get_file_from_home(file, to_symlink);

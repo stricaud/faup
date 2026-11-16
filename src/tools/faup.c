@@ -221,7 +221,7 @@ void print_help(char **argv)
 	printf("-h\tprint this help\n");
 	printf("-l\tprefix with the line number (csv only)\n");
 #ifdef FAUP_LUA_MODULES
-	printf("-m\t{module1 module2 module3}\n\tLoad the modules in the given order.\n\tIf empty, load no modules. If this option is not provided, modules in the shared data in modules_enabled will be loaded by default\n");
+	printf("-m\t{module1.lua module2.lua ...}\n\tLoad the modules in the given order (a module that cannot be found is an error).\n\tThe last argument is the url or file to parse unless it ends with .lua. If this option is not provided, modules in the shared data in modules_enabled will be loaded by default\n");
 #endif
 	printf("-o {csv,json,module}\n\toutput csv or json at your convenience. You can also just let the modules handle it.\n");
 	printf("-p\tprint the header\n");
@@ -330,33 +330,33 @@ int main(int argc, char **argv)
 	    faup_opts->print_line = 1;
 	    break;
 	  case 'm':
-	  	for (optind--;optind < argc - 1;) {
-	  		// In case we parse the next option, we shall stop!
-	  		if (argv[optind][0] == '-') {
-	  			break;
-	  		} 
-
-	  		optind++;
-
-	  		if (!has_module) {
-	  			// This is our first argument
-	  			// we push our first arg: 'optarg'
-	  			if (push_module_arg(faup_opts, optarg) < 0) {
-	  				exit(1);
-	  			}
-	  			has_module = 1;
+#ifndef FAUP_LUA_MODULES
+	  	fprintf(stderr, "Error: this faup was built without Lua support, modules (-m) are not available.\n");
+	  	faup_options_free(faup_opts);
+	  	exit(1);
+#endif
+	  	/* Module names follow -m up to the next option. The last non-option argument
+	  	 * is the URL or file to parse unless it is itself a module (ends with ".lua"),
+	  	 * so that both "faup -m mod.lua url" and "cat urls | faup -m mod.lua" work. */
+	  	if (optarg[0] == '-') {
+	  		fprintf(stderr, "Error: -m requires a module name\n");
+	  		faup_options_free(faup_opts);
+	  		exit(1);
+	  	}
+	  	if (push_module_arg(faup_opts, optarg) < 0) {
+	  		exit(1);
+	  	}
+	  	has_module = 1;
+	  	while ((optind < argc) && (argv[optind][0] != '-')) {
+	  		size_t arglen = strlen(argv[optind]);
+	  		bool is_lua = (arglen > 4) && !strcmp(argv[optind] + arglen - 4, ".lua");
+	  		if ((optind == argc - 1) && !is_lua) {
+	  			break; /* the URL or file argument */
 	  		}
-	  		
-
-	  		// In case we parse the next option, we shall stop!
-	  		// In case the next argument is the last, that means this is the url, not the module
-	  		if ((argv[optind][0] == '-') | (optind == argc - 1)) {
-	  			break;
-	  		}
-
 	  		if (push_module_arg(faup_opts, argv[optind]) < 0) {
 	  			exit(1);
 	  		}
+	  		optind++;
 	  	}
 
 	  	if (has_module) {
@@ -402,9 +402,9 @@ int main(int argc, char **argv)
 	  	faup_options_disable_tld_above_one(faup_opts);
 	  	break;
 	  case 'u':
-	  	faup_tld_update();
+	  	ret = faup_tld_update();
 		faup_options_free(faup_opts);
-	  	exit(0);
+	  	exit(ret == 0 ? 0 : 1);
 	  	break;
 	  case 'v':
 	    printf("faup v%s\n", faup_get_version());
@@ -461,6 +461,19 @@ int main(int argc, char **argv)
 	if (!fh) {
 		fh = faup_init(faup_opts);
 	}
+	if (!fh) {
+		fprintf(stderr, "Error: cannot initialize faup\n");
+		faup_options_free(faup_opts);
+		exit(1);
+	}
+#ifdef FAUP_LUA_MODULES
+	if ((faup_opts->exec_modules == FAUP_MODULES_EXECARG) && !fh->modules) {
+		// The requested module(s) could not be loaded (issue #90)
+		faup_options_free(faup_opts);
+		faup_terminate(fh);
+		exit(1);
+	}
+#endif
 
 //	printf("Lart arg:'%s'\n", argv[optind+1]);
 

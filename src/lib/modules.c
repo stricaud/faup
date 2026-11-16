@@ -166,7 +166,12 @@ faup_modules_t *faup_modules_load_from_arg(char **argv, int argc)
 				}
 				fclose(fp);
 			} else {
-				fprintf(stderr, "Cannot register the module '%s': Not found in modules_available nor local path!\n", argv[count]);
+				// A requested module that cannot be loaded is an error, not something to
+				// silently skip (issue #90)
+				fprintf(stderr, "Cannot load the module '%s': not found in modules_available nor as a local file!\n", argv[count]);
+				free(available_module);
+				faup_modules_terminate(modules);
+				return NULL;
 			}
 			free(available_module);
 
@@ -298,6 +303,11 @@ faup_modules_transformed_url_t *faup_modules_decode_url_start(faup_handler_t con
 
 	// For every loaded module, we run the function 'faup_url_in'
 	for (count=0; count < modules->nb_modules; count++) {
+			// Drop what the previous URL left on the Lua stack (the faup_url_in result and the
+			// faup_output results stay there until now because faup keeps pointers into them).
+			// Without this the stack grows with every URL until Lua aborts (issue #89).
+			lua_settop(modules->module[count].lua_state, 0);
+
 			lua_getglobal(modules->module[count].lua_state, "faup_url_in");
 			if (!new_url) {
 				lua_pushstring(modules->module[count].lua_state, url);
@@ -307,9 +317,8 @@ faup_modules_transformed_url_t *faup_modules_decode_url_start(faup_handler_t con
 			retval = lua_pcall(modules->module[count].lua_state, 1, 1, 0);
 			if (retval) {
 				// This module has no faup_url_in function. Nothing wrong here, we can continue
+				lua_settop(modules->module[count].lua_state, 0);
 				continue;
-				//fprintf(stderr, "*** Error(%s): %s\n", __FUNCTION__, lua_tostring(modules->module[count].lua_state, -1));
-				//return NULL;
 			}
 
 			new_url = lua_tostring(modules->module[count].lua_state, -1);	
@@ -377,8 +386,8 @@ bool faup_modules_url_output(faup_handler_t *fh, FILE* out)
 	for (count = 0; count < modules->nb_modules; count++) {
 		lua_getglobal(modules->module[count].lua_state, "faup_output");
 		if(!lua_isfunction(modules->module[count].lua_state, -1)) {
-			//printf("No such function: 'faup_output'\n");
 			// Since that function does not exists in the module, we skip it!
+			lua_pop(modules->module[count].lua_state, 1);
 			continue;
 		}
 
@@ -403,8 +412,12 @@ bool faup_modules_url_output(faup_handler_t *fh, FILE* out)
 		_faup_add_keyvalstr_dict(modules, count, "url_type", faup_output_get_string_from_url_type(fh));
 		
 
-		// If the function does not exists, we just ignore it
+		// The two results stay on the stack until the next URL: fh->faup.org_str may point into them
 		retval = lua_pcall(modules->module[count].lua_state, 2, 2, 0);
+		if (retval != 0) {
+			fprintf(stderr, "*** Error(%s)[in script:%s]: %s\n", __FUNCTION__, modules->module[count].module_path, lua_tostring(modules->module[count].lua_state, -1));
+			lua_pop(modules->module[count].lua_state, 1);
+		}
 		if (retval == 0) {
 			module_executed = true;
 			transformed_url = lua_tostring(modules->module[count].lua_state, -1);

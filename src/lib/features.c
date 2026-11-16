@@ -95,6 +95,18 @@ int faup_features_errors_lookup(faup_features_t const* url_features)
 	return 0;
 }
 
+
+/* True when url[from, to) contains only hexadecimal digits and colons */
+static bool faup_features_is_hex_and_colons(const char *url, ssize_t from, ssize_t to)
+{
+	ssize_t i;
+	if (from < 0) return false;
+	for (i = from; i < to; i++) {
+		if ((url[i] != ':') && !isxdigit((unsigned char)url[i])) return false;
+	}
+	return true;
+}
+
 void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_len)
 {
 	faup_features_t* url_features = &fh->faup.features;
@@ -108,6 +120,7 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 
 	faup_last_slash_t last_slash_meaning = FAUP_LAST_SLASH_NOTFOUND;
 	char host_is_ipv6 = 0;
+	char host_is_bare_ipv6 = 0; /* IPv6 literal without brackets: ends at '/', '?' or '#' */
 
 	ssize_t current_pos = 0;
 	ssize_t buffer_pos = 0;
@@ -134,8 +147,14 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 		/* printf("reading %c, bufferpos=%d\n", c, buffer_pos); */
 
 		if (host_is_ipv6 && c != ']') {
-			current_pos++;
-		        continue;
+			if (host_is_bare_ipv6 && ((c == '/') || (c == '?') || (c == '#'))) {
+				/* End of the unbracketed literal: this char is processed normally */
+				host_is_ipv6 = 0;
+				host_is_bare_ipv6 = 0;
+			} else {
+				current_pos++;
+				continue;
+			}
 		}
 
 		switch(c) {
@@ -231,12 +250,21 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 						    if (url_features->host.pos < 0) {
 						      url_features->host.pos = current_pos;
 						      host_is_ipv6 = 1;
-						      fh->faup.url_type = FAUP_URL_IPV6;
+						      host_is_bare_ipv6 = 1;
+						      /* url_type is decided by faup_decode() once the literal is validated */
 						    }
 
 						  }
 						}
 					}
+				} else if (!host_is_ipv6 && (last_slash_meaning < FAUP_LAST_SLASH_AFTER_DOMAIN)
+					   && faup_features_exist(url_features->host) && !faup_features_exist(url_features->credential)
+					   && faup_features_is_hex_and_colons(url_o, url_features->host.pos, current_pos)) {
+					/* A second ':' in the authority, with only hex digits and colons so far:
+					 * this is an IPv6 literal without brackets ("2001:db8::1"), not host:port (issue #105) */
+					url_features->port.pos = -1;
+					host_is_ipv6 = 1;
+					host_is_bare_ipv6 = 1;
 				}
 
 				buffer_pos=-1;
@@ -296,7 +324,20 @@ void faup_features_find(faup_handler_t *fh, const char *url, const size_t url_le
 			    break;
 		    case ']':
 			    host_is_ipv6 = 0; /* We stop handle the special IPv6 case*/
+			    host_is_bare_ipv6 = 0;
 			    break;
+			case '\\':
+				/* Browsers treat a backslash like a slash after the host of http(s) and file
+				 * URLs ("http://github.com\contact", "file://c:\program.exe", issue #75).
+				 * We do the same, except for the "\/" escape some credentials use. */
+				if ((next_c != '/') && faup_features_exist(url_features->host)
+				    && (last_slash_meaning < FAUP_LAST_SLASH_AFTER_DOMAIN)
+				    && !faup_features_exist(url_features->resource_path)) {
+					last_slash_meaning = FAUP_LAST_SLASH_AFTER_DOMAIN;
+					url_features->resource_path.pos = current_pos;
+				}
+				buffer_pos=-1;
+				break;
 			default:
 				//fh->allocated_buf[buffer_pos] = c;
 				if (current_pos == 0) {

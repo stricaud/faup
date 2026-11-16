@@ -37,6 +37,7 @@
 #ifndef WIN32
 #include <unistd.h>
 #include <pwd.h>
+#include <sys/wait.h>
 #endif // WIN32
 
 #include <faup/faup.h>
@@ -48,48 +49,104 @@
 
 static UT_array *_tlds = NULL;
 
-// FIXME: We should make this code work for native Windows API
+/*
+ * Download the public suffix list with curl (or $FAUP_DOWNLOAD_PROGRAM, which receives
+ * "<url> --output <file>") into a temporary file, and replace the current list only
+ * when the download succeeded: a failure must not leave an empty or HTML "list"
+ * behind (issues #79 and #81). Returns 0 on success, -1 otherwise.
+ */
 int faup_tld_download_mozilla_list(char *store_to_file) 
 {
+#ifdef WIN32
+	fprintf(stderr, "Downloading the TLD list is not supported on Windows. Fetch %s to %s yourself.\n", MOZILLA_TLD_LIST_URL, store_to_file);
+	return -1;
+#else
 	char *download_program;
-	char *newargv[] = { NULL, MOZILLA_TLD_LIST_URL, "--output", store_to_file, NULL };
-	char *newenviron[] = { NULL };
-	int retval = -1;
-	
-	fprintf(stdout, "Downloading new TLD list to %s\n", store_to_file);
+	char *tmp_file = NULL;
+	char *curl_argv[] = { NULL, "--fail", "--silent", "--show-error", "--location", MOZILLA_TLD_LIST_URL, "--output", NULL, NULL };
+	char *custom_argv[] = { NULL, MOZILLA_TLD_LIST_URL, "--output", NULL, NULL };
+	char **newargv;
+	pid_t pid;
+	int status;
+	struct stat st;
+	int retval;
 
 	download_program = getenv("FAUP_DOWNLOAD_PROGRAM");
+	retval = asprintf(&tmp_file, "%s.download", store_to_file);
+	if (retval < 0) {
+		fprintf(stderr, "Cannot allocate the temporary download path\n");
+		return -1;
+	}
 	if (!download_program) {
-		newargv[0] = "/usr/bin/curl";
+		download_program = "/usr/bin/curl";
+		curl_argv[0] = download_program;
+		curl_argv[7] = tmp_file;
+		newargv = curl_argv;
 	} else {
-		newargv[0] = download_program;
+		custom_argv[0] = download_program;
+		custom_argv[3] = tmp_file;
+		newargv = custom_argv;
 	}
 
-	if (!newargv[0]) {
+	fprintf(stdout, "Downloading new TLD list to %s\n", store_to_file);
+
+	pid = fork();
+	if (pid < 0) {
+		fprintf(stderr, "Cannot fork to run %s: %s\n", download_program, strerror(errno));
+		free(tmp_file);
 		return -1;
 	}
-	retval = execve(newargv[0], newargv, newenviron);
-	if (retval == -1) {
-		fprintf(stderr, "execve on %s failed. Reason: %s\n", newargv[0], strerror(errno));
+	if (pid == 0) {
+		execv(download_program, newargv);
+		fprintf(stderr, "Cannot run %s: %s\n", download_program, strerror(errno));
+		_exit(127);
+	}
+	if (waitpid(pid, &status, 0) < 0) {
+		fprintf(stderr, "Cannot wait for %s: %s\n", download_program, strerror(errno));
+		unlink(tmp_file);
+		free(tmp_file);
 		return -1;
 	}
+	if (!WIFEXITED(status) || (WEXITSTATUS(status) != 0)) {
+		fprintf(stderr, "Download failed (%s exited with status %d). Keeping the current %s.\n",
+			download_program, WIFEXITED(status) ? WEXITSTATUS(status) : -1, store_to_file);
+		unlink(tmp_file);
+		free(tmp_file);
+		return -1;
+	}
+	/* The real list is several hundred KB; anything tiny is an error page or an empty file */
+	if ((stat(tmp_file, &st) < 0) || (st.st_size < 10000)) {
+		fprintf(stderr, "Download of %s produced no usable list. Keeping the current %s.\n", MOZILLA_TLD_LIST_URL, store_to_file);
+		unlink(tmp_file);
+		free(tmp_file);
+		return -1;
+	}
+	if (rename(tmp_file, store_to_file) < 0) {
+		fprintf(stderr, "Cannot install the new list as %s: %s\n", store_to_file, strerror(errno));
+		unlink(tmp_file);
+		free(tmp_file);
+		return -1;
+	}
+	free(tmp_file);
 
 	return 0;
+#endif
 }
 
 int faup_tld_update(void)
 {
 	char *tld_file;
+	int retval;
 
 	tld_file = faup_datadir_file_to_write(faup_tld_get_filename(), false);
-	if (tld_file) {
-		faup_tld_download_mozilla_list(tld_file);
-		free(tld_file);
-	} else {
+	if (!tld_file) {
+		fprintf(stderr, "Cannot find a writable location for the TLD list\n");
 		return -1;
 	}
+	retval = faup_tld_download_mozilla_list(tld_file);
+	free(tld_file);
 
-	return 0;
+	return retval;
 }
 
 int faup_tld_array_populate(void)
