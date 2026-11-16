@@ -14,6 +14,10 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 
+#ifdef LINUX
+#define _GNU_SOURCE // asprintf() and friends: must come before any system header
+#endif
+
 #ifdef WIN32
  	#include <winsock2.h>
  	#pragma comment(lib,"ws2_32.lib")
@@ -24,9 +28,6 @@
 	#include <sys/stat.h>
 #endif
 
-#ifdef LINUX
-#define _GNU_SOURCE // asprintf() and friends on glibc and musl
-#endif
 
 #include <stdio.h>
 #include <ctype.h>

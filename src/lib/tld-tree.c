@@ -16,13 +16,14 @@
  * 
  */
 
+#ifdef LINUX
+#define _GNU_SOURCE // asprintf() and friends: must come before any system header
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef LINUX
-#define _GNU_SOURCE // asprintf() and friends on glibc and musl
-#endif
 
 
 #include <faup/faup.h>
